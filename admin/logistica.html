@@ -26,8 +26,8 @@
       <div id="banner-novo-pedido"></div>
 
       <!-- Filtros -->
-      <div class="filter-tabs" id="filtros">
-        <button class="filter-tab filter-tab--ativo" data-status="todos" onclick="filtrar('todos')">Todos <span class="filter-count" id="cnt-todos">0</span></button>
+      <div class="filter-tabs mb-15" id="filtros">
+        <button class="filter-tab filter-tab--active" data-status="todos"     onclick="filtrar('todos')">Todos <span class="filter-count" id="cnt-todos">0</span></button>
         <button class="filter-tab" data-status="pendente"   onclick="filtrar('pendente')">Pendente <span class="filter-count" id="cnt-pendente">0</span></button>
         <button class="filter-tab" data-status="em_preparo" onclick="filtrar('em_preparo')">Em preparo <span class="filter-count" id="cnt-em_preparo">0</span></button>
         <button class="filter-tab" data-status="saiu"       onclick="filtrar('saiu')">Saiu <span class="filter-count" id="cnt-saiu">0</span></button>
@@ -54,27 +54,29 @@
     <div class="modal__body">
       <div class="form-row" style="margin-bottom:.875rem">
         <div class="form-group" style="margin-bottom:0">
-          <label>Vendedor (editar antes de copiar)</label>
-          <input type="text" id="comanda-vendedor" placeholder="Nome do vendedor" value="Site Online">
+          <label>Vendedor</label>
+          <input class="form-input" type="text" id="comanda-vendedor" placeholder="Nome do vendedor" value="Site Online">
         </div>
         <div class="form-group" style="margin-bottom:0">
           <label>Taxa de entrega (R$)</label>
-          <input type="number" id="comanda-taxa" placeholder="0,00" step="0.50" min="0">
+          <input class="form-input" type="number" id="comanda-taxa" placeholder="0,00" step="0.50" min="0">
         </div>
       </div>
       <div class="comanda-box">
         <div class="comanda-header">
           <span class="comanda-label">Comanda</span>
-          <button class="btn btn--gold btn--sm" onclick="atualizarComanda()">↻ Atualizar</button>
+          <button class="btn btn--outline btn--sm" onclick="atualizarComanda()">↻ Atualizar</button>
         </div>
         <div class="comanda-text" id="comanda-texto"></div>
       </div>
     </div>
     <div class="modal__footer">
       <button class="btn btn--outline" onclick="fecharModal('modal-comanda')">Fechar</button>
+      <button class="btn btn--primary" id="btn-enviar-motoboy" style="display:none" onclick="enviarParaMotoboy()">
+        📱 Enviar para Motoboy
+      </button>
       <button class="btn btn--primary" onclick="copiarComanda()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-        Copiar Comanda
+        📋 Copiar Comanda
       </button>
     </div>
   </div>
@@ -83,9 +85,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../js/admin-core.js"></script>
 <script>
-let todosPedidos = [];
-let motoboys     = [];
-let filtroAtivo  = 'todos';
+let todosPedidos  = [];
+let motoboys      = [];
+let filtroAtivo   = 'todos';
 let pedidoComanda = null;
 
 (async () => {
@@ -93,7 +95,6 @@ let pedidoComanda = null;
   const profile = await requireAuth(['admin', 'logistica']);
   if (!profile) return;
   atualizarBadgePendentes();
-
   await Promise.all([carregarMotoboys(), carregarPedidos()]);
   setupRealtime();
 })();
@@ -106,11 +107,11 @@ async function carregarMotoboys() {
 async function carregarPedidos() {
   const { data, error } = await db
     .from('pedidos')
-    .select(`*, clientes(nome, telefone, cpf), itens_pedido(cesta_nome, cesta_peso, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa_entrega, motoboys(nome))`)
+    .select('*, clientes(nome, telefone), itens_pedido(cesta_nome, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa, motoboys(nome, telefone))')
     .order('created_at', { ascending: false })
-    .limit(100);
+    .limit(200);
 
-  if (error) { toast('Erro ao carregar pedidos', 'error'); return; }
+  if (error) { toast('Erro ao carregar pedidos: ' + error.message, 'error'); return; }
   todosPedidos = data || [];
   atualizarContadores();
   renderPedidos();
@@ -122,7 +123,7 @@ function atualizarContadores() {
     const s = p.entregas?.[0]?.status || 'pendente';
     if (counts[s] !== undefined) counts[s]++;
   });
-  Object.entries(counts).forEach(([k, v]) => {
+  Object.entries(counts).forEach(([k,v]) => {
     const el = document.getElementById('cnt-' + k);
     if (el) el.textContent = v;
   });
@@ -130,7 +131,7 @@ function atualizarContadores() {
 
 function filtrar(status) {
   filtroAtivo = status;
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('filter-tab--ativo', t.dataset.status === status));
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('filter-tab--active', t.dataset.status === status));
   renderPedidos();
 }
 
@@ -144,78 +145,109 @@ function renderPedidos() {
     lista.innerHTML = `<div class="empty-state"><div class="empty-state__icon">📦</div><p>Nenhum pedido ${filtroAtivo !== 'todos' ? 'com esse status' : 'encontrado'}.</p></div>`;
     return;
   }
-
   lista.innerHTML = filtrados.map(p => cardPedido(p)).join('');
 }
 
 function cardPedido(p) {
-  const entrega = p.entregas?.[0] || {};
-  const status  = entrega.status || 'pendente';
-  const cliente = p.clientes    || {};
-  const isNovo  = (Date.now() - new Date(p.created_at)) < 5 * 60 * 1000;
+  const entrega  = p.entregas?.[0] || {};
+  const status   = entrega.status || 'pendente';
+  const cliente  = p.clientes || {};
+  const isNovo   = (Date.now() - new Date(p.created_at)) < 5 * 60 * 1000;
+  const motoboy  = entrega.motoboys || null;
 
   const enderecoStr = p.forma_entrega === 'entrega'
-    ? `${p.logradouro || ''}, ${p.numero_end || ''} — ${p.bairro || ''}`
+    ? [p.logradouro, p.numero_end, p.bairro].filter(Boolean).join(', ') || '—'
     : '🏪 Retirada na loja';
 
+  const pgto = { pix:'💠 PIX', cartao:'💳 Cartão', avista:'💵 À vista', dinheiro:'💵 Dinheiro' };
+
   const itensHTML = (p.itens_pedido || []).map(i => `
-    <div class="pedido-itens-box" style="margin-bottom:.4rem">
-      <div class="pedido-itens-nome">${i.cesta_nome} × ${i.quantidade} — <strong>${fmtR$(i.preco * i.quantidade)}</strong></div>
-      <div class="pedido-itens-lista">${(i.itens_selecionados || []).join(', ')}</div>
+    <div style="margin-bottom:.3rem">
+      <div style="font-weight:600;font-size:.85rem">${i.cesta_nome} × ${i.quantidade} — <span style="color:var(--navy)">${fmtR$(i.preco * i.quantidade)}</span></div>
+      ${(i.itens_selecionados||[]).length ? `<div style="font-size:.75rem;color:var(--text-muted)">${(i.itens_selecionados||[]).join(', ')}</div>` : ''}
     </div>`).join('');
 
   const motoboyOpts = motoboys.map(m =>
-    `<option value="${m.id}" ${entrega.motoboy_id === m.id ? 'selected' : ''}>${m.nome}</option>`
+    `<option value="${m.id}" ${entrega.motoboy_id === m.id ? 'selected':''}>${m.nome}</option>`
   ).join('');
 
+  const btnMotoboy = (status === 'saiu' && motoboy?.telefone)
+    ? `<button class="btn btn--sm" style="background:#25d366;color:#fff;border:none" onclick="notificarMotoboy('${p.id}')">📱 Notificar Motoboy</button>`
+    : '';
+
+  const troco = (p.troco_para && p.forma_pagamento === 'dinheiro')
+    ? `<div class="pedido-info-item"><label>Troco</label><span>Para ${fmtR$(p.troco_para)}</span></div>` : '';
+
   return `
-  <div class="pedido-card ${isNovo ? 'pedido-card--novo' : ''}" id="card-${p.id}">
+  <div class="pedido-card ${isNovo ? 'pedido-card--novo':''}" id="card-${p.id}">
     <div class="pedido-card__header">
-      <div style="display:flex;align-items:center;gap:.625rem;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
         <span class="pedido-card__num">#${p.numero}</span>
         ${badgeStatus(status)}
-        ${isNovo ? '<span class="badge" style="background:#fdf6e3;color:#a87e00">🆕 Novo</span>' : ''}
+        ${isNovo ? '<span class="badge" style="background:#fdf6e3;color:#a87e00;font-size:.7rem">🆕 Novo</span>' : ''}
+        ${motoboy ? `<span class="badge badge--logistica" style="font-size:.7rem">🛵 ${motoboy.nome}</span>` : ''}
       </div>
       <span class="pedido-card__hora">${fmtDataHora(p.created_at)} · ${tempoAtras(p.created_at)}</span>
     </div>
     <div class="pedido-card__body">
       <div class="pedido-info-grid">
         <div class="pedido-info-item"><label>Cliente</label><span><strong>${cliente.nome || '—'}</strong></span></div>
-        <div class="pedido-info-item"><label>Telefone</label><span><a href="tel:${cliente.telefone}" style="color:var(--navy)">${cliente.telefone || '—'}</a></span></div>
+        <div class="pedido-info-item"><label>Telefone</label><span><a href="https://wa.me/55${(cliente.telefone||'').replace(/\D/g,'')}" target="_blank" style="color:var(--navy)">${cliente.telefone || '—'}</a></span></div>
         <div class="pedido-info-item"><label>Endereço</label><span>${enderecoStr}</span></div>
-        <div class="pedido-info-item"><label>Pagamento</label><span>${p.forma_pagamento === 'pix' ? '💠 PIX' : '💳 Cartão'}</span></div>
+        <div class="pedido-info-item"><label>Pagamento</label><span>${pgto[p.forma_pagamento] || p.forma_pagamento || '—'}</span></div>
+        ${troco}
       </div>
-      ${itensHTML}
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">${itensHTML}</div>
     </div>
     <div class="pedido-card__footer">
       <span class="pedido-card__total">${fmtR$(p.total)}</span>
-      <select class="status-select" onchange="atualizarStatus('${p.id}','${entrega.id||''}',this.value)">
-        <option value="pendente"   ${status==='pendente'   ?'selected':''}>Pendente</option>
-        <option value="em_preparo" ${status==='em_preparo' ?'selected':''}>Em preparo</option>
-        <option value="saiu"       ${status==='saiu'       ?'selected':''}>Saiu para entrega</option>
-        <option value="entregue"   ${status==='entregue'   ?'selected':''}>Entregue</option>
-        <option value="cancelado"  ${status==='cancelado'  ?'selected':''}>Cancelado</option>
-      </select>
-      ${motoboyOpts ? `<select class="motoboy-select" onchange="atribuirMotoboy('${entrega.id||''}','${p.id}',this.value)"><option value="">🛵 Motoboy</option>${motoboyOpts}</select>` : ''}
-      <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">📋 Comanda</button>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        <select class="status-select" onchange="atualizarStatus('${p.id}','${entrega.id||''}',this.value)">
+          <option value="pendente"   ${status==='pendente'  ?'selected':''}>Pendente</option>
+          <option value="em_preparo" ${status==='em_preparo'?'selected':''}>Em preparo</option>
+          <option value="saiu"       ${status==='saiu'      ?'selected':''}>Saiu p/ entrega</option>
+          <option value="entregue"   ${status==='entregue'  ?'selected':''}>Entregue</option>
+          <option value="cancelado"  ${status==='cancelado' ?'selected':''}>Cancelado</option>
+        </select>
+        ${motoboyOpts ? `<select class="motoboy-select" onchange="atribuirMotoboy('${entrega.id||''}','${p.id}',this.value)"><option value="">🛵 Motoboy</option>${motoboyOpts}</select>` : ''}
+        ${btnMotoboy}
+        <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">📋 Comanda</button>
+      </div>
     </div>
   </div>`;
 }
 
 async function atualizarStatus(pedidoId, entregaId, novoStatus) {
+  const extra = {};
+  if (novoStatus === 'saiu')     extra.saiu_em     = new Date().toISOString();
+  if (novoStatus === 'entregue') extra.entregue_em = new Date().toISOString();
+
   if (entregaId) {
-    const extra = {};
-    if (novoStatus === 'saiu')     extra.saiu_em     = new Date().toISOString();
-    if (novoStatus === 'entregue') extra.entregue_em = new Date().toISOString();
-    await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', entregaId);
+    const { error } = await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', entregaId);
+    if (error) { toast('Erro ao atualizar status', 'error'); return; }
   } else {
-    const { data: nova } = await db.from('entregas').insert({ pedido_id: pedidoId, status: novoStatus }).select('id').single();
+    const { data: nova, error } = await db.from('entregas').insert({ pedido_id: pedidoId, status: novoStatus }).select('id').single();
+    if (error) { toast('Erro ao criar entrega', 'error'); return; }
     if (nova) {
       todosPedidos = todosPedidos.map(p => p.id === pedidoId ? { ...p, entregas: [{ id: nova.id, status: novoStatus }] } : p);
     }
   }
+
   const p = todosPedidos.find(x => x.id === pedidoId);
   if (p && p.entregas?.[0]) p.entregas[0].status = novoStatus;
+
+  // Notificação automática pro motoboy quando sai p/ entrega
+  if (novoStatus === 'saiu' && p) {
+    const motoboy = motoboys.find(m => m.id === p.entregas?.[0]?.motoboy_id);
+    if (motoboy?.telefone) {
+      const comanda = gerarComanda(p, 'Logística', p.entregas?.[0]?.taxa || '');
+      const tel = '55' + motoboy.telefone.replace(/\D/g,'');
+      const url = `https://wa.me/${tel}?text=${encodeURIComponent(comanda)}`;
+      toast(`🛵 Abrindo WhatsApp para ${motoboy.nome}...`, 'success');
+      setTimeout(() => window.open(url, '_blank'), 800);
+    }
+  }
+
   atualizarContadores();
   renderPedidos();
   atualizarBadgePendentes();
@@ -229,15 +261,41 @@ async function atribuirMotoboy(entregaId, pedidoId, motoboyId) {
     await db.from('entregas').update({ motoboy_id: motoboyId || null }).eq('id', entregaId);
   }
   const p = todosPedidos.find(x => x.id === pedidoId);
-  if (p) { if (!p.entregas) p.entregas = [{}]; p.entregas[0].motoboy_id = motoboyId; }
+  if (p) {
+    if (!p.entregas) p.entregas = [{}];
+    p.entregas[0].motoboy_id = motoboyId;
+    const mb = motoboys.find(m => m.id === motoboyId);
+    p.entregas[0].motoboys = mb || null;
+  }
+  renderPedidos();
   toast('Motoboy atribuído!');
+}
+
+function notificarMotoboy(pedidoId) {
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (!p) return;
+  const motoboy = motoboys.find(m => m.id === p.entregas?.[0]?.motoboy_id);
+  if (!motoboy?.telefone) { toast('Motoboy sem telefone cadastrado', 'warning'); return; }
+  const comanda = gerarComanda(p, 'Logística', p.entregas?.[0]?.taxa || '');
+  const tel = '55' + motoboy.telefone.replace(/\D/g,'');
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(comanda)}`, '_blank');
 }
 
 function abrirComandaModal(pedidoId) {
   pedidoComanda = todosPedidos.find(p => p.id === pedidoId);
   if (!pedidoComanda) return;
   document.getElementById('comanda-numero').textContent = pedidoComanda.numero;
-  document.getElementById('comanda-taxa').value = pedidoComanda.entregas?.[0]?.taxa_entrega || '';
+  document.getElementById('comanda-taxa').value = pedidoComanda.entregas?.[0]?.taxa || '';
+
+  const motoboy = motoboys.find(m => m.id === pedidoComanda.entregas?.[0]?.motoboy_id);
+  const btnMoto = document.getElementById('btn-enviar-motoboy');
+  if (motoboy?.telefone) {
+    btnMoto.style.display = '';
+    btnMoto.textContent = `📱 Enviar para ${motoboy.nome}`;
+  } else {
+    btnMoto.style.display = 'none';
+  }
+
   atualizarComanda();
   abrirModal('modal-comanda');
 }
@@ -252,23 +310,30 @@ function atualizarComanda() {
 async function copiarComanda() {
   const texto = document.getElementById('comanda-texto').textContent;
   await navigator.clipboard.writeText(texto);
-
-  // Salva taxa se alterada
   const taxa    = document.getElementById('comanda-taxa').value;
   const entrega = pedidoComanda?.entregas?.[0];
-  if (entrega?.id && taxa) await db.from('entregas').update({ taxa_entrega: parseFloat(taxa) || 0 }).eq('id', entrega.id);
-
-  toast('Comanda copiada! Cole no grupo 👍', 'success');
+  if (entrega?.id && taxa) await db.from('entregas').update({ taxa: parseFloat(taxa) || 0 }).eq('id', entrega.id);
+  toast('Comanda copiada! Cole no grupo 👍');
   fecharModal('modal-comanda');
+}
+
+function enviarParaMotoboy() {
+  if (!pedidoComanda) return;
+  const motoboy = motoboys.find(m => m.id === pedidoComanda.entregas?.[0]?.motoboy_id);
+  if (!motoboy?.telefone) { toast('Motoboy sem telefone cadastrado', 'warning'); return; }
+  const texto = document.getElementById('comanda-texto').textContent;
+  const tel   = '55' + motoboy.telefone.replace(/\D/g,'');
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+  toast(`Abrindo WhatsApp para ${motoboy.nome}...`);
 }
 
 function setupRealtime() {
   db.channel('logistica-realtime')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, async payload => {
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'pedidos' }, async payload => {
       beepNovoPedido();
       const { data: novoPedido } = await db
         .from('pedidos')
-        .select('*, clientes(nome, telefone, cpf), itens_pedido(cesta_nome, cesta_peso, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa_entrega, motoboys(nome))')
+        .select('*, clientes(nome, telefone), itens_pedido(cesta_nome, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa, motoboys(nome, telefone))')
         .eq('id', payload.new.id)
         .single();
 
@@ -278,7 +343,6 @@ function setupRealtime() {
         renderPedidos();
         atualizarBadgePendentes();
         mostrarBannerNovoPedido(novoPedido);
-
         if (Notification.permission === 'granted') {
           new Notification('🛒 Novo pedido — RR Distribuidora', {
             body: `#${novoPedido.numero} | ${novoPedido.clientes?.nome || 'Cliente'} | ${fmtR$(novoPedido.total)}`,
@@ -298,9 +362,9 @@ function mostrarBannerNovoPedido(p) {
       <span>🛒</span>
       <p><strong>Novo pedido #${p.numero}</strong> — ${p.clientes?.nome || 'Cliente'} — ${fmtR$(p.total)}</p>
       <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">Ver comanda</button>
-      <button class="btn btn--ghost btn--sm" style="color:white" onclick="this.closest('.novo-pedido-banner').remove()">✕</button>
+      <button class="btn btn--outline btn--sm" style="color:#fff;border-color:#fff" onclick="this.closest('.novo-pedido-banner').remove()">✕</button>
     </div>`;
-  setTimeout(() => { banner.querySelector('.novo-pedido-banner')?.remove(); }, 30000);
+  setTimeout(() => banner.querySelector('.novo-pedido-banner')?.remove(), 30000);
 }
 </script>
 </body>

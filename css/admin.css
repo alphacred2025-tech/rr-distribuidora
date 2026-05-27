@@ -201,9 +201,11 @@ input, select, textarea { font-family: var(--font); }
 .filter-tabs::-webkit-scrollbar { display: none; }
 .filter-tab { padding: .575rem 1.1rem; font-size: .835rem; font-weight: 500; color: var(--text-muted); background: none; border: none; border-bottom: 2.5px solid transparent; margin-bottom: -2px; cursor: pointer; white-space: nowrap; transition: all .18s; }
 .filter-tab:hover   { color: var(--navy); }
-.filter-tab--ativo  { color: var(--navy); font-weight: 700; border-bottom-color: var(--navy); }
+.filter-tab--ativo,
+.filter-tab--active  { color: var(--navy); font-weight: 700; border-bottom-color: var(--navy); }
 .filter-count       { display: inline-block; background: var(--gray-200); color: var(--gray-600); border-radius: 100px; padding: 0 .45rem; font-size: .68rem; font-weight: 700; margin-left: .3rem; }
-.filter-tab--ativo .filter-count { background: var(--navy); color: white; }
+.filter-tab--ativo .filter-count,
+.filter-tab--active .filter-count { background: var(--navy); color: white; }
 
 /* ── Search ──────────────────────────────────────────────────── */
 .search-wrap { position: relative; }
@@ -216,12 +218,15 @@ input, select, textarea { font-family: var(--font); }
 .form-group label { font-size: .8rem; font-weight: 600; color: var(--gray-800); }
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.form-input {
   padding: .575rem .8rem; border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-sm); font-size: .875rem;
   background: var(--white); color: var(--text); transition: border-color .18s;
+  font-family: var(--font); width: 100%;
 }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--navy); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus,
+.form-input:focus { outline: none; border-color: var(--navy); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .875rem; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .875rem; }
 .form-hint { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
