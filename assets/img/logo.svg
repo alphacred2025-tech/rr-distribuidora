@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 420">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&amp;display=swap');
+    </style>
+  </defs>
+  <!-- R1 background -->
+  <text x="12" y="280" font-family="'Arial Black', 'Arial', sans-serif" font-weight="900" font-size="260" fill="#1B3A87" letter-spacing="-8">RR</text>
+  <!-- Diagonal accent slash between the two Rs -->
+  <polygon points="242,20 258,20 268,280 252,280" fill="white" opacity="1"/>
+  <!-- DISTRIBUIDORA -->
+  <text x="18" y="370" font-family="'Arial', 'Helvetica', sans-serif" font-weight="700" font-size="46" fill="#1B3A87" letter-spacing="6">DISTRIBUIDORA</text>
+</svg>

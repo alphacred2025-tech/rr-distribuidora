@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="admin-header__titulo">Dashboard</span>
+      </div>
+      <div class="admin-header__right">
+        <div class="realtime-pill"><span class="realtime-dot"></span>Tempo real</div>
+        <span id="data-hoje" style="font-size:.8rem;color:var(--text-muted)"></span>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      <!-- KPIs -->
+      <div class="stats-grid" id="kpis">
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-card__label">Pedidos Hoje</div><div class="stat-card__valor" id="kpi-pedidos-hoje">—</div><div class="stat-card__sub">desde meia-noite</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Faturamento Hoje</div><div class="stat-card__valor" id="kpi-fat-hoje" style="font-size:1.35rem">—</div><div class="stat-card__sub">receitas confirmadas</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Em Aberto</div><div class="stat-card__valor" id="kpi-abertos">—</div><div class="stat-card__sub">pendente + preparo</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div class="stat-card__label">Entregues Hoje</div><div class="stat-card__valor" id="kpi-entregues">—</div><div class="stat-card__sub">concluídos no dia</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div class="stat-card__label">Total Clientes</div><div class="stat-card__valor" id="kpi-clientes">—</div><div class="stat-card__sub">cadastrados</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div><div class="stat-card__label">Faturamento Mês</div><div class="stat-card__valor" id="kpi-fat-mes" style="font-size:1.35rem">—</div><div class="stat-card__sub" id="kpi-mes-label">este mês</div></div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid-2 mb-15">
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">Faturamento — últimos 7 dias</span></div>
+          <div class="card__body"><div class="chart-wrap" style="height:200px"><canvas id="chart-fat"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">Pedidos por Status</span></div>
+          <div class="card__body"><div class="chart-wrap" style="height:200px"><canvas id="chart-status"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- Pedidos recentes -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__titulo">Pedidos Recentes</span>
+          <a href="logistica.html" class="btn btn--outline btn--sm">Ver todos →</a>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-recentes">
+            <thead><tr>
+              <th>Nº Pedido</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Entrega</th><th>Status</th><th>Hora</th>
+            </tr></thead>
+            <tbody id="tbody-recentes"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+(async () => {
+  renderSidebar('painel');
+  const profile = await requireAuth(['admin']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+
+  // Data de hoje
+  document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' });
+
+  await Promise.all([carregarKPIs(), carregarPedidosRecentes()]);
+  await carregarGraficos();
+
+  // Realtime
+  db.channel('dash-realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, () => {
+      carregarKPIs();
+      carregarPedidosRecentes();
+      atualizarBadgePendentes();
+    })
+    .subscribe();
+})();
+
+async function carregarKPIs() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const mesInicio = hoje.slice(0, 7) + '-01';
+
+  const [{ count: cHoje }, { data: dHoje }, { count: cAbertos }, { count: cEntregues }, { count: cClientes }, { data: dMes }] = await Promise.all([
+    db.from('pedidos').select('*', { count:'exact', head:true }).gte('created_at', hoje + 'T00:00:00'),
+    db.from('pedidos').select('total').gte('created_at', hoje + 'T00:00:00'),
+    db.from('entregas').select('*', { count:'exact', head:true }).in('status', ['pendente','em_preparo']),
+    db.from('entregas').select('*', { count:'exact', head:true }).eq('status','entregue').gte('created_at', hoje + 'T00:00:00'),
+    db.from('clientes').select('*', { count:'exact', head:true }),
+    db.from('pedidos').select('total').gte('created_at', mesInicio + 'T00:00:00'),
+  ]);
+
+  document.getElementById('kpi-pedidos-hoje').textContent = cHoje || 0;
+  document.getElementById('kpi-fat-hoje').textContent     = fmtR$(dHoje?.reduce((s,p)=>s+p.total,0)||0);
+  document.getElementById('kpi-abertos').textContent      = cAbertos || 0;
+  document.getElementById('kpi-entregues').textContent    = cEntregues || 0;
+  document.getElementById('kpi-clientes').textContent     = cClientes || 0;
+  document.getElementById('kpi-fat-mes').textContent      = fmtR$(dMes?.reduce((s,p)=>s+p.total,0)||0);
+  document.getElementById('kpi-mes-label').textContent    = MESES[new Date().getMonth()];
+}
+
+async function carregarPedidosRecentes() {
+  const { data } = await db.from('pedidos')
+    .select('*, clientes(nome), entregas(status)')
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  const tbody = document.getElementById('tbody-recentes');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum pedido ainda.</td></tr>'; return; }
+
+  tbody.innerHTML = data.map(p => {
+    const status = p.entregas?.[0]?.status || 'pendente';
+    return `<tr>
+      <td><strong>${p.numero}</strong></td>
+      <td>${p.clientes?.nome || '—'}</td>
+      <td><strong>${fmtR$(p.total)}</strong></td>
+      <td>${p.forma_pagamento === 'pix' ? 'PIX' : 'Cartão'}</td>
+      <td>${p.forma_entrega === 'entrega' ? '🚚 Entrega' : '🏪 Retirada'}</td>
+      <td>${badgeStatus(status)}</td>
+      <td style="color:var(--text-muted)">${fmtHora(p.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+let chartFat, chartStatus;
+
+async function carregarGraficos() {
+  // Faturamento 7 dias
+  const dias = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
+
+  const { data: pedidosDias } = await db.from('pedidos').select('total, created_at')
+    .gte('created_at', dias[0] + 'T00:00:00');
+
+  const fatPorDia = dias.map(d => {
+    return (pedidosDias || []).filter(p => p.created_at.startsWith(d)).reduce((s, p) => s + p.total, 0);
+  });
+
+  const ctxFat = document.getElementById('chart-fat').getContext('2d');
+  if (chartFat) chartFat.destroy();
+  chartFat = new Chart(ctxFat, {
+    type: 'bar',
+    data: {
+      labels: dias.map(d => { const dt = new Date(d + 'T12:00:00'); return dt.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }); }),
+      datasets: [{ label: 'Faturamento', data: fatPorDia, backgroundColor: '#1B3A87', borderRadius: 6 }],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+               scales: { y: { ticks: { callback: v => 'R$' + v.toLocaleString('pt-BR') }, grid: { color: '#eef' } }, x: { grid: { display: false } } } },
+  });
+
+  // Status
+  const { data: statusData } = await db.from('entregas').select('status');
+  const counts = { pendente:0, em_preparo:0, saiu:0, entregue:0, cancelado:0 };
+  (statusData || []).forEach(e => { if (counts[e.status] !== undefined) counts[e.status]++; });
+
+  const ctxS = document.getElementById('chart-status').getContext('2d');
+  if (chartStatus) chartStatus.destroy();
+  chartStatus = new Chart(ctxS, {
+    type: 'doughnut',
+    data: {
+      labels: ['Pendente', 'Em preparo', 'Saiu', 'Entregue', 'Cancelado'],
+      datasets: [{ data: Object.values(counts), backgroundColor: ['#f59e0b','#1B3A87','#7c3aed','#388e3c','#d93025'], borderWidth: 0 }],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Poppins', size: 11 } } } } },
+  });
+}
+</script>
+</body>
+</html>

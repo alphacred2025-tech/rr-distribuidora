@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <span class="admin-header__titulo">Configurações</span>
+      </div>
+    </header>
+    <main class="admin-content">
+
+      <div class="filter-tabs mb-15" id="config-tabs">
+        <button class="filter-tab filter-tab--active" onclick="mudarAba('empresa')">Empresa</button>
+        <button class="filter-tab" onclick="mudarAba('usuarios')">Usuários</button>
+        <button class="filter-tab" onclick="mudarAba('motoboys')">Motoboys</button>
+        <button class="filter-tab" onclick="mudarAba('comercial')">Comercial</button>
+      </div>
+
+      <!-- ABA: EMPRESA -->
+      <div id="aba-empresa" class="aba-content">
+        <div class="grid-2 mb-15">
+          <div class="card">
+            <div class="card__header"><span class="card__titulo">Dados da Empresa</span></div>
+            <div class="card__body">
+              <form id="form-empresa">
+                <div class="form-group">
+                  <label>Nome da empresa</label>
+                  <input class="form-input" type="text" id="cfg-nome-empresa" placeholder="RR Distribuidora">
+                </div>
+                <div class="form-group">
+                  <label>WhatsApp (com código do país)</label>
+                  <input class="form-input" type="text" id="cfg-whatsapp" placeholder="5581996206567">
+                </div>
+                <div class="form-group">
+                  <label>Endereço</label>
+                  <input class="form-input" type="text" id="cfg-endereco" placeholder="Rua Itaí, 71 — Recife/PE">
+                </div>
+                <div class="form-group">
+                  <label>Horário de funcionamento</label>
+                  <input class="form-input" type="text" id="cfg-horario" placeholder="Seg–Sex 08h–18h / Sáb 08h–13h">
+                </div>
+                <div class="form-group">
+                  <label>E-mail de contato</label>
+                  <input class="form-input" type="email" id="cfg-email" placeholder="contato@rrdistribuidora.com.br">
+                </div>
+                <button type="submit" class="btn btn--primary">Salvar dados da empresa</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header"><span class="card__titulo">Entregas</span></div>
+            <div class="card__body">
+              <form id="form-entrega">
+                <div class="form-group">
+                  <label>Taxa de entrega padrão (R$)</label>
+                  <input class="form-input" type="number" id="cfg-taxa-entrega" placeholder="5.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                  <label>Pedido mínimo para frete grátis (R$)</label>
+                  <input class="form-input" type="number" id="cfg-frete-gratis" placeholder="0 = desativado" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                  <label>Raio de entrega máximo (km)</label>
+                  <input class="form-input" type="number" id="cfg-raio-km" placeholder="10" min="0" step="1">
+                </div>
+                <div class="form-group">
+                  <label>Mensagem padrão no WhatsApp</label>
+                  <textarea class="form-input" id="cfg-msg-whatsapp" rows="3" style="resize:vertical" placeholder="Olá! Gostaria de fazer um pedido…"></textarea>
+                </div>
+                <button type="submit" class="btn btn--primary">Salvar configurações de entrega</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">Formas de Pagamento</span></div>
+          <div class="card__body">
+            <form id="form-pagamento">
+              <div style="display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:1.5rem">
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                  <input type="checkbox" id="cfg-pix" style="width:18px;height:18px"> PIX ativo
+                </label>
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                  <input type="checkbox" id="cfg-cartao" style="width:18px;height:18px"> Cartão ativo
+                </label>
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                  <input type="checkbox" id="cfg-dinheiro" style="width:18px;height:18px"> Dinheiro / À vista ativo
+                </label>
+              </div>
+              <div class="form-group" style="max-width:400px">
+                <label>Chave PIX</label>
+                <input class="form-input" type="text" id="cfg-chave-pix" placeholder="CPF, e-mail, telefone ou chave aleatória">
+              </div>
+              <button type="submit" class="btn btn--primary">Salvar pagamento</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA: USUÁRIOS -->
+      <div id="aba-usuarios" class="aba-content" style="display:none">
+        <div class="card">
+          <div class="card__header">
+            <span class="card__titulo">Usuários do Sistema</span>
+            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-add-usuario')">+ Novo Usuário</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Status</th><th>Desde</th><th></th></tr></thead>
+              <tbody id="tbody-usuarios"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="card__body" style="padding-top:0;border-top:1px solid var(--border)">
+            <p style="font-size:.8rem;color:var(--text-muted);margin:0">
+              ℹ️ Para criar novos usuários, acesse o <strong>Supabase Dashboard → Authentication → Users → Add User</strong>. Após criar, selecione o papel desejado aqui na tabela acima.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA: MOTOBOYS -->
+      <div id="aba-motoboys" class="aba-content" style="display:none">
+        <div class="card">
+          <div class="card__header">
+            <span class="card__titulo">Motoboys Cadastrados</span>
+            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-add-motoboy')">+ Adicionar</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Nome</th><th>Telefone</th><th>Placa</th><th>Entregas Realizadas</th><th>Status</th><th></th></tr></thead>
+              <tbody id="tbody-motoboys"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA: COMERCIAL -->
+      <div id="aba-comercial" class="aba-content" style="display:none">
+        <div class="grid-2 mb-15">
+          <div class="card">
+            <div class="card__header"><span class="card__titulo">Comissões de Vendedores</span></div>
+            <div class="card__body">
+              <form id="form-comissoes">
+                <div class="form-group">
+                  <label>Percentual de comissão padrão (%)</label>
+                  <input class="form-input" type="number" id="cfg-comissao-pct" placeholder="5" min="0" max="100" step="0.5">
+                  <span style="font-size:.8rem;color:var(--text-muted)">Aplicado sobre o total bruto de cada pedido</span>
+                </div>
+                <div class="form-group">
+                  <label>Dia de corte para pagamento</label>
+                  <input class="form-input" type="number" id="cfg-dia-corte" placeholder="25" min="1" max="28">
+                  <span style="font-size:.8rem;color:var(--text-muted)">Dia do mês em que as comissões são fechadas</span>
+                </div>
+                <button type="submit" class="btn btn--primary">Salvar comissões</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header"><span class="card__titulo">Metas de Vendas</span></div>
+            <div class="card__body">
+              <form id="form-metas">
+                <div class="form-group">
+                  <label>Meta de faturamento mensal (R$)</label>
+                  <input class="form-input" type="number" id="cfg-meta-fat" placeholder="10000" min="0" step="100">
+                </div>
+                <div class="form-group">
+                  <label>Meta de novos clientes no mês</label>
+                  <input class="form-input" type="number" id="cfg-meta-clientes" placeholder="30" min="0">
+                </div>
+                <div class="form-group">
+                  <label>Meta de pedidos no mês</label>
+                  <input class="form-input" type="number" id="cfg-meta-pedidos" placeholder="150" min="0">
+                </div>
+                <button type="submit" class="btn btn--primary">Salvar metas</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">Bônus por Desempenho</span></div>
+          <div class="card__body">
+            <form id="form-bonus">
+              <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Configure bônus extras quando o vendedor atingir determinada faixa de faturamento no mês.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+                <div class="form-group" style="margin:0">
+                  <label>Faixa 1 — a partir de (R$)</label>
+                  <input class="form-input" type="number" id="cfg-bonus1-min" placeholder="5000" min="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Bônus faixa 1 (R$)</label>
+                  <input class="form-input" type="number" id="cfg-bonus1-val" placeholder="200" min="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Faixa 2 — a partir de (R$)</label>
+                  <input class="form-input" type="number" id="cfg-bonus2-min" placeholder="8000" min="0">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+                <div class="form-group" style="margin:0">
+                  <label>Bônus faixa 2 (R$)</label>
+                  <input class="form-input" type="number" id="cfg-bonus2-val" placeholder="400" min="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Faixa 3 — a partir de (R$)</label>
+                  <input class="form-input" type="number" id="cfg-bonus3-min" placeholder="12000" min="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Bônus faixa 3 (R$)</label>
+                  <input class="form-input" type="number" id="cfg-bonus3-val" placeholder="700" min="0">
+                </div>
+              </div>
+              <button type="submit" class="btn btn--primary">Salvar bônus</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Alterar papel do usuário -->
+<div class="modal-overlay" id="modal-papel">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__titulo">Alterar papel — <span id="papel-usuario-nome"></span></span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-papel')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="papel-usuario-id">
+      <div class="form-group">
+        <label>Papel / Área de acesso</label>
+        <select class="form-input" id="papel-select">
+          <option value="admin">Admin — acesso total</option>
+          <option value="vendedor">Vendedor — Comercial</option>
+          <option value="logistica">Logística — Logística</option>
+          <option value="financeiro">Financeiro — Financeiro</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-papel')">Cancelar</button>
+      <button class="btn btn--primary" onclick="salvarPapel()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Adicionar motoboy -->
+<div class="modal-overlay" id="modal-add-motoboy">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__titulo" id="titulo-modal-motoboy">Adicionar Motoboy</span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-add-motoboy')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="motoboy-edit-id">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input class="form-input" type="text" id="motoboy-nome" placeholder="João da Silva">
+      </div>
+      <div class="form-group">
+        <label>Telefone / WhatsApp</label>
+        <input class="form-input" type="text" id="motoboy-telefone" placeholder="(81) 99999-9999">
+      </div>
+      <div class="form-group">
+        <label>Placa da moto</label>
+        <input class="form-input" type="text" id="motoboy-placa" placeholder="ABC-1234" style="text-transform:uppercase">
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-add-motoboy')">Cancelar</button>
+      <button class="btn btn--primary" onclick="salvarMotoboy()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+let configCache = {};
+let abAativa = 'empresa';
+
+(async () => {
+  renderSidebar('config');
+  const profile = await requireAuth(['admin']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+  await Promise.all([carregarConfigs(), carregarUsuarios(), carregarMotoboys()]);
+})();
+
+function mudarAba(aba) {
+  abAativa = aba;
+  document.querySelectorAll('.aba-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.filter-tab').forEach(el => el.classList.remove('filter-tab--active'));
+  document.getElementById('aba-' + aba).style.display = '';
+  const idx = ['empresa','usuarios','motoboys','comercial'].indexOf(aba);
+  document.querySelectorAll('.filter-tab')[idx]?.classList.add('filter-tab--active');
+}
+
+// ─── Configs ────────────────────────────────────────────────────────────────
+
+async function carregarConfigs() {
+  const { data } = await db.from('configuracoes').select('chave, valor');
+  configCache = {};
+  (data || []).forEach(r => configCache[r.chave] = r.valor);
+
+  const set = (id, chave) => { const el = document.getElementById(id); if (el && configCache[chave] !== undefined) el.value = configCache[chave]; };
+  const setChk = (id, chave) => { const el = document.getElementById(id); if (el) el.checked = configCache[chave] === 'true'; };
+
+  set('cfg-nome-empresa', 'nome_empresa');
+  set('cfg-whatsapp', 'whatsapp');
+  set('cfg-endereco', 'endereco');
+  set('cfg-horario', 'horario');
+  set('cfg-email', 'email');
+  set('cfg-taxa-entrega', 'taxa_entrega');
+  set('cfg-frete-gratis', 'frete_gratis_acima');
+  set('cfg-raio-km', 'raio_entrega_km');
+  set('cfg-msg-whatsapp', 'msg_whatsapp');
+  setChk('cfg-pix', 'pagamento_pix');
+  setChk('cfg-cartao', 'pagamento_cartao');
+  setChk('cfg-dinheiro', 'pagamento_dinheiro');
+  set('cfg-chave-pix', 'chave_pix');
+  set('cfg-comissao-pct', 'comissao_percentual');
+  set('cfg-dia-corte', 'comissao_dia_corte');
+  set('cfg-meta-fat', 'meta_faturamento');
+  set('cfg-meta-clientes', 'meta_clientes');
+  set('cfg-meta-pedidos', 'meta_pedidos');
+  set('cfg-bonus1-min', 'bonus_faixa1_min');
+  set('cfg-bonus1-val', 'bonus_faixa1_valor');
+  set('cfg-bonus2-min', 'bonus_faixa2_min');
+  set('cfg-bonus2-val', 'bonus_faixa2_valor');
+  set('cfg-bonus3-min', 'bonus_faixa3_min');
+  set('cfg-bonus3-val', 'bonus_faixa3_valor');
+}
+
+async function upsertConfigs(pares) {
+  for (const [chave, valor] of Object.entries(pares)) {
+    await db.from('configuracoes').upsert({ chave, valor: String(valor) }, { onConflict: 'chave' });
+  }
+}
+
+document.getElementById('form-empresa').addEventListener('submit', async e => {
+  e.preventDefault();
+  await upsertConfigs({
+    nome_empresa: document.getElementById('cfg-nome-empresa').value,
+    whatsapp:     document.getElementById('cfg-whatsapp').value,
+    endereco:     document.getElementById('cfg-endereco').value,
+    horario:      document.getElementById('cfg-horario').value,
+    email:        document.getElementById('cfg-email').value,
+  });
+  toast('Dados da empresa salvos!');
+});
+
+document.getElementById('form-entrega').addEventListener('submit', async e => {
+  e.preventDefault();
+  await upsertConfigs({
+    taxa_entrega:        document.getElementById('cfg-taxa-entrega').value,
+    frete_gratis_acima:  document.getElementById('cfg-frete-gratis').value,
+    raio_entrega_km:     document.getElementById('cfg-raio-km').value,
+    msg_whatsapp:        document.getElementById('cfg-msg-whatsapp').value,
+  });
+  toast('Configurações de entrega salvas!');
+});
+
+document.getElementById('form-pagamento').addEventListener('submit', async e => {
+  e.preventDefault();
+  await upsertConfigs({
+    pagamento_pix:      document.getElementById('cfg-pix').checked,
+    pagamento_cartao:   document.getElementById('cfg-cartao').checked,
+    pagamento_dinheiro: document.getElementById('cfg-dinheiro').checked,
+    chave_pix:          document.getElementById('cfg-chave-pix').value,
+  });
+  toast('Configurações de pagamento salvas!');
+});
+
+document.getElementById('form-comissoes').addEventListener('submit', async e => {
+  e.preventDefault();
+  await upsertConfigs({
+    comissao_percentual: document.getElementById('cfg-comissao-pct').value,
+    comissao_dia_corte:  document.getElementById('cfg-dia-corte').value,
+  });
+  toast('Comissões salvas!');
+});
+
+document.getElementById('form-metas').addEventListener('submit', async e => {
+  e.preventDefault();
+  await upsertConfigs({
+    meta_faturamento: document.getElementById('cfg-meta-fat').value,
+    meta_clientes:    document.getElementById('cfg-meta-clientes').value,
+    meta_pedidos:     document.getElementById('cfg-meta-pedidos').value,
+  });
+  toast('Metas salvas!');
+});
+
+document.getElementById('form-bonus').addEventListener('submit', async e => {
+  e.preventDefault();
+  await upsertConfigs({
+    bonus_faixa1_min:   document.getElementById('cfg-bonus1-min').value,
+    bonus_faixa1_valor: document.getElementById('cfg-bonus1-val').value,
+    bonus_faixa2_min:   document.getElementById('cfg-bonus2-min').value,
+    bonus_faixa2_valor: document.getElementById('cfg-bonus2-val').value,
+    bonus_faixa3_min:   document.getElementById('cfg-bonus3-min').value,
+    bonus_faixa3_valor: document.getElementById('cfg-bonus3-val').value,
+  });
+  toast('Bônus salvos!');
+});
+
+// ─── Usuários ────────────────────────────────────────────────────────────────
+
+async function carregarUsuarios() {
+  const { data } = await db.from('profiles').select('id, nome, email, papel, ativo, created_at').order('created_at');
+  const tbody = document.getElementById('tbody-usuarios');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum usuário cadastrado.</td></tr>'; return; }
+  tbody.innerHTML = data.map(u => `
+    <tr>
+      <td><strong>${u.nome || '—'}</strong></td>
+      <td style="color:var(--text-muted)">${u.email || '—'}</td>
+      <td>${badgePapel(u.papel)}</td>
+      <td><span class="badge ${u.ativo !== false ? 'badge--entregue' : 'badge--cancelado'}">${u.ativo !== false ? 'Ativo' : 'Inativo'}</span></td>
+      <td style="color:var(--text-muted)">${fmtData(u.created_at)}</td>
+      <td>
+        <button class="btn btn--outline btn--sm" onclick="editarPapel('${u.id}','${u.nome || ''}','${u.papel}')">Papel</button>
+        <button class="btn btn--outline btn--sm" onclick="toggleAtivo('${u.id}',${u.ativo !== false})" style="margin-left:.3rem">${u.ativo !== false ? 'Desativar' : 'Ativar'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function editarPapel(id, nome, papelAtual) {
+  document.getElementById('papel-usuario-id').value = id;
+  document.getElementById('papel-usuario-nome').textContent = nome;
+  document.getElementById('papel-select').value = papelAtual;
+  abrirModal('modal-papel');
+}
+
+async function salvarPapel() {
+  const id    = document.getElementById('papel-usuario-id').value;
+  const papel = document.getElementById('papel-select').value;
+  await db.from('profiles').update({ papel }).eq('id', id);
+  fecharModal('modal-papel');
+  toast('Papel atualizado!');
+  carregarUsuarios();
+}
+
+async function toggleAtivo(id, ativoAtual) {
+  await db.from('profiles').update({ ativo: !ativoAtual }).eq('id', id);
+  toast(ativoAtual ? 'Usuário desativado.' : 'Usuário ativado!');
+  carregarUsuarios();
+}
+
+// ─── Motoboys ────────────────────────────────────────────────────────────────
+
+async function carregarMotoboys() {
+  const { data } = await db.from('motoboys').select('id, nome, telefone, placa, ativo, created_at').order('nome');
+  const tbody = document.getElementById('tbody-motoboys');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum motoboy cadastrado.</td></tr>'; return; }
+
+  const counts = await Promise.all(data.map(m =>
+    db.from('entregas').select('*', { count:'exact', head:true }).eq('motoboy_id', m.id).eq('status','entregue')
+  ));
+
+  tbody.innerHTML = data.map((m, i) => `
+    <tr>
+      <td><strong>${m.nome}</strong></td>
+      <td>${m.telefone || '—'}</td>
+      <td>${m.placa || '—'}</td>
+      <td>${counts[i]?.count || 0}</td>
+      <td><span class="badge ${m.ativo ? 'badge--entregue' : 'badge--cancelado'}">${m.ativo ? 'Ativo' : 'Inativo'}</span></td>
+      <td>
+        <button class="btn btn--outline btn--sm" onclick="editarMotoboy('${m.id}','${m.nome}','${m.telefone||''}','${m.placa||''}')">Editar</button>
+        <button class="btn btn--outline btn--sm" onclick="toggleMotoboy('${m.id}',${m.ativo})" style="margin-left:.3rem">${m.ativo ? 'Desativar' : 'Ativar'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function editarMotoboy(id, nome, telefone, placa) {
+  document.getElementById('motoboy-edit-id').value = id;
+  document.getElementById('motoboy-nome').value = nome;
+  document.getElementById('motoboy-telefone').value = telefone;
+  document.getElementById('motoboy-placa').value = placa;
+  document.getElementById('titulo-modal-motoboy').textContent = 'Editar Motoboy';
+  abrirModal('modal-add-motoboy');
+}
+
+function abrirNovoMotoboy() {
+  document.getElementById('motoboy-edit-id').value = '';
+  document.getElementById('motoboy-nome').value = '';
+  document.getElementById('motoboy-telefone').value = '';
+  document.getElementById('motoboy-placa').value = '';
+  document.getElementById('titulo-modal-motoboy').textContent = 'Adicionar Motoboy';
+  abrirModal('modal-add-motoboy');
+}
+
+async function salvarMotoboy() {
+  const id       = document.getElementById('motoboy-edit-id').value;
+  const nome     = document.getElementById('motoboy-nome').value.trim();
+  const telefone = document.getElementById('motoboy-telefone').value.trim();
+  const placa    = document.getElementById('motoboy-placa').value.trim().toUpperCase();
+
+  if (!nome) { toast('Informe o nome do motoboy.', 'erro'); return; }
+
+  if (id) {
+    await db.from('motoboys').update({ nome, telefone, placa }).eq('id', id);
+  } else {
+    await db.from('motoboys').insert({ nome, telefone, placa, ativo: true });
+  }
+
+  fecharModal('modal-add-motoboy');
+  toast(id ? 'Motoboy atualizado!' : 'Motoboy adicionado!');
+  carregarMotoboys();
+}
+
+async function toggleMotoboy(id, ativoAtual) {
+  await db.from('motoboys').update({ ativo: !ativoAtual }).eq('id', id);
+  toast(ativoAtual ? 'Motoboy desativado.' : 'Motoboy ativado!');
+  carregarMotoboys();
+}
+</script>
+</body>
+</html>

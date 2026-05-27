@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — RR Distribuidora</title>
+  <link rel="stylesheet" href="css/style.css?v=3" />
+</head>
+<body data-page="checkout">
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="container">
+      <div class="header__inner">
+        <a href="index.html" class="header__logo">
+          <img src="assets/img/logo.svg" alt="RR Distribuidora" class="header__logo-img">
+        </a>
+        <nav class="header__nav">
+          <a href="carrinho.html" class="header__cart" aria-label="Ver carrinho">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Carrinho
+            <span class="cart-badge">0</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ STEPPER ═══════════════════════════════════════════════ -->
+  <div class="container">
+    <nav class="stepper" aria-label="Progresso do pedido">
+      <div class="step step--done">
+        <div class="step__num">✓</div>
+        <span>Carrinho</span>
+      </div>
+      <div class="step-sep step-sep--done"></div>
+      <div class="step step--ativo">
+        <div class="step__num">2</div>
+        <span>Dados</span>
+      </div>
+      <div class="step-sep"></div>
+      <div class="step">
+        <div class="step__num">3</div>
+        <span>Pagamento</span>
+      </div>
+      <div class="step-sep"></div>
+      <div class="step">
+        <div class="step__num">4</div>
+        <span>Confirmação</span>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ═══ CONTEÚDO ══════════════════════════════════════════════ -->
+  <main class="checkout-page">
+    <div class="container">
+      <h1 class="page-titulo">Finalizar Pedido</h1>
+
+      <div class="checkout-layout">
+        <!-- Formulário principal -->
+        <form id="form-checkout" class="checkout-form-box" novalidate>
+
+          <!-- Dados pessoais -->
+          <div class="form-section">
+            <h2 class="form-section__titulo">Dados Pessoais</h2>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column:1/-1;">
+                <label for="nome">Nome completo *</label>
+                <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Seu nome completo" required />
+              </div>
+              <div class="form-group">
+                <label for="cpf">CPF *</label>
+                <input type="text" id="cpf" name="cpf" autocomplete="off" placeholder="000.000.000-00" maxlength="14" required />
+              </div>
+              <div class="form-group">
+                <label for="telefone">Telefone / WhatsApp *</label>
+                <input type="tel" id="telefone" name="telefone" autocomplete="tel" placeholder="(81) 99620-6567" maxlength="15" required />
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label for="email">E-mail *</label>
+                <input type="email" id="email" name="email" autocomplete="email" placeholder="seuemail@exemplo.com" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tipo de entrega -->
+          <div class="form-section">
+            <h2 class="form-section__titulo">Forma de Recebimento</h2>
+            <div class="radio-group">
+              <label class="radio-card">
+                <input type="radio" name="tipoEntrega" value="entrega" checked />
+                🚚 Entrega no endereço
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="tipoEntrega" value="retirada" />
+                🏪 Retirar na loja
+              </label>
+            </div>
+
+            <!-- Endereço de entrega -->
+            <div class="secao-entrega" id="secao-entrega">
+              <div class="form-grid" style="margin-top:1rem;">
+                <div class="form-group">
+                  <label for="cep">CEP *</label>
+                  <div class="cep-wrapper">
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" autocomplete="postal-code" required />
+                    <span class="cep-loading" id="cep-loading">Buscando...</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="numero">Número *</label>
+                  <input type="text" id="numero" name="numero" placeholder="Ex: 123" required />
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                  <label for="logradouro">Logradouro</label>
+                  <input type="text" id="logradouro" name="logradouro" placeholder="Rua / Avenida / Alameda" readonly />
+                </div>
+                <div class="form-group">
+                  <label for="complemento">Complemento</label>
+                  <input type="text" id="complemento" name="complemento" placeholder="Apto, Bloco, Casa..." />
+                </div>
+                <div class="form-group">
+                  <label for="bairro">Bairro</label>
+                  <input type="text" id="bairro" name="bairro" readonly />
+                </div>
+                <div class="form-group">
+                  <label for="cidade">Cidade</label>
+                  <input type="text" id="cidade" name="cidade" readonly />
+                </div>
+                <div class="form-group">
+                  <label for="uf">UF</label>
+                  <input type="text" id="uf" name="uf" readonly style="max-width:80px;" />
+                </div>
+              </div>
+              <p class="frete-nota" style="margin-top:.75rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                O valor do frete será informado ao confirmar o pedido via WhatsApp.
+              </p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full btn--lg">
+            Ir para Pagamento →
+          </button>
+        </form>
+
+        <!-- Resumo do pedido -->
+        <aside class="checkout-resumo">
+          <h3>Resumo do Pedido</h3>
+          <div id="resumo-itens">
+            <!-- Preenchido via JS -->
+          </div>
+          <div class="resumo-total-linha">
+            <strong>Total</strong>
+            <strong id="resumo-total">R$ 0,00</strong>
+          </div>
+          <p class="frete-nota" style="margin-top:.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            + frete a combinar
+          </p>
+          <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--gray-200);">
+            <p style="font-size:.82rem; color:var(--text-muted); display:flex; gap:.375rem; align-items:center;">
+              🔒 Pagamento processado com segurança pelo Mercado Pago
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <img src="assets/img/logo-white.svg" alt="RR Distribuidora" style="height:56px;width:auto;margin-bottom:.75rem;display:block;">
+          <div class="footer__nome">RR Distribuidora</div>
+          <p class="footer__tag">Cestas Básicas de Qualidade</p>
+        </div>
+        <div>
+          <h4>Links Rápidos</h4>
+          <ul class="footer__list">
+            <li><a href="index.html">Início</a></li>
+            <li><a href="carrinho.html">Carrinho</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contato</h4>
+          <ul class="footer__contact">
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:#25D366">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              <a href="https://wa.me/5581996206567" target="_blank" rel="noopener">(81) 99620-6567</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4>Horários</h4>
+          <ul class="footer__list">
+            <li>Seg–Sex: 8h às 18h</li>
+            <li>Sábado: 8h às 13h</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2025 RR Distribuidora. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/dados.js?v=2"></script>
+  <script src="js/carrinho.js?v=2"></script>
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>

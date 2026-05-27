@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comercial — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <span class="admin-header__titulo">Comercial</span>
+      </div>
+    </header>
+    <main class="admin-content">
+
+      <!-- KPIs -->
+      <div class="stats-grid mb-15">
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div class="stat-card__label">Total Clientes</div><div class="stat-card__valor" id="kpi-total">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg></div><div class="stat-card__label">Novos Este Mês</div><div class="stat-card__valor" id="kpi-novos">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-card__label">Total Pedidos</div><div class="stat-card__valor" id="kpi-pedidos">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Ticket Médio</div><div class="stat-card__valor" id="kpi-ticket" style="font-size:1.3rem">—</div></div>
+      </div>
+
+      <div class="grid-2 mb-15">
+        <!-- Ranking Vendedores -->
+        <div class="card" id="bloco-ranking" data-roles="admin">
+          <div class="card__header">
+            <span class="card__titulo">🏆 Ranking Vendedores — <span id="rank-mes-label"></span></span>
+          </div>
+          <div class="card__body" id="ranking-lista">
+            <div class="empty-state"><div class="empty-state__icon">🏅</div><p>Nenhum dado de vendas registrado.</p></div>
+          </div>
+        </div>
+
+        <!-- Clientes recentes -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__titulo">Clientes Recentes</span>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Nome</th><th>Telefone</th><th>Pedidos</th><th>Último pedido</th></tr></thead>
+              <tbody id="tbody-clientes-rec"><tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM — Lista completa de clientes -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__titulo">CRM — Todos os Clientes</span>
+          <div class="search-wrap" style="width:240px">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input class="search-input" type="text" placeholder="Buscar nome ou telefone…" id="busca-cliente" oninput="buscarCliente(this.value)">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Cliente</th><th>Telefone</th><th>E-mail</th><th>Pedidos</th><th>Total gasto</th><th>Origem</th><th>Cadastro</th><th></th></tr></thead>
+            <tbody id="tbody-crm"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal histórico -->
+<div class="modal-overlay" id="modal-historico">
+  <div class="modal modal--lg">
+    <div class="modal__header">
+      <span class="modal__titulo">Histórico — <span id="hist-nome"></span></span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-historico')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+        <div class="stat-card" style="flex:1;min-width:120px"><div class="stat-card__label">Total pedidos</div><div class="stat-card__valor" id="hist-total-pedidos" style="font-size:1.4rem">—</div></div>
+        <div class="stat-card" style="flex:1;min-width:120px"><div class="stat-card__label">Total gasto</div><div class="stat-card__valor" id="hist-total-gasto" style="font-size:1.3rem">—</div></div>
+        <div class="stat-card" style="flex:1;min-width:120px"><div class="stat-card__label">Ticket médio</div><div class="stat-card__valor" id="hist-ticket" style="font-size:1.3rem">—</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Pedido</th><th>Data</th><th>Itens</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="tbody-historico"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal__footer"><button class="btn btn--outline" onclick="fecharModal('modal-historico')">Fechar</button></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+let todosClientes = [];
+
+(async () => {
+  renderSidebar('comercial');
+  const profile = await requireAuth(['admin', 'vendedor']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+  document.getElementById('rank-mes-label').textContent = MESES[new Date().getMonth()];
+  await Promise.all([carregarKPIs(), carregarClientes()]);
+  if (profile.papel === 'admin') carregarRanking();
+})();
+
+async function carregarKPIs() {
+  const mesInicio = new Date().toISOString().slice(0,7) + '-01';
+  const [{ count: total }, { count: novos }, { count: pedidos }, { data: vals }] = await Promise.all([
+    db.from('clientes').select('*', { count:'exact', head:true }),
+    db.from('clientes').select('*', { count:'exact', head:true }).gte('created_at', mesInicio + 'T00:00:00'),
+    db.from('pedidos').select('*', { count:'exact', head:true }),
+    db.from('pedidos').select('total'),
+  ]);
+  const totalFat = (vals || []).reduce((s, p) => s + p.total, 0);
+  document.getElementById('kpi-total').textContent   = total || 0;
+  document.getElementById('kpi-novos').textContent   = novos || 0;
+  document.getElementById('kpi-pedidos').textContent = pedidos || 0;
+  document.getElementById('kpi-ticket').textContent  = pedidos ? fmtR$(totalFat / pedidos) : fmtR$(0);
+}
+
+async function carregarClientes() {
+  const { data } = await db.from('clientes').select('*, pedidos(id, total, created_at)').order('created_at', { ascending:false });
+  todosClientes = (data || []).map(c => ({
+    ...c,
+    totalPedidos: c.pedidos?.length || 0,
+    totalGasto:   (c.pedidos || []).reduce((s, p) => s + p.total, 0),
+    ultimoPedido: c.pedidos?.length ? c.pedidos.sort((a,b) => new Date(b.created_at)-new Date(a.created_at))[0].created_at : null,
+  }));
+
+  renderTabelaClientes(todosClientes);
+
+  // Recentes (top 5 por último pedido)
+  const recentes = [...todosClientes].sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
+  document.getElementById('tbody-clientes-rec').innerHTML = recentes.map(c => `
+    <tr>
+      <td><strong>${c.nome}</strong></td>
+      <td>${c.telefone}</td>
+      <td>${c.totalPedidos}</td>
+      <td style="color:var(--text-muted)">${c.ultimoPedido ? fmtData(c.ultimoPedido) : '—'}</td>
+    </tr>`).join('');
+}
+
+function renderTabelaClientes(lista) {
+  const tbody = document.getElementById('tbody-crm');
+  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum cliente encontrado.</td></tr>'; return; }
+  tbody.innerHTML = lista.map(c => `
+    <tr>
+      <td><strong>${c.nome}</strong></td>
+      <td>${c.telefone || '—'}</td>
+      <td style="color:var(--text-muted)">${c.email || '—'}</td>
+      <td>${c.totalPedidos}</td>
+      <td>${fmtR$(c.totalGasto)}</td>
+      <td><span class="badge badge--${c.origem || 'site'}">${c.origem || 'site'}</span></td>
+      <td style="color:var(--text-muted)">${fmtData(c.created_at)}</td>
+      <td><button class="btn btn--outline btn--sm" onclick="verHistorico('${c.id}')">Ver</button></td>
+    </tr>`).join('');
+}
+
+function buscarCliente(termo) {
+  const t = termo.toLowerCase();
+  const filtrados = !t ? todosClientes : todosClientes.filter(c => c.nome?.toLowerCase().includes(t) || c.telefone?.includes(t) || c.email?.toLowerCase().includes(t));
+  renderTabelaClientes(filtrados);
+}
+
+async function carregarRanking() {
+  const mesInicio = new Date().toISOString().slice(0,7) + '-01';
+  const { data: pedidos } = await db.from('pedidos').select('total, vendedor_id, profiles(nome)').gte('created_at', mesInicio + 'T00:00:00').not('vendedor_id','is',null);
+
+  const map = {};
+  (pedidos || []).forEach(p => {
+    const id = p.vendedor_id;
+    if (!map[id]) map[id] = { nome: p.profiles?.nome || 'Vendedor', total: 0, qtd: 0 };
+    map[id].total += p.total;
+    map[id].qtd++;
+  });
+
+  const ranking = Object.values(map).sort((a,b) => b.total - a.total);
+  const maxVal  = ranking[0]?.total || 1;
+
+  const el = document.getElementById('ranking-lista');
+  if (!ranking.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state__icon">🏅</div><p>Nenhuma venda registrada este mês.</p></div>'; return; }
+  el.innerHTML = ranking.map((v, i) => `
+    <div class="ranking-item">
+      <div class="ranking-pos ranking-pos--${i+1}">${i+1}</div>
+      <div style="flex:1">
+        <div class="ranking-nome">${v.nome} <span style="font-size:.75rem;color:var(--text-muted)">(${v.qtd} pedidos)</span></div>
+        <div class="ranking-bar"><div class="ranking-bar-fill" style="width:${(v.total/maxVal*100).toFixed(0)}%"></div></div>
+      </div>
+      <div class="ranking-valor">${fmtR$(v.total)}</div>
+    </div>`).join('');
+}
+
+async function verHistorico(clienteId) {
+  const cli = todosClientes.find(c => c.id === clienteId);
+  if (!cli) return;
+  document.getElementById('hist-nome').textContent = cli.nome;
+
+  const { data: pedidos } = await db.from('pedidos')
+    .select('numero, total, created_at, itens_pedido(cesta_nome, quantidade), entregas(status)')
+    .eq('cliente_id', clienteId)
+    .order('created_at', { ascending:false });
+
+  const total = (pedidos || []).reduce((s,p)=>s+p.total,0);
+  document.getElementById('hist-total-pedidos').textContent = pedidos?.length || 0;
+  document.getElementById('hist-total-gasto').textContent   = fmtR$(total);
+  document.getElementById('hist-ticket').textContent        = pedidos?.length ? fmtR$(total/pedidos.length) : fmtR$(0);
+
+  document.getElementById('tbody-historico').innerHTML = (pedidos || []).map(p => {
+    const itens = (p.itens_pedido || []).map(i=>`${i.cesta_nome}${i.quantidade>1?` x${i.quantidade}`:''}`).join(', ');
+    const status = p.entregas?.[0]?.status || 'pendente';
+    return `<tr>
+      <td><strong>#${p.numero}</strong></td>
+      <td>${fmtData(p.created_at)}</td>
+      <td style="font-size:.8rem;color:var(--text-muted)">${itens}</td>
+      <td><strong>${fmtR$(p.total)}</strong></td>
+      <td>${badgeStatus(status)}</td>
+    </tr>`;
+  }).join('');
+
+  abrirModal('modal-historico');
+}
+</script>
+</body>
+</html>

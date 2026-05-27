@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagamento — RR Distribuidora</title>
+  <link rel="stylesheet" href="css/style.css?v=3" />
+
+  <!--
+  ══════════════════════════════════════════════════════════════════
+  MERCADO PAGO SDK — ADICIONAR AQUI QUANDO INTEGRAR
+  Descomentar a linha abaixo e substituir pela URL oficial do SDK:
+
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+  Depois, no app.js → initPagamento():
+    const mp = new MercadoPago('SUA_PUBLIC_KEY', { locale: 'pt-BR' });
+
+  Para PIX:
+    - Gerar preference via backend com items + payer
+    - Renderizar QR Code retornado pela API
+    - Webhook para confirmar pagamento
+
+  Para Cartão:
+    const cardForm = mp.cardForm({
+      amount: String(pedido.total),
+      iframe: true,
+      form: { id: 'form-cartao', ... },
+      callbacks: {
+        onFormMounted: error => { ... },
+        onSubmit: async (event) => {
+          const { getCardFormData } = event;
+          const cardFormData = getCardFormData();
+          // Enviar ao backend para processar
+        },
+      },
+    });
+
+  Documentação: https://www.mercadopago.com.br/developers/pt/docs
+  ══════════════════════════════════════════════════════════════════
+  -->
+</head>
+<body data-page="pagamento">
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="container">
+      <div class="header__inner">
+        <a href="index.html" class="header__logo">
+          <img src="assets/img/logo.svg" alt="RR Distribuidora" class="header__logo-img">
+        </a>
+        <nav class="header__nav">
+          <a href="carrinho.html" class="header__cart" aria-label="Ver carrinho">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Carrinho
+            <span class="cart-badge">0</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ STEPPER ═══════════════════════════════════════════════ -->
+  <div class="container">
+    <nav class="stepper" aria-label="Progresso do pedido">
+      <div class="step step--done">
+        <div class="step__num">✓</div>
+        <span>Carrinho</span>
+      </div>
+      <div class="step-sep step-sep--done"></div>
+      <div class="step step--done">
+        <div class="step__num">✓</div>
+        <span>Dados</span>
+      </div>
+      <div class="step-sep step-sep--done"></div>
+      <div class="step step--ativo">
+        <div class="step__num">3</div>
+        <span>Pagamento</span>
+      </div>
+      <div class="step-sep"></div>
+      <div class="step">
+        <div class="step__num">4</div>
+        <span>Confirmação</span>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ═══ CONTEÚDO ══════════════════════════════════════════════ -->
+  <main class="pagamento-page">
+    <div class="container">
+      <div style="margin-bottom:1.5rem;">
+        <h1 class="page-titulo">Pagamento</h1>
+        <p>Pedido <strong id="pagamento-numero-pedido">#———</strong> · Total: <strong id="pagamento-total" style="color:var(--green);">R$ 0,00</strong></p>
+      </div>
+
+      <div class="pagamento-layout">
+        <!-- Formulário de pagamento -->
+        <div class="pagamento-form-box">
+
+          <!-- Tabs -->
+          <div class="tabs" role="tablist">
+            <button class="tab-btn tab-btn--ativo" data-tab="pix" role="tab" aria-selected="true" aria-controls="tab-pix">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M17 14h3M14 17v3"/></svg>
+              PIX
+            </button>
+            <button class="tab-btn" data-tab="cartao" role="tab" aria-selected="false" aria-controls="tab-cartao">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              Cartão de Crédito
+            </button>
+          </div>
+
+          <!-- Tab PIX -->
+          <div class="tab-painel tab-painel--ativo" id="tab-pix" role="tabpanel">
+            <div class="pix-box">
+              <div class="pix-qr">
+                <!--
+                  MERCADO PAGO: substituir pelo QR Code real gerado pela API.
+                  Exemplo: <img src="${pixQRCodeBase64}" alt="QR Code PIX" />
+                -->
+                <div class="pix-qr__icon">📱</div>
+                <span>QR Code PIX<br>(gerado pelo Mercado Pago)</span>
+              </div>
+
+              <div class="pix-chave-box">
+                <div>
+                  <div class="pix-chave-label">Chave PIX (CNPJ/E-mail)</div>
+                  <!--
+                    ATUALIZAR: substituir pela chave PIX real do Mercado Pago
+                    ou pelo CNPJ/e-mail da empresa
+                  -->
+                  <div class="pix-chave-valor" id="pix-chave">00.000.000/0001-00</div>
+                </div>
+                <button class="btn btn--outline" id="btn-copiar-pix" type="button">Copiar</button>
+              </div>
+
+              <ol class="pix-instrucoes">
+                <li>Abra o app do seu banco ou carteira digital</li>
+                <li>Escolha pagar com PIX e escaneie o QR Code</li>
+                <li>Ou cole a chave PIX acima no campo indicado</li>
+                <li>Confirme o pagamento e clique em "Já paguei" abaixo</li>
+              </ol>
+            </div>
+
+            <button class="btn btn--primary btn--full btn--lg" id="btn-ja-paguei" type="button" style="margin-top:1.5rem;">
+              ✓ Já realizei o pagamento
+            </button>
+
+            <div class="mp-note" style="margin-top:1rem;">
+              <strong>Integração Mercado Pago (PIX)</strong>
+              Em produção, o QR Code e a chave Copia e Cola serão gerados automaticamente ao criar a preferência de pagamento via API do Mercado Pago. O status será confirmado via webhook.
+            </div>
+          </div>
+
+          <!-- Tab Cartão -->
+          <div class="tab-painel" id="tab-cartao" role="tabpanel">
+            <!--
+              ══════════════════════════════════════════════════════════
+              MERCADO PAGO — CARD FORM
+              Em produção, substituir este formulário pelo cardForm do SDK:
+                const cardForm = mp.cardForm({ ... });
+              O SDK injeta os iframes de campos seguros automaticamente.
+              ══════════════════════════════════════════════════════════
+            -->
+            <form id="form-cartao" class="card-form" novalidate>
+              <div class="form-group">
+                <label for="nome-cartao">Nome no cartão *</label>
+                <input type="text" id="nome-cartao" name="nome-cartao" placeholder="Igual ao impresso no cartão" autocomplete="cc-name" required />
+              </div>
+              <div class="form-group">
+                <label for="numero-cartao">Número do cartão *</label>
+                <div class="card-numero-wrapper">
+                  <input type="text" id="numero-cartao" name="numero-cartao" placeholder="0000 0000 0000 0000" autocomplete="cc-number" maxlength="19" required />
+                  <span class="bandeira-icone" id="bandeira-icone"></span>
+                </div>
+              </div>
+              <div class="form-grid form-grid--2">
+                <div class="form-group">
+                  <label for="validade">Validade *</label>
+                  <input type="text" id="validade" name="validade" placeholder="MM/AA" autocomplete="cc-exp" maxlength="5" required />
+                </div>
+                <div class="form-group">
+                  <label for="cvv">CVV *</label>
+                  <input type="text" id="cvv" name="cvv" placeholder="000" autocomplete="cc-csc" maxlength="4" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="parcelas">Parcelas</label>
+                <select id="parcelas" name="parcelas">
+                  <option value="1">1x sem juros</option>
+                  <option value="2">2x sem juros</option>
+                  <option value="3">3x sem juros</option>
+                  <option value="6">6x com juros (a confirmar)</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn--primary btn--full btn--lg" style="margin-top:.5rem;">
+                Confirmar Pagamento →
+              </button>
+
+              <div class="mp-note">
+                <strong>Integração Mercado Pago (Cartão)</strong>
+                Em produção, este formulário será substituído pelo cardForm do SDK do Mercado Pago, que garante a tokenização segura dos dados do cartão sem que eles passem pelo servidor.
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Resumo do pedido -->
+        <aside class="pagamento-resumo-box">
+          <h3>Resumo do Pedido</h3>
+          <div id="pagamento-resumo">
+            <!-- Preenchido via JS -->
+          </div>
+          <div style="margin-top:1rem; padding-top:.875rem; border-top:1px solid var(--gray-200);">
+            <p style="font-size:.8rem; color:var(--text-muted); text-align:center;">
+              🔒 Pagamento processado com segurança<br>pelo Mercado Pago
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <img src="assets/img/logo-white.svg" alt="RR Distribuidora" style="height:56px;width:auto;margin-bottom:.75rem;display:block;">
+          <div class="footer__nome">RR Distribuidora</div>
+          <p class="footer__tag">Cestas Básicas de Qualidade</p>
+        </div>
+        <div>
+          <h4>Links Rápidos</h4>
+          <ul class="footer__list">
+            <li><a href="index.html">Início</a></li>
+            <li><a href="carrinho.html">Carrinho</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contato</h4>
+          <ul class="footer__contact">
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:#25D366">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              <a href="https://wa.me/5581996206567" target="_blank" rel="noopener">(81) 99620-6567</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4>Horários</h4>
+          <ul class="footer__list">
+            <li>Seg–Sex: 8h às 18h</li>
+            <li>Sábado: 8h às 13h</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2025 RR Distribuidora. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/dados.js?v=2"></script>
+  <script src="js/carrinho.js?v=2"></script>
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>

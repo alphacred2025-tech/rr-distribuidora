@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logística — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="admin-header__titulo">Logística — Pedidos</span>
+      </div>
+      <div class="admin-header__right">
+        <div class="realtime-pill"><span class="realtime-dot"></span>Ao vivo</div>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      <div id="banner-novo-pedido"></div>
+
+      <!-- Filtros -->
+      <div class="filter-tabs" id="filtros">
+        <button class="filter-tab filter-tab--ativo" data-status="todos" onclick="filtrar('todos')">Todos <span class="filter-count" id="cnt-todos">0</span></button>
+        <button class="filter-tab" data-status="pendente"   onclick="filtrar('pendente')">Pendente <span class="filter-count" id="cnt-pendente">0</span></button>
+        <button class="filter-tab" data-status="em_preparo" onclick="filtrar('em_preparo')">Em preparo <span class="filter-count" id="cnt-em_preparo">0</span></button>
+        <button class="filter-tab" data-status="saiu"       onclick="filtrar('saiu')">Saiu <span class="filter-count" id="cnt-saiu">0</span></button>
+        <button class="filter-tab" data-status="entregue"   onclick="filtrar('entregue')">Entregue <span class="filter-count" id="cnt-entregue">0</span></button>
+        <button class="filter-tab" data-status="cancelado"  onclick="filtrar('cancelado')">Cancelado <span class="filter-count" id="cnt-cancelado">0</span></button>
+      </div>
+
+      <div id="lista-pedidos" style="display:flex;flex-direction:column;gap:1rem">
+        <div class="empty-state"><div class="empty-state__icon">🚚</div><p>Carregando pedidos…</p></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal comanda -->
+<div class="modal-overlay" id="modal-comanda">
+  <div class="modal modal--lg">
+    <div class="modal__header">
+      <span class="modal__titulo">📋 Comanda — <span id="comanda-numero"></span></span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-comanda')">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div class="form-row" style="margin-bottom:.875rem">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Vendedor (editar antes de copiar)</label>
+          <input type="text" id="comanda-vendedor" placeholder="Nome do vendedor" value="Site Online">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Taxa de entrega (R$)</label>
+          <input type="number" id="comanda-taxa" placeholder="0,00" step="0.50" min="0">
+        </div>
+      </div>
+      <div class="comanda-box">
+        <div class="comanda-header">
+          <span class="comanda-label">Comanda</span>
+          <button class="btn btn--gold btn--sm" onclick="atualizarComanda()">↻ Atualizar</button>
+        </div>
+        <div class="comanda-text" id="comanda-texto"></div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-comanda')">Fechar</button>
+      <button class="btn btn--primary" onclick="copiarComanda()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+        Copiar Comanda
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+let todosPedidos = [];
+let motoboys     = [];
+let filtroAtivo  = 'todos';
+let pedidoComanda = null;
+
+(async () => {
+  renderSidebar('logistica');
+  const profile = await requireAuth(['admin', 'logistica']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+
+  await Promise.all([carregarMotoboys(), carregarPedidos()]);
+  setupRealtime();
+})();
+
+async function carregarMotoboys() {
+  const { data } = await db.from('motoboys').select('*').eq('ativo', true).order('nome');
+  motoboys = data || [];
+}
+
+async function carregarPedidos() {
+  const { data, error } = await db
+    .from('pedidos')
+    .select(`*, clientes(nome, telefone, cpf), itens_pedido(cesta_nome, cesta_peso, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa_entrega, motoboys(nome))`)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (error) { toast('Erro ao carregar pedidos', 'error'); return; }
+  todosPedidos = data || [];
+  atualizarContadores();
+  renderPedidos();
+}
+
+function atualizarContadores() {
+  const counts = { todos: todosPedidos.length, pendente:0, em_preparo:0, saiu:0, entregue:0, cancelado:0 };
+  todosPedidos.forEach(p => {
+    const s = p.entregas?.[0]?.status || 'pendente';
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  Object.entries(counts).forEach(([k, v]) => {
+    const el = document.getElementById('cnt-' + k);
+    if (el) el.textContent = v;
+  });
+}
+
+function filtrar(status) {
+  filtroAtivo = status;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('filter-tab--ativo', t.dataset.status === status));
+  renderPedidos();
+}
+
+function renderPedidos() {
+  const lista = document.getElementById('lista-pedidos');
+  const filtrados = filtroAtivo === 'todos'
+    ? todosPedidos
+    : todosPedidos.filter(p => (p.entregas?.[0]?.status || 'pendente') === filtroAtivo);
+
+  if (!filtrados.length) {
+    lista.innerHTML = `<div class="empty-state"><div class="empty-state__icon">📦</div><p>Nenhum pedido ${filtroAtivo !== 'todos' ? 'com esse status' : 'encontrado'}.</p></div>`;
+    return;
+  }
+
+  lista.innerHTML = filtrados.map(p => cardPedido(p)).join('');
+}
+
+function cardPedido(p) {
+  const entrega = p.entregas?.[0] || {};
+  const status  = entrega.status || 'pendente';
+  const cliente = p.clientes    || {};
+  const isNovo  = (Date.now() - new Date(p.created_at)) < 5 * 60 * 1000;
+
+  const enderecoStr = p.forma_entrega === 'entrega'
+    ? `${p.logradouro || ''}, ${p.numero_end || ''} — ${p.bairro || ''}`
+    : '🏪 Retirada na loja';
+
+  const itensHTML = (p.itens_pedido || []).map(i => `
+    <div class="pedido-itens-box" style="margin-bottom:.4rem">
+      <div class="pedido-itens-nome">${i.cesta_nome} × ${i.quantidade} — <strong>${fmtR$(i.preco * i.quantidade)}</strong></div>
+      <div class="pedido-itens-lista">${(i.itens_selecionados || []).join(', ')}</div>
+    </div>`).join('');
+
+  const motoboyOpts = motoboys.map(m =>
+    `<option value="${m.id}" ${entrega.motoboy_id === m.id ? 'selected' : ''}>${m.nome}</option>`
+  ).join('');
+
+  return `
+  <div class="pedido-card ${isNovo ? 'pedido-card--novo' : ''}" id="card-${p.id}">
+    <div class="pedido-card__header">
+      <div style="display:flex;align-items:center;gap:.625rem;flex-wrap:wrap">
+        <span class="pedido-card__num">#${p.numero}</span>
+        ${badgeStatus(status)}
+        ${isNovo ? '<span class="badge" style="background:#fdf6e3;color:#a87e00">🆕 Novo</span>' : ''}
+      </div>
+      <span class="pedido-card__hora">${fmtDataHora(p.created_at)} · ${tempoAtras(p.created_at)}</span>
+    </div>
+    <div class="pedido-card__body">
+      <div class="pedido-info-grid">
+        <div class="pedido-info-item"><label>Cliente</label><span><strong>${cliente.nome || '—'}</strong></span></div>
+        <div class="pedido-info-item"><label>Telefone</label><span><a href="tel:${cliente.telefone}" style="color:var(--navy)">${cliente.telefone || '—'}</a></span></div>
+        <div class="pedido-info-item"><label>Endereço</label><span>${enderecoStr}</span></div>
+        <div class="pedido-info-item"><label>Pagamento</label><span>${p.forma_pagamento === 'pix' ? '💠 PIX' : '💳 Cartão'}</span></div>
+      </div>
+      ${itensHTML}
+    </div>
+    <div class="pedido-card__footer">
+      <span class="pedido-card__total">${fmtR$(p.total)}</span>
+      <select class="status-select" onchange="atualizarStatus('${p.id}','${entrega.id||''}',this.value)">
+        <option value="pendente"   ${status==='pendente'   ?'selected':''}>Pendente</option>
+        <option value="em_preparo" ${status==='em_preparo' ?'selected':''}>Em preparo</option>
+        <option value="saiu"       ${status==='saiu'       ?'selected':''}>Saiu para entrega</option>
+        <option value="entregue"   ${status==='entregue'   ?'selected':''}>Entregue</option>
+        <option value="cancelado"  ${status==='cancelado'  ?'selected':''}>Cancelado</option>
+      </select>
+      ${motoboyOpts ? `<select class="motoboy-select" onchange="atribuirMotoboy('${entrega.id||''}','${p.id}',this.value)"><option value="">🛵 Motoboy</option>${motoboyOpts}</select>` : ''}
+      <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">📋 Comanda</button>
+    </div>
+  </div>`;
+}
+
+async function atualizarStatus(pedidoId, entregaId, novoStatus) {
+  if (entregaId) {
+    const extra = {};
+    if (novoStatus === 'saiu')     extra.saiu_em     = new Date().toISOString();
+    if (novoStatus === 'entregue') extra.entregue_em = new Date().toISOString();
+    await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', entregaId);
+  } else {
+    const { data: nova } = await db.from('entregas').insert({ pedido_id: pedidoId, status: novoStatus }).select('id').single();
+    if (nova) {
+      todosPedidos = todosPedidos.map(p => p.id === pedidoId ? { ...p, entregas: [{ id: nova.id, status: novoStatus }] } : p);
+    }
+  }
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (p && p.entregas?.[0]) p.entregas[0].status = novoStatus;
+  atualizarContadores();
+  renderPedidos();
+  atualizarBadgePendentes();
+  toast('Status atualizado!');
+}
+
+async function atribuirMotoboy(entregaId, pedidoId, motoboyId) {
+  if (!entregaId) {
+    await db.from('entregas').insert({ pedido_id: pedidoId, status:'em_preparo', motoboy_id: motoboyId || null });
+  } else {
+    await db.from('entregas').update({ motoboy_id: motoboyId || null }).eq('id', entregaId);
+  }
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (p) { if (!p.entregas) p.entregas = [{}]; p.entregas[0].motoboy_id = motoboyId; }
+  toast('Motoboy atribuído!');
+}
+
+function abrirComandaModal(pedidoId) {
+  pedidoComanda = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedidoComanda) return;
+  document.getElementById('comanda-numero').textContent = pedidoComanda.numero;
+  document.getElementById('comanda-taxa').value = pedidoComanda.entregas?.[0]?.taxa_entrega || '';
+  atualizarComanda();
+  abrirModal('modal-comanda');
+}
+
+function atualizarComanda() {
+  if (!pedidoComanda) return;
+  const vendedor = document.getElementById('comanda-vendedor').value;
+  const taxa     = document.getElementById('comanda-taxa').value;
+  document.getElementById('comanda-texto').textContent = gerarComanda(pedidoComanda, vendedor, taxa);
+}
+
+async function copiarComanda() {
+  const texto = document.getElementById('comanda-texto').textContent;
+  await navigator.clipboard.writeText(texto);
+
+  // Salva taxa se alterada
+  const taxa    = document.getElementById('comanda-taxa').value;
+  const entrega = pedidoComanda?.entregas?.[0];
+  if (entrega?.id && taxa) await db.from('entregas').update({ taxa_entrega: parseFloat(taxa) || 0 }).eq('id', entrega.id);
+
+  toast('Comanda copiada! Cole no grupo 👍', 'success');
+  fecharModal('modal-comanda');
+}
+
+function setupRealtime() {
+  db.channel('logistica-realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, async payload => {
+      beepNovoPedido();
+      const { data: novoPedido } = await db
+        .from('pedidos')
+        .select('*, clientes(nome, telefone, cpf), itens_pedido(cesta_nome, cesta_peso, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa_entrega, motoboys(nome))')
+        .eq('id', payload.new.id)
+        .single();
+
+      if (novoPedido) {
+        todosPedidos.unshift(novoPedido);
+        atualizarContadores();
+        renderPedidos();
+        atualizarBadgePendentes();
+        mostrarBannerNovoPedido(novoPedido);
+
+        if (Notification.permission === 'granted') {
+          new Notification('🛒 Novo pedido — RR Distribuidora', {
+            body: `#${novoPedido.numero} | ${novoPedido.clientes?.nome || 'Cliente'} | ${fmtR$(novoPedido.total)}`,
+          });
+        }
+      }
+    })
+    .subscribe();
+
+  if (Notification.permission === 'default') Notification.requestPermission();
+}
+
+function mostrarBannerNovoPedido(p) {
+  const banner = document.getElementById('banner-novo-pedido');
+  banner.innerHTML = `
+    <div class="novo-pedido-banner">
+      <span>🛒</span>
+      <p><strong>Novo pedido #${p.numero}</strong> — ${p.clientes?.nome || 'Cliente'} — ${fmtR$(p.total)}</p>
+      <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">Ver comanda</button>
+      <button class="btn btn--ghost btn--sm" style="color:white" onclick="this.closest('.novo-pedido-banner').remove()">✕</button>
+    </div>`;
+  setTimeout(() => { banner.querySelector('.novo-pedido-banner')?.remove(); }, 30000);
+}
+</script>
+</body>
+</html>

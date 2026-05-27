@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financeiro — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <span class="admin-header__titulo">Financeiro</span>
+      </div>
+      <div class="admin-header__right">
+        <div class="mes-picker">
+          <button onclick="mudarMes(-1)">‹</button>
+          <span id="mes-label">Carregando…</span>
+          <button onclick="mudarMes(1)">›</button>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-lancamento')">+ Lançamento</button>
+      </div>
+    </header>
+    <main class="admin-content">
+
+      <!-- KPIs -->
+      <div class="stats-grid mb-15">
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div><div class="stat-card__label">Receita</div><div class="stat-card__valor" id="kpi-receita" style="font-size:1.3rem">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--red"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg></div><div class="stat-card__label">Despesas</div><div class="stat-card__valor" id="kpi-despesa" style="font-size:1.3rem">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Lucro Bruto</div><div class="stat-card__valor" id="kpi-lucro" style="font-size:1.3rem">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><div class="stat-card__label">Margem</div><div class="stat-card__valor" id="kpi-margem">—</div></div>
+      </div>
+
+      <div class="grid-2 mb-15">
+        <!-- Gráfico receita diária -->
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">Receita diária</span></div>
+          <div class="card__body"><div class="chart-wrap" style="height:210px"><canvas id="chart-diario"></canvas></div></div>
+        </div>
+
+        <!-- DRE -->
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">DRE — <span id="dre-mes-label"></span></span></div>
+          <div class="card__body" style="padding:0">
+            <table class="dre-table" id="tabela-dre">
+              <tbody><tr><td colspan="2" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lançamentos -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__titulo">Lançamentos — <span id="lanc-mes-label"></span></span>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <div class="filter-tabs" style="border:none;margin:0">
+              <button class="filter-tab filter-tab--ativo" onclick="filtrarLanc('todos',this)">Todos</button>
+              <button class="filter-tab" onclick="filtrarLanc('receita',this)">Receitas</button>
+              <button class="filter-tab" onclick="filtrarLanc('despesa',this)">Despesas</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th class="col-acao">Valor</th></tr></thead>
+            <tbody id="tbody-lancamentos"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal lançamento -->
+<div class="modal-overlay" id="modal-lancamento">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <span class="modal__titulo">Novo Lançamento</span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-lancamento')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="lanc-tipo" onchange="carregarCategorias(this.value)">
+          <option value="receita">Receita</option>
+          <option value="despesa">Despesa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="lanc-categoria"></select>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <input type="text" id="lanc-descricao" placeholder="Ex: Aluguel março">
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Valor (R$)</label>
+          <input type="number" id="lanc-valor" placeholder="0,00" step="0.01" min="0">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Data</label>
+          <input type="date" id="lanc-data">
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-lancamento')">Cancelar</button>
+      <button class="btn btn--primary" onclick="salvarLancamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+let mesSel = new Date().getMonth();
+let anoSel = new Date().getFullYear();
+let todosLanc = [];
+let filtroLanc = 'todos';
+let chartDiario;
+let categorias = [];
+
+(async () => {
+  renderSidebar('financeiro');
+  const profile = await requireAuth(['admin', 'financeiro']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+  document.getElementById('lanc-data').value = new Date().toISOString().split('T')[0];
+  await carregarCategorias('despesa');
+  await carregarDados();
+})();
+
+function mudarMes(delta) {
+  mesSel += delta;
+  if (mesSel > 11) { mesSel = 0; anoSel++; }
+  if (mesSel < 0)  { mesSel = 11; anoSel--; }
+  carregarDados();
+}
+
+function labelMes() { return `${MESES[mesSel]} ${anoSel}`; }
+
+function inicioFimMes() {
+  const inicio = `${anoSel}-${String(mesSel+1).padStart(2,'0')}-01`;
+  const fim    = new Date(anoSel, mesSel+1, 0).toISOString().split('T')[0];
+  return { inicio, fim };
+}
+
+async function carregarDados() {
+  const label = labelMes();
+  document.getElementById('mes-label').textContent     = label;
+  document.getElementById('dre-mes-label').textContent = label;
+  document.getElementById('lanc-mes-label').textContent = label;
+
+  const { inicio, fim } = inicioFimMes();
+
+  // Pedidos do mês (receita automática do site)
+  const { data: pedidos } = await db.from('pedidos').select('total, created_at').gte('created_at', inicio + 'T00:00:00').lte('created_at', fim + 'T23:59:59');
+  const receitaSite = (pedidos || []).reduce((s,p)=>s+p.total,0);
+
+  // Lançamentos manuais do mês
+  const { data: lancs } = await db.from('lancamentos')
+    .select('*, categorias_financeiras(nome, tipo, cor)')
+    .gte('data', inicio).lte('data', fim)
+    .order('data', { ascending:false });
+
+  todosLanc = lancs || [];
+  const receitaManual = todosLanc.filter(l=>l.tipo==='receita').reduce((s,l)=>s+l.valor,0);
+  const despesaTotal  = todosLanc.filter(l=>l.tipo==='despesa').reduce((s,l)=>s+l.valor,0);
+  const receitaTotal  = receitaSite + receitaManual;
+  const lucro         = receitaTotal - despesaTotal;
+  const margem        = receitaTotal ? ((lucro/receitaTotal)*100).toFixed(1) + '%' : '—';
+
+  document.getElementById('kpi-receita').textContent = fmtR$(receitaTotal);
+  document.getElementById('kpi-despesa').textContent = fmtR$(despesaTotal);
+  document.getElementById('kpi-lucro').textContent   = fmtR$(lucro);
+  document.getElementById('kpi-margem').textContent  = margem;
+
+  renderLancamentos();
+  renderDRE(receitaSite, receitaManual, despesaTotal, todosLanc);
+  await renderGrafico(pedidos || [], inicio, fim);
+}
+
+function filtrarLanc(tipo, btn) {
+  filtroLanc = tipo;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('filter-tab--ativo'));
+  btn.classList.add('filter-tab--ativo');
+  renderLancamentos();
+}
+
+function renderLancamentos() {
+  const lista = filtroLanc === 'todos' ? todosLanc : todosLanc.filter(l => l.tipo === filtroLanc);
+  const tbody = document.getElementById('tbody-lancamentos');
+  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum lançamento encontrado.</td></tr>'; return; }
+  tbody.innerHTML = lista.map(l => `
+    <tr>
+      <td>${fmtData(l.data)}</td>
+      <td>${l.descricao}</td>
+      <td><span style="font-size:.8rem">${l.categorias_financeiras?.nome || '—'}</span></td>
+      <td>${l.tipo === 'receita' ? '<span class="badge badge--receita">Receita</span>' : '<span class="badge badge--despesa">Despesa</span>'}</td>
+      <td class="col-acao"><strong class="${l.tipo==='receita'?'val-pos':'val-neg'}">${l.tipo==='despesa'?'−':'+'} ${fmtR$(l.valor)}</strong></td>
+    </tr>`).join('');
+}
+
+function renderDRE(receitaSite, receitaManual, despesaTotal, lancs) {
+  const receitaTotal = receitaSite + receitaManual;
+  const despPorCat   = {};
+  lancs.filter(l=>l.tipo==='despesa').forEach(l => {
+    const c = l.categorias_financeiras?.nome || 'Outros';
+    despPorCat[c] = (despPorCat[c]||0) + l.valor;
+  });
+  const lucro = receitaTotal - despesaTotal;
+
+  let html = `
+    <tr class="dre-grupo"><td colspan="2">RECEITAS</td></tr>
+    <tr class="dre-item"><td>Vendas pelo Site</td><td class="val-pos">${fmtR$(receitaSite)}</td></tr>
+    ${receitaManual ? `<tr class="dre-item"><td>Outras Receitas</td><td class="val-pos">${fmtR$(receitaManual)}</td></tr>` : ''}
+    <tr class="dre-total"><td>Total Receitas</td><td class="val-pos val-bold">${fmtR$(receitaTotal)}</td></tr>
+    <tr class="dre-grupo"><td colspan="2">DESPESAS</td></tr>
+    ${Object.entries(despPorCat).map(([k,v])=>`<tr class="dre-item"><td>${k}</td><td class="val-neg">${fmtR$(v)}</td></tr>`).join('')}
+    ${!Object.keys(despPorCat).length ? '<tr class="dre-item"><td style="color:var(--text-muted)" colspan="2">Nenhuma despesa lançada</td></tr>' : ''}
+    <tr class="dre-total"><td>Total Despesas</td><td class="val-neg val-bold">${fmtR$(despesaTotal)}</td></tr>
+    <tr class="dre-resultado"><td>LUCRO BRUTO</td><td class="${lucro>=0?'val-pos':'val-neg'} val-bold">${fmtR$(lucro)}</td></tr>`;
+
+  document.querySelector('#tabela-dre tbody').innerHTML = html;
+}
+
+async function renderGrafico(pedidos, inicio, fim) {
+  const dias = [];
+  const d0 = new Date(inicio + 'T12:00:00'), d1 = new Date(fim + 'T12:00:00');
+  for (let d = new Date(d0); d <= d1; d.setDate(d.getDate()+1)) dias.push(d.toISOString().split('T')[0]);
+
+  const vals = dias.map(d => pedidos.filter(p=>p.created_at.startsWith(d)).reduce((s,p)=>s+p.total,0));
+  const ctx  = document.getElementById('chart-diario').getContext('2d');
+  if (chartDiario) chartDiario.destroy();
+  chartDiario = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dias.map(d => new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})),
+      datasets: [{ label:'Receita', data: vals, borderColor:'#1B3A87', backgroundColor:'rgba(27,58,135,.08)', fill:true, tension:.4, pointRadius:3 }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ ticks:{ callback: v => 'R$'+v.toLocaleString('pt-BR') }, grid:{color:'#eef'} }, x:{grid:{display:false}} } },
+  });
+}
+
+async function carregarCategorias(tipo) {
+  const { data } = await db.from('categorias_financeiras').select('*').eq('tipo', tipo).order('nome');
+  categorias = data || [];
+  const sel = document.getElementById('lanc-categoria');
+  if (!sel) return;
+  sel.innerHTML = categorias.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+}
+
+async function salvarLancamento() {
+  const tipo      = document.getElementById('lanc-tipo').value;
+  const catId     = document.getElementById('lanc-categoria').value;
+  const descricao = document.getElementById('lanc-descricao').value.trim();
+  const valor     = parseFloat(document.getElementById('lanc-valor').value);
+  const data      = document.getElementById('lanc-data').value;
+
+  if (!descricao || !valor || !data) { toast('Preencha todos os campos', 'warning'); return; }
+
+  const { error } = await db.from('lancamentos').insert({
+    tipo, categoria_id: catId || null, descricao, valor, data,
+    criado_por: (await db.auth.getUser()).data.user?.id || null,
+  });
+
+  if (error) { toast('Erro ao salvar lançamento', 'error'); return; }
+
+  fecharModal('modal-lancamento');
+  toast('Lançamento salvo!');
+  document.getElementById('lanc-descricao').value = '';
+  document.getElementById('lanc-valor').value     = '';
+  await carregarDados();
+}
+</script>
+</body>
+</html>

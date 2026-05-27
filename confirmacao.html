@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedido Confirmado — RR Distribuidora</title>
+  <link rel="stylesheet" href="css/style.css?v=3" />
+</head>
+<body data-page="confirmacao">
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="container">
+      <div class="header__inner">
+        <a href="index.html" class="header__logo">
+          <img src="assets/img/logo.svg" alt="RR Distribuidora" class="header__logo-img">
+        </a>
+        <nav class="header__nav">
+          <a href="index.html" class="btn btn--outline" style="font-size:.88rem; padding:.5rem 1rem;">
+            ← Voltar à loja
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ STEPPER ═══════════════════════════════════════════════ -->
+  <div class="container">
+    <nav class="stepper" aria-label="Progresso do pedido">
+      <div class="step step--done">
+        <div class="step__num">✓</div>
+        <span>Carrinho</span>
+      </div>
+      <div class="step-sep step-sep--done"></div>
+      <div class="step step--done">
+        <div class="step__num">✓</div>
+        <span>Dados</span>
+      </div>
+      <div class="step-sep step-sep--done"></div>
+      <div class="step step--done">
+        <div class="step__num">✓</div>
+        <span>Pagamento</span>
+      </div>
+      <div class="step-sep step-sep--done"></div>
+      <div class="step step--ativo">
+        <div class="step__num">4</div>
+        <span>Confirmação</span>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ═══ CONTEÚDO ══════════════════════════════════════════════ -->
+  <main class="confirmacao-page">
+    <div class="container">
+      <div class="confirmacao-box">
+        <!-- Ícone de sucesso animado -->
+        <div class="conf-success-icon" role="img" aria-label="Pedido realizado com sucesso">✅</div>
+
+        <h1 class="conf-titulo">Pedido realizado com sucesso!</h1>
+        <p class="conf-subtitulo">Obrigado pela sua compra. Em breve entraremos em contato para confirmar os detalhes.</p>
+
+        <div class="conf-numero">Pedido <span id="conf-numero">#———</span></div>
+
+        <!-- Detalhes do pedido -->
+        <div class="conf-detalhes">
+          <div class="conf-detalhe-linha">
+            <span>Cliente</span>
+            <span id="conf-nome">—</span>
+          </div>
+          <div class="conf-detalhe-linha">
+            <span>Pagamento</span>
+            <span id="conf-pagamento">—</span>
+          </div>
+          <div class="conf-detalhe-linha">
+            <span>Entrega / Retirada</span>
+            <span id="conf-entrega">—</span>
+          </div>
+        </div>
+
+        <!-- Itens do pedido -->
+        <div class="conf-itens" id="conf-itens">
+          <!-- Preenchido via JS -->
+        </div>
+
+        <div class="conf-total">
+          <span>Total</span>
+          <span id="conf-total">R$ 0,00</span>
+        </div>
+
+        <!-- Seção WhatsApp -->
+        <div class="conf-wa-section">
+          <p>
+            Clique abaixo para enviar o resumo do seu pedido via WhatsApp e agilizar o atendimento:
+          </p>
+          <a href="#" id="btn-whatsapp" target="_blank" rel="noopener" class="btn btn--whatsapp btn--full btn--lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            Enviar pedido pelo WhatsApp
+          </a>
+          <p class="conf-countdown">
+            Redirecionando automaticamente em <span id="countdown">5</span> segundos...
+          </p>
+        </div>
+
+        <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--gray-200);">
+          <a href="index.html" class="btn btn--ghost btn--full">
+            Fazer outro pedido
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <img src="assets/img/logo-white.svg" alt="RR Distribuidora" style="height:56px;width:auto;margin-bottom:.75rem;display:block;">
+          <div class="footer__nome">RR Distribuidora</div>
+          <p class="footer__tag">Cestas Básicas de Qualidade</p>
+        </div>
+        <div>
+          <h4>Links Rápidos</h4>
+          <ul class="footer__list">
+            <li><a href="index.html">Início</a></li>
+            <li><a href="index.html#produtos">Cestas</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contato</h4>
+          <ul class="footer__contact">
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:#25D366">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              <a href="https://wa.me/5581996206567" target="_blank" rel="noopener">(81) 99620-6567</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4>Horários</h4>
+          <ul class="footer__list">
+            <li>Seg–Sex: 8h às 18h</li>
+            <li>Sábado: 8h às 13h</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2025 RR Distribuidora. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/dados.js?v=2"></script>
+  <script src="js/carrinho.js?v=2"></script>
+  <script src="js/database.js?v=1"></script>
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>
