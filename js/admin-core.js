@@ -10,9 +10,9 @@ const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 let currentUser    = null;
 let currentProfile = null;
 
-const PAPEIS = { admin:'Administrador', vendedor:'Vendedor', logistica:'Logística', financeiro:'Financeiro' };
+const PAPEIS = { admin:'Administrador', vendedor:'Vendedor', logistica:'Logística', financeiro:'Financeiro', montador:'Montador', motoboy:'Motoboy' };
 const STATUS  = { pendente:'Pendente', em_preparo:'Em preparo', saiu:'Saiu para entrega', entregue:'Entregue', cancelado:'Cancelado' };
-const ROTAS   = { admin:'painel.html', vendedor:'comercial.html', logistica:'logistica.html', financeiro:'financeiro.html' };
+const ROTAS   = { admin:'painel.html', vendedor:'comercial.html', logistica:'logistica.html', financeiro:'financeiro.html', montador:'logistica.html', motoboy:'logistica.html' };
 
 // ── Auth ──────────────────────────────────────────────────────
 

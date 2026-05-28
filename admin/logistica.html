@@ -25,6 +25,16 @@
     <main class="admin-content">
       <div id="banner-novo-pedido"></div>
 
+      <!-- KPIs operacionais -->
+      <div class="stats-grid mb-15" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-card__label">Pedidos Hoje</div><div class="stat-card__valor" id="kpi-hoje">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Aguardando</div><div class="stat-card__valor" id="kpi-aguardando" style="color:#f59e0b">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div><div class="stat-card__label">Em Rota Agora</div><div class="stat-card__valor" id="kpi-rota" style="color:#6366f1">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Entregues Hoje</div><div class="stat-card__valor" id="kpi-entregues" style="color:#22c55e">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Receita Hoje</div><div class="stat-card__valor" id="kpi-receita-hoje" style="font-size:1.1rem">—</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--red"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div><div class="stat-card__label">Com Maquineta</div><div class="stat-card__valor" id="kpi-maquineta" style="color:#ef4444">—</div><div class="stat-card__sub">retirar da rota</div></div>
+      </div>
+
       <!-- Filtros -->
       <div class="filter-tabs mb-15" id="filtros">
         <button class="filter-tab filter-tab--active" data-status="todos"     onclick="filtrar('todos')">Todos <span class="filter-count" id="cnt-todos">0</span></button>
@@ -89,12 +99,22 @@ let todosPedidos  = [];
 let motoboys      = [];
 let filtroAtivo   = 'todos';
 let pedidoComanda = null;
+let comissaoMotoboy = 14;
+let comissaoVendedor = 20;
 
 (async () => {
   renderSidebar('logistica');
-  const profile = await requireAuth(['admin', 'logistica']);
+  const profile = await requireAuth(['admin', 'logistica', 'montador', 'motoboy']);
   if (!profile) return;
   atualizarBadgePendentes();
+  // Carrega comissões configuradas
+  const { data: cfgs } = await db.from('configuracoes')
+    .select('chave,valor')
+    .in('chave', ['comissao_motoboy','comissao_vendedor_cesta']);
+  (cfgs || []).forEach(c => {
+    if (c.chave === 'comissao_motoboy')        comissaoMotoboy  = parseFloat(c.valor) || 14;
+    if (c.chave === 'comissao_vendedor_cesta') comissaoVendedor = parseFloat(c.valor) || 20;
+  });
   await Promise.all([carregarMotoboys(), carregarPedidos()]);
   setupRealtime();
 })();
@@ -107,14 +127,35 @@ async function carregarMotoboys() {
 async function carregarPedidos() {
   const { data, error } = await db
     .from('pedidos')
-    .select('*, clientes(nome, telefone), itens_pedido(cesta_nome, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa, motoboys(nome, telefone))')
+    .select('*, clientes(nome, telefone), itens_pedido(cesta_nome, preco, quantidade, itens_selecionados), entregas(id, status, motoboy_id, taxa, saiu_em, entregue_em, motoboys(nome, telefone)), profiles(nome)')
     .order('created_at', { ascending: false })
     .limit(200);
 
   if (error) { toast('Erro ao carregar pedidos: ' + error.message, 'error'); return; }
   todosPedidos = data || [];
   atualizarContadores();
+  atualizarKPIs();
   renderPedidos();
+}
+
+async function atualizarKPIs() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const pedidosHoje = todosPedidos.filter(p => p.created_at?.startsWith(hoje));
+  const aguardando  = todosPedidos.filter(p => ['pendente','em_preparo'].includes(p.entregas?.[0]?.status || 'pendente')).length;
+  const emRota      = todosPedidos.filter(p => p.entregas?.[0]?.status === 'saiu').length;
+  const entreguesH  = pedidosHoje.filter(p => p.entregas?.[0]?.status === 'entregue').length;
+  const receitaHoje = pedidosHoje.reduce((s,p) => s + (p.total || 0), 0);
+  const maquineta   = todosPedidos.filter(p =>
+    p.forma_pagamento === 'cartao' &&
+    !['entregue','cancelado'].includes(p.entregas?.[0]?.status || 'pendente')
+  ).length;
+
+  document.getElementById('kpi-hoje').textContent        = pedidosHoje.length;
+  document.getElementById('kpi-aguardando').textContent  = aguardando;
+  document.getElementById('kpi-rota').textContent        = emRota;
+  document.getElementById('kpi-entregues').textContent   = entreguesH;
+  document.getElementById('kpi-receita-hoje').textContent= fmtR$(receitaHoje);
+  document.getElementById('kpi-maquineta').textContent   = maquineta;
 }
 
 function atualizarContadores() {
@@ -160,6 +201,10 @@ function cardPedido(p) {
     : '🏪 Retirada na loja';
 
   const pgto = { pix:'💠 PIX', cartao:'💳 Cartão', avista:'💵 À vista', dinheiro:'💵 Dinheiro' };
+  const telLimpo = (cliente.telefone || '').replace(/\D/g,'');
+  const qtdCestas = (p.itens_pedido || []).reduce((s,i) => s + (i.quantidade||1), 0);
+  const precisaMaquineta = p.forma_pagamento === 'cartao';
+  const vendedor = p.profiles?.nome || null;
 
   const itensHTML = (p.itens_pedido || []).map(i => `
     <div style="margin-bottom:.3rem">
@@ -176,7 +221,14 @@ function cardPedido(p) {
     : '';
 
   const troco = (p.troco_para && p.forma_pagamento === 'dinheiro')
-    ? `<div class="pedido-info-item"><label>Troco</label><span>Para ${fmtR$(p.troco_para)}</span></div>` : '';
+    ? `<div class="pedido-info-item"><label>Troco p/</label><span style="font-weight:700;color:#16a34a">${fmtR$(p.troco_para)}</span></div>` : '';
+
+  const tempoEmRota = (status === 'saiu' && entrega.saiu_em)
+    ? `<span style="font-size:.75rem;color:#f59e0b;font-weight:600">⏱ ${tempoAtras(entrega.saiu_em)}</span>` : '';
+
+  const comissaoPreview = status !== 'entregue' && status !== 'cancelado'
+    ? `<span style="font-size:.72rem;color:var(--text-muted)">🛵 R$${(qtdCestas * comissaoMotoboy + (entrega.taxa||0)).toFixed(0)} motoboy${vendedor ? ` · 🧑‍💼 R$${(qtdCestas * comissaoVendedor).toFixed(0)} vendedor` : ''}</span>`
+    : '';
 
   return `
   <div class="pedido-card ${isNovo ? 'pedido-card--novo':''}" id="card-${p.id}">
@@ -185,22 +237,39 @@ function cardPedido(p) {
         <span class="pedido-card__num">#${p.numero}</span>
         ${badgeStatus(status)}
         ${isNovo ? '<span class="badge" style="background:#fdf6e3;color:#a87e00;font-size:.7rem">🆕 Novo</span>' : ''}
+        <span style="background:#e8eef8;color:var(--navy);padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600">${qtdCestas} cesta${qtdCestas>1?'s':''}</span>
+        ${precisaMaquineta ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:700">💳 MAQUINETA</span>' : ''}
         ${motoboy ? `<span class="badge badge--logistica" style="font-size:.7rem">🛵 ${motoboy.nome}</span>` : ''}
+        ${tempoEmRota}
       </div>
       <span class="pedido-card__hora">${fmtDataHora(p.created_at)} · ${tempoAtras(p.created_at)}</span>
     </div>
     <div class="pedido-card__body">
       <div class="pedido-info-grid">
-        <div class="pedido-info-item"><label>Cliente</label><span><strong>${cliente.nome || '—'}</strong></span></div>
-        <div class="pedido-info-item"><label>Telefone</label><span><a href="https://wa.me/55${(cliente.telefone||'').replace(/\D/g,'')}" target="_blank" style="color:var(--navy)">${cliente.telefone || '—'}</a></span></div>
+        <div class="pedido-info-item">
+          <label>Cliente</label>
+          <span>
+            <strong>${cliente.nome || '—'}</strong>
+            ${telLimpo ? `
+              <span style="display:inline-flex;gap:.3rem;margin-left:.4rem">
+                <a href="https://wa.me/55${telLimpo}" target="_blank" title="WhatsApp" style="background:#25d366;color:#fff;padding:1px 7px;border-radius:10px;font-size:.7rem;text-decoration:none">WA</a>
+                <a href="tel:+55${telLimpo}" title="Ligar" style="background:#3b82f6;color:#fff;padding:1px 7px;border-radius:10px;font-size:.7rem;text-decoration:none">📞</a>
+              </span>` : ''}
+          </span>
+        </div>
         <div class="pedido-info-item"><label>Endereço</label><span>${enderecoStr}</span></div>
         <div class="pedido-info-item"><label>Pagamento</label><span>${pgto[p.forma_pagamento] || p.forma_pagamento || '—'}</span></div>
         ${troco}
+        ${vendedor ? `<div class="pedido-info-item"><label>Vendedor</label><span>${vendedor}</span></div>` : ''}
+        ${entrega.taxa ? `<div class="pedido-info-item"><label>Taxa entrega</label><span style="font-weight:600">${fmtR$(entrega.taxa)}</span></div>` : ''}
       </div>
       <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">${itensHTML}</div>
     </div>
     <div class="pedido-card__footer">
-      <span class="pedido-card__total">${fmtR$(p.total)}</span>
+      <div style="display:flex;flex-direction:column;gap:.2rem">
+        <span class="pedido-card__total">${fmtR$(p.total)}</span>
+        ${comissaoPreview}
+      </div>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
         <select class="status-select" onchange="atualizarStatus('${p.id}','${entrega.id||''}',this.value)">
           <option value="pendente"   ${status==='pendente'  ?'selected':''}>Pendente</option>
@@ -222,33 +291,76 @@ async function atualizarStatus(pedidoId, entregaId, novoStatus) {
   if (novoStatus === 'saiu')     extra.saiu_em     = new Date().toISOString();
   if (novoStatus === 'entregue') extra.entregue_em = new Date().toISOString();
 
+  const p = todosPedidos.find(x => x.id === pedidoId);
+
+  // Bloqueia "saiu" sem motoboy atribuído
+  if (novoStatus === 'saiu' && p && !p.entregas?.[0]?.motoboy_id) {
+    toast('Atribua um motoboy antes de marcar como saiu!', 'error');
+    // Reverte o select
+    const card = document.getElementById('card-' + pedidoId);
+    if (card) { const sel = card.querySelector('.status-select'); if (sel) sel.value = p.entregas?.[0]?.status || 'pendente'; }
+    return;
+  }
+
   if (entregaId) {
     const { error } = await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', entregaId);
     if (error) { toast('Erro ao atualizar status', 'error'); return; }
   } else {
     const { data: nova, error } = await db.from('entregas').insert({ pedido_id: pedidoId, status: novoStatus }).select('id').single();
     if (error) { toast('Erro ao criar entrega', 'error'); return; }
-    if (nova) {
-      todosPedidos = todosPedidos.map(p => p.id === pedidoId ? { ...p, entregas: [{ id: nova.id, status: novoStatus }] } : p);
-    }
+    if (nova) todosPedidos = todosPedidos.map(x => x.id === pedidoId ? { ...x, entregas: [{ id: nova.id, status: novoStatus }] } : x);
   }
 
-  const p = todosPedidos.find(x => x.id === pedidoId);
   if (p && p.entregas?.[0]) p.entregas[0].status = novoStatus;
 
-  // Notificação automática pro motoboy quando sai p/ entrega
+  // ── Quando SAI: WhatsApp automático pro motoboy ──────────────
   if (novoStatus === 'saiu' && p) {
     const motoboy = motoboys.find(m => m.id === p.entregas?.[0]?.motoboy_id);
     if (motoboy?.telefone) {
-      const comanda = gerarComanda(p, 'Logística', p.entregas?.[0]?.taxa || '');
+      const comanda = gerarComanda(p, p.profiles?.nome || 'Logística', p.entregas?.[0]?.taxa || '');
       const tel = '55' + motoboy.telefone.replace(/\D/g,'');
-      const url = `https://wa.me/${tel}?text=${encodeURIComponent(comanda)}`;
-      toast(`🛵 Abrindo WhatsApp para ${motoboy.nome}...`, 'success');
-      setTimeout(() => window.open(url, '_blank'), 800);
+      toast(`🛵 Enviando comanda para ${motoboy.nome}...`, 'success');
+      setTimeout(() => window.open(`https://wa.me/${tel}?text=${encodeURIComponent(comanda)}`, '_blank'), 700);
+    }
+  }
+
+  // ── Quando ENTREGUE: cria comissões automaticamente ──────────
+  if (novoStatus === 'entregue' && p) {
+    const entrega   = p.entregas?.[0] || {};
+    const motoboy   = motoboys.find(m => m.id === entrega.motoboy_id);
+    const qtdCestas = (p.itens_pedido || []).reduce((s,i) => s + (i.quantidade||1), 0);
+    const hoje      = new Date().toISOString().split('T')[0];
+
+    // Comissão motoboy: R$14 × qtd cestas + taxa de entrega
+    if (motoboy) {
+      const valMotoboy = (qtdCestas * comissaoMotoboy) + (entrega.taxa || 0);
+      await db.from('lancamentos').insert({
+        tipo:      'despesa',
+        categoria: 'transporte',
+        descricao: `Comissão motoboy ${motoboy.nome} — Pedido #${p.numero} (${qtdCestas} cesta${qtdCestas>1?'s':''})`,
+        valor:     valMotoboy,
+        data:      hoje,
+        pedido_id: pedidoId,
+      });
+      toast(`✅ Comissão motoboy ${fmtR$(valMotoboy)} registrada!`, 'success');
+    }
+
+    // Comissão vendedor: R$20 × qtd cestas (só se pedido veio de vendedor)
+    if (p.vendedor_id && p.profiles?.nome) {
+      const valVendedor = qtdCestas * comissaoVendedor;
+      await db.from('lancamentos').insert({
+        tipo:      'despesa',
+        categoria: 'salarios',
+        descricao: `Comissão vendedor ${p.profiles.nome} — Pedido #${p.numero} (${qtdCestas} cesta${qtdCestas>1?'s':''})`,
+        valor:     valVendedor,
+        data:      hoje,
+        pedido_id: pedidoId,
+      });
     }
   }
 
   atualizarContadores();
+  atualizarKPIs();
   renderPedidos();
   atualizarBadgePendentes();
   toast('Status atualizado!');

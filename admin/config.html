@@ -19,10 +19,11 @@
     <main class="admin-content">
 
       <div class="filter-tabs mb-15" id="config-tabs">
-        <button class="filter-tab filter-tab--active" onclick="mudarAba('empresa')">Empresa</button>
-        <button class="filter-tab" onclick="mudarAba('usuarios')">Usuários</button>
-        <button class="filter-tab" onclick="mudarAba('motoboys')">Motoboys</button>
-        <button class="filter-tab" onclick="mudarAba('comercial')">Comercial</button>
+        <button class="filter-tab filter-tab--active" onclick="mudarAba('empresa',this)">Empresa</button>
+        <button class="filter-tab" onclick="mudarAba('usuarios',this)">Usuários</button>
+        <button class="filter-tab" onclick="mudarAba('motoboys',this)">Motoboys</button>
+        <button class="filter-tab" onclick="mudarAba('comercial',this)">Comercial</button>
+        <button class="filter-tab" onclick="mudarAba('bairros',this)">Taxas por Bairro</button>
       </div>
 
       <!-- ABA: EMPRESA -->
@@ -129,6 +130,25 @@
         </div>
       </div>
 
+      <!-- ABA: BAIRROS -->
+      <div id="aba-bairros" class="aba-content" style="display:none">
+        <div class="card">
+          <div class="card__header">
+            <span class="card__titulo">Taxas de Entrega por Bairro / Região</span>
+            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-add-bairro')">+ Adicionar</button>
+          </div>
+          <div class="alerta alerta--info" style="margin:0 1rem .5rem">
+            Essas taxas aparecem automaticamente no checkout quando o cliente informa o CEP. Configure de acordo com a região de entrega.
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Bairro / Região</th><th>Município</th><th>Taxa</th><th></th></tr></thead>
+              <tbody id="tbody-bairros"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ABA: MOTOBOYS -->
       <div id="aba-motoboys" class="aba-content" style="display:none">
         <div class="card">
@@ -149,18 +169,22 @@
       <div id="aba-comercial" class="aba-content" style="display:none">
         <div class="grid-2 mb-15">
           <div class="card">
-            <div class="card__header"><span class="card__titulo">Comissões de Vendedores</span></div>
+            <div class="card__header"><span class="card__titulo">Comissões</span></div>
             <div class="card__body">
               <form id="form-comissoes">
                 <div class="form-group">
-                  <label>Percentual de comissão padrão (%)</label>
-                  <input class="form-input" type="number" id="cfg-comissao-pct" placeholder="5" min="0" max="100" step="0.5">
-                  <span style="font-size:.8rem;color:var(--text-muted)">Aplicado sobre o total bruto de cada pedido</span>
+                  <label>Comissão do vendedor por cesta (R$)</label>
+                  <input class="form-input" type="number" id="cfg-comissao-vendedor" placeholder="20.00" min="0" step="0.50">
+                  <span style="font-size:.8rem;color:var(--text-muted)">Ex: R$20 por cesta vendida. Criado automaticamente no financeiro ao entregar.</span>
+                </div>
+                <div class="form-group">
+                  <label>Comissão do motoboy por cesta (R$)</label>
+                  <input class="form-input" type="number" id="cfg-comissao-motoboy" placeholder="14.00" min="0" step="0.50">
+                  <span style="font-size:.8rem;color:var(--text-muted)">Ex: R$14 por cesta + taxa de entrega do bairro.</span>
                 </div>
                 <div class="form-group">
                   <label>Dia de corte para pagamento</label>
                   <input class="form-input" type="number" id="cfg-dia-corte" placeholder="25" min="1" max="28">
-                  <span style="font-size:.8rem;color:var(--text-muted)">Dia do mês em que as comissões são fechadas</span>
                 </div>
                 <button type="submit" class="btn btn--primary">Salvar comissões</button>
               </form>
@@ -232,6 +256,35 @@
   </div>
 </div>
 
+<!-- Modal: Adicionar/Editar Bairro -->
+<div class="modal-overlay" id="modal-add-bairro">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__titulo" id="titulo-modal-bairro">Adicionar Bairro</span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-add-bairro')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="bairro-edit-idx">
+      <div class="form-group">
+        <label>Bairro / Região</label>
+        <input class="form-input" type="text" id="bairro-nome" placeholder="Ex: Boa Viagem">
+      </div>
+      <div class="form-group">
+        <label>Município</label>
+        <input class="form-input" type="text" id="bairro-municipio" placeholder="Ex: Recife">
+      </div>
+      <div class="form-group">
+        <label>Taxa de Entrega (R$)</label>
+        <input class="form-input" type="number" id="bairro-taxa" placeholder="5.00" min="0" step="0.50">
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-add-bairro')">Cancelar</button>
+      <button class="btn btn--primary" onclick="salvarBairro()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Alterar papel do usuário -->
 <div class="modal-overlay" id="modal-papel">
   <div class="modal">
@@ -245,9 +298,11 @@
         <label>Papel / Área de acesso</label>
         <select class="form-input" id="papel-select">
           <option value="admin">Admin — acesso total</option>
-          <option value="vendedor">Vendedor — Comercial</option>
-          <option value="logistica">Logística — Logística</option>
-          <option value="financeiro">Financeiro — Financeiro</option>
+          <option value="vendedor">Vendedor — Comercial + pedidos</option>
+          <option value="logistica">Logística — Pedidos e entregas</option>
+          <option value="financeiro">Financeiro — Lançamentos</option>
+          <option value="montador">Montador — Fila de montagem</option>
+          <option value="motoboy">Motoboy — Entregas e comissões</option>
         </select>
       </div>
     </div>
@@ -291,7 +346,7 @@
 <script src="../js/admin-core.js"></script>
 <script>
 let configCache = {};
-let abAativa = 'empresa';
+let bairrosList  = [];
 
 (async () => {
   renderSidebar('config');
@@ -301,13 +356,12 @@ let abAativa = 'empresa';
   await Promise.all([carregarConfigs(), carregarUsuarios(), carregarMotoboys()]);
 })();
 
-function mudarAba(aba) {
-  abAativa = aba;
+function mudarAba(aba, btn) {
   document.querySelectorAll('.aba-content').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.filter-tab').forEach(el => el.classList.remove('filter-tab--active'));
   document.getElementById('aba-' + aba).style.display = '';
-  const idx = ['empresa','usuarios','motoboys','comercial'].indexOf(aba);
-  document.querySelectorAll('.filter-tab')[idx]?.classList.add('filter-tab--active');
+  if (btn) btn.classList.add('filter-tab--active');
+  if (aba === 'bairros') carregarBairros();
 }
 
 // ─── Configs ────────────────────────────────────────────────────────────────
@@ -333,8 +387,10 @@ async function carregarConfigs() {
   setChk('cfg-cartao', 'pagamento_cartao');
   setChk('cfg-dinheiro', 'pagamento_dinheiro');
   set('cfg-chave-pix', 'chave_pix');
-  set('cfg-comissao-pct', 'comissao_percentual');
-  set('cfg-dia-corte', 'comissao_dia_corte');
+  set('cfg-comissao-vendedor', 'comissao_vendedor_cesta');
+  set('cfg-comissao-motoboy',  'comissao_motoboy');
+  set('cfg-comissao-pct',      'comissao_percentual');
+  set('cfg-dia-corte',         'comissao_dia_corte');
   set('cfg-meta-fat', 'meta_faturamento');
   set('cfg-meta-clientes', 'meta_clientes');
   set('cfg-meta-pedidos', 'meta_pedidos');
@@ -389,11 +445,83 @@ document.getElementById('form-pagamento').addEventListener('submit', async e => 
 document.getElementById('form-comissoes').addEventListener('submit', async e => {
   e.preventDefault();
   await upsertConfigs({
-    comissao_percentual: document.getElementById('cfg-comissao-pct').value,
-    comissao_dia_corte:  document.getElementById('cfg-dia-corte').value,
+    comissao_vendedor_cesta: document.getElementById('cfg-comissao-vendedor').value,
+    comissao_motoboy:        document.getElementById('cfg-comissao-motoboy').value,
+    comissao_percentual:     document.getElementById('cfg-comissao-pct').value || '0',
+    comissao_dia_corte:      document.getElementById('cfg-dia-corte').value,
   });
   toast('Comissões salvas!');
 });
+
+// ─── Bairros / Taxas ────────────────────────────────────────────────────────
+
+async function carregarBairros() {
+  const { data } = await db.from('configuracoes').select('valor').eq('chave','taxas_bairros').maybeSingle();
+  try { bairrosList = data?.valor ? JSON.parse(data.valor) : []; } catch(e) { bairrosList = []; }
+  renderBairros();
+}
+
+function renderBairros() {
+  const tbody = document.getElementById('tbody-bairros');
+  if (!bairrosList.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhuma taxa cadastrada.</td></tr>';
+    return;
+  }
+  const sorted = [...bairrosList].sort((a,b) => a.taxa - b.taxa || a.bairro.localeCompare(b.bairro));
+  tbody.innerHTML = sorted.map((b, i) => `
+    <tr>
+      <td><strong>${b.bairro}</strong></td>
+      <td style="color:var(--text-muted)">${b.municipio || '—'}</td>
+      <td><span style="font-weight:700;color:var(--navy)">${fmtR$(b.taxa)}</span></td>
+      <td>
+        <button class="btn btn--outline btn--sm" onclick="editarBairro(${i})">Editar</button>
+        <button class="btn btn--outline btn--sm" onclick="removerBairro(${i})" style="color:#ef4444;border-color:#ef4444;margin-left:.3rem">Remover</button>
+      </td>
+    </tr>`).join('');
+}
+
+function editarBairro(idx) {
+  const b = bairrosList[idx];
+  if (!b) return;
+  document.getElementById('bairro-edit-idx').value   = idx;
+  document.getElementById('bairro-nome').value        = b.bairro;
+  document.getElementById('bairro-municipio').value   = b.municipio || '';
+  document.getElementById('bairro-taxa').value        = b.taxa;
+  document.getElementById('titulo-modal-bairro').textContent = 'Editar Bairro';
+  abrirModal('modal-add-bairro');
+}
+
+function abrirNovoBairro() {
+  document.getElementById('bairro-edit-idx').value = '';
+  document.getElementById('bairro-nome').value = '';
+  document.getElementById('bairro-municipio').value = '';
+  document.getElementById('bairro-taxa').value = '';
+  document.getElementById('titulo-modal-bairro').textContent = 'Adicionar Bairro';
+}
+
+async function salvarBairro() {
+  const idx       = document.getElementById('bairro-edit-idx').value;
+  const bairro    = document.getElementById('bairro-nome').value.trim();
+  const municipio = document.getElementById('bairro-municipio').value.trim();
+  const taxa      = parseFloat(document.getElementById('bairro-taxa').value);
+  if (!bairro || isNaN(taxa)) { toast('Preencha bairro e taxa.', 'error'); return; }
+
+  if (idx !== '') bairrosList[parseInt(idx)] = { bairro, municipio, taxa };
+  else bairrosList.push({ bairro, municipio, taxa });
+
+  await upsertConfigs({ taxas_bairros: JSON.stringify(bairrosList) });
+  toast('Bairro salvo!');
+  fecharModal('modal-add-bairro');
+  renderBairros();
+}
+
+async function removerBairro(idx) {
+  if (!confirm('Remover este bairro da tabela de taxas?')) return;
+  bairrosList.splice(idx, 1);
+  await upsertConfigs({ taxas_bairros: JSON.stringify(bairrosList) });
+  toast('Bairro removido.');
+  renderBairros();
+}
 
 document.getElementById('form-metas').addEventListener('submit', async e => {
   e.preventDefault();
