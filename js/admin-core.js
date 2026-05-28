@@ -32,8 +32,6 @@ async function requireAuth(papeisOk = null) {
   if (q('user-nome'))  q('user-nome').textContent  = p.nome;
   if (q('user-papel')) q('user-papel').textContent = PAPEIS[p.papel] || p.papel;
 
-  const page = location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('nav-link--ativo', l.dataset.page === page));
   document.querySelectorAll('[data-roles]').forEach(el => {
     el.style.display = el.dataset.roles.split(',').includes(p.papel) ? '' : 'none';
   });
@@ -177,7 +175,7 @@ function renderSidebar(paginaAtiva) {
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Comercial
       </a>
-      <a href="logistica.html" class="nav-link ${paginaAtiva==='logistica'?'nav-link--ativo':''}" data-roles="admin,logistica">
+      <a href="logistica.html" class="nav-link ${paginaAtiva==='logistica'?'nav-link--ativo':''}" data-roles="admin,logistica,montador,motoboy">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
         Logística
         <span class="nav-badge" id="badge-pendentes" style="display:none">0</span>

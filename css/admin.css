@@ -169,6 +169,8 @@ input, select, textarea { font-family: var(--font); }
 .badge--vendedor    { background: #e8eef8; color: var(--navy); }
 .badge--logistica   { background: #f3e8ff; color: var(--purple); }
 .badge--financeiro  { background: #e8f5e9; color: var(--green-ok); }
+.badge--montador    { background: #fff3cd; color: #856404; }
+.badge--motoboy     { background: #d1ecf1; color: #0c5460; }
 .badge--ativo       { background: #e8f5e9; color: var(--green-ok); }
 .badge--inativo     { background: var(--gray-100); color: var(--gray-600); }
 
@@ -266,7 +268,7 @@ input, select, textarea { font-family: var(--font); }
 .pedido-itens-box { background: var(--gray-100); border-radius: var(--radius-sm); padding: .55rem .8rem; }
 .pedido-itens-nome  { font-size: .82rem; font-weight: 600; color: var(--navy); margin-bottom: .2rem; }
 .pedido-itens-lista { font-size: .75rem; color: var(--text-muted); line-height: 1.5; }
-.pedido-card__footer { padding: .75rem 1.125rem; border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.pedido-card__footer { padding: .75rem 1.125rem; border-top: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
 .pedido-card__total { font-size: 1rem; font-weight: 800; color: var(--navy); margin-right: auto; }
 
 .status-select { padding: .32rem .6rem; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); font-size: .78rem; font-weight: 600; background: var(--white); cursor: pointer; font-family: var(--font); }
@@ -357,4 +359,12 @@ input, select, textarea { font-family: var(--font); }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .admin-content { padding: 1rem; }
   .modal { max-width: 100%; }
+  .pedido-card__footer { flex-direction: column; align-items: stretch; gap: .75rem; }
+  .pedido-card__footer > div { justify-content: flex-start; }
+  .status-select, .motoboy-select { width: 100%; }
+  .filter-tabs { padding-bottom: .25rem; }
+}
+@media (max-width: 380px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .admin-header__titulo { font-size: .85rem; }
 }

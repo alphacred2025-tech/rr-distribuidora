@@ -6,39 +6,6 @@
   <title>Pagamento — RR Distribuidora</title>
   <link rel="stylesheet" href="css/style.css?v=3" />
 
-  <!--
-  ══════════════════════════════════════════════════════════════════
-  MERCADO PAGO SDK — ADICIONAR AQUI QUANDO INTEGRAR
-  Descomentar a linha abaixo e substituir pela URL oficial do SDK:
-
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
-
-  Depois, no app.js → initPagamento():
-    const mp = new MercadoPago('SUA_PUBLIC_KEY', { locale: 'pt-BR' });
-
-  Para PIX:
-    - Gerar preference via backend com items + payer
-    - Renderizar QR Code retornado pela API
-    - Webhook para confirmar pagamento
-
-  Para Cartão:
-    const cardForm = mp.cardForm({
-      amount: String(pedido.total),
-      iframe: true,
-      form: { id: 'form-cartao', ... },
-      callbacks: {
-        onFormMounted: error => { ... },
-        onSubmit: async (event) => {
-          const { getCardFormData } = event;
-          const cardFormData = getCardFormData();
-          // Enviar ao backend para processar
-        },
-      },
-    });
-
-  Documentação: https://www.mercadopago.com.br/developers/pt/docs
-  ══════════════════════════════════════════════════════════════════
-  -->
 </head>
 <body data-page="pagamento">
 
@@ -115,22 +82,14 @@
           <div class="tab-painel tab-painel--ativo" id="tab-pix" role="tabpanel">
             <div class="pix-box">
               <div class="pix-qr">
-                <!--
-                  MERCADO PAGO: substituir pelo QR Code real gerado pela API.
-                  Exemplo: <img src="${pixQRCodeBase64}" alt="QR Code PIX" />
-                -->
                 <div class="pix-qr__icon">📱</div>
-                <span>QR Code PIX<br>(gerado pelo Mercado Pago)</span>
+                <span style="font-size:.82rem;color:var(--text-muted)">Escaneie ou use a chave abaixo</span>
               </div>
 
               <div class="pix-chave-box">
                 <div>
-                  <div class="pix-chave-label">Chave PIX (CNPJ/E-mail)</div>
-                  <!--
-                    ATUALIZAR: substituir pela chave PIX real do Mercado Pago
-                    ou pelo CNPJ/e-mail da empresa
-                  -->
-                  <div class="pix-chave-valor" id="pix-chave">00.000.000/0001-00</div>
+                  <div class="pix-chave-label">Chave PIX (Telefone)</div>
+                  <div class="pix-chave-valor" id="pix-chave">81996206567</div>
                 </div>
                 <button class="btn btn--outline" id="btn-copiar-pix" type="button">Copiar</button>
               </div>
@@ -146,23 +105,10 @@
             <button class="btn btn--primary btn--full btn--lg" id="btn-ja-paguei" type="button" style="margin-top:1.5rem;">
               ✓ Já realizei o pagamento
             </button>
-
-            <div class="mp-note" style="margin-top:1rem;">
-              <strong>Integração Mercado Pago (PIX)</strong>
-              Em produção, o QR Code e a chave Copia e Cola serão gerados automaticamente ao criar a preferência de pagamento via API do Mercado Pago. O status será confirmado via webhook.
-            </div>
           </div>
 
           <!-- Tab Cartão -->
           <div class="tab-painel" id="tab-cartao" role="tabpanel">
-            <!--
-              ══════════════════════════════════════════════════════════
-              MERCADO PAGO — CARD FORM
-              Em produção, substituir este formulário pelo cardForm do SDK:
-                const cardForm = mp.cardForm({ ... });
-              O SDK injeta os iframes de campos seguros automaticamente.
-              ══════════════════════════════════════════════════════════
-            -->
             <form id="form-cartao" class="card-form" novalidate>
               <div class="form-group">
                 <label for="nome-cartao">Nome no cartão *</label>
@@ -198,11 +144,6 @@
               <button type="submit" class="btn btn--primary btn--full btn--lg" style="margin-top:.5rem;">
                 Confirmar Pagamento →
               </button>
-
-              <div class="mp-note">
-                <strong>Integração Mercado Pago (Cartão)</strong>
-                Em produção, este formulário será substituído pelo cardForm do SDK do Mercado Pago, que garante a tokenização segura dos dados do cartão sem que eles passem pelo servidor.
-              </div>
             </form>
           </div>
 

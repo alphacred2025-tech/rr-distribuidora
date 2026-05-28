@@ -251,11 +251,14 @@ function initProduto() {
 
     // Feedback visual
     const btn = document.getElementById('btn-adicionar');
+    const origHTML = btn.innerHTML;
     btn.textContent = '✓ Adicionado!';
     btn.classList.add('btn--sucesso');
+    btn.disabled = true;
     setTimeout(() => {
-      btn.textContent = 'Adicionar ao Carrinho';
+      btn.innerHTML = origHTML;
       btn.classList.remove('btn--sucesso');
+      btn.disabled = false;
     }, 2000);
   });
 
