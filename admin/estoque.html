@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estoque — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <span class="admin-header__titulo">Estoque</span>
+      </div>
+      <div class="admin-header__right">
+        <button class="btn btn--primary" onclick="abrirModal('modal-produto')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Novo Produto
+        </button>
+      </div>
+    </header>
+    <main class="admin-content">
+
+      <!-- KPIs -->
+      <div class="stats-grid mb-15" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+          <div class="stat-card__label">Total Produtos</div>
+          <div class="stat-card__valor" id="kpi-total-prod">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div class="stat-card__label">Valor em Estoque</div>
+          <div class="stat-card__valor" id="kpi-valor-estoque" style="font-size:1.3rem">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--red"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+          <div class="stat-card__label">Abaixo do Mínimo</div>
+          <div class="stat-card__valor" id="kpi-abaixo-min" style="color:#d93025">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg></div>
+          <div class="stat-card__label">Movimentações Hoje</div>
+          <div class="stat-card__valor" id="kpi-mov-hoje">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg></div>
+          <div class="stat-card__label">Margem Média</div>
+          <div class="stat-card__valor" id="kpi-margem">—</div>
+        </div>
+      </div>
+
+      <!-- Alerta estoque crítico -->
+      <div id="alerta-critico" class="alerta alerta--erro" style="display:none">
+        <strong>⚠ Estoque Crítico:</strong> <span id="alerta-critico-nomes"></span> — abaixo do mínimo!
+      </div>
+
+      <!-- Filtros -->
+      <div class="card mb-15">
+        <div class="card__body" style="padding:.75rem 1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+          <div class="filter-tabs">
+            <button class="filter-tab filter-tab--ativo" onclick="filtrarStatus('todos',this)">Todos</button>
+            <button class="filter-tab" onclick="filtrarStatus('ok',this)">Normal</button>
+            <button class="filter-tab" onclick="filtrarStatus('alerta',this)">Alerta</button>
+            <button class="filter-tab" onclick="filtrarStatus('critico',this)">Crítico</button>
+          </div>
+          <input class="form-input" type="text" id="busca-produto" placeholder="Buscar produto…" oninput="filtrarBusca()" style="max-width:280px">
+          <select class="form-input" id="filtro-categoria" onchange="filtrarBusca()" style="max-width:180px">
+            <option value="">Todas as categorias</option>
+            <option value="cesta">Cestas</option>
+            <option value="embalagem">Embalagens</option>
+            <option value="insumo">Insumos</option>
+            <option value="outro">Outros</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabela produtos -->
+      <div class="card mb-15">
+        <div class="card__header">
+          <span class="card__titulo">Produtos em Estoque</span>
+          <button class="btn btn--ghost btn--sm" onclick="exportarCSV()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Exportar
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-produtos">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Estoque</th>
+                <th>Mínimo</th>
+                <th>Status</th>
+                <th>Preço Venda</th>
+                <th>Custo</th>
+                <th>Margem</th>
+                <th>Valor Total</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-produtos">
+              <tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Histórico de movimentações -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__titulo">Histórico de Movimentações</span>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <select class="form-input" id="filtro-mov-tipo" onchange="carregarMovimentos()" style="max-width:160px">
+              <option value="">Todos os tipos</option>
+              <option value="entrada">Entradas</option>
+              <option value="saida">Saídas</option>
+              <option value="ajuste">Ajustes</option>
+              <option value="perda">Perdas</option>
+            </select>
+            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-movimento')">+ Lançar</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Data/Hora</th><th>Produto</th><th>Tipo</th><th>Qtd</th><th>Observação</th><th>Usuário</th></tr>
+            </thead>
+            <tbody id="tbody-movimentos">
+              <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card__footer" style="padding:.75rem 1rem;display:flex;justify-content:flex-end">
+          <button class="btn btn--ghost btn--sm" id="btn-mais-mov" onclick="carregarMaisMovimentos()">Carregar mais</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Lançar Movimento -->
+<div class="modal-overlay" id="modal-movimento">
+  <div class="modal" style="max-width:500px">
+    <div class="modal__header">
+      <h3 class="modal__titulo">Lançar Movimentação</h3>
+      <button class="modal__close" onclick="fecharModal('modal-movimento')">&times;</button>
+    </div>
+    <div class="modal__body">
+      <form id="form-movimento" onsubmit="salvarMovimento(event)">
+        <div class="form-group">
+          <label class="form-label">Produto *</label>
+          <select class="form-input" id="mov-produto" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo *</label>
+          <select class="form-input" id="mov-tipo" required onchange="atualizarLabelQtd()">
+            <option value="entrada">Entrada (compra/reposição)</option>
+            <option value="saida">Saída manual</option>
+            <option value="ajuste">Ajuste de inventário</option>
+            <option value="perda">Perda/Avaria</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="label-qtd">Quantidade *</label>
+          <input class="form-input" type="number" id="mov-qtd" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observação</label>
+          <textarea class="form-input" id="mov-obs" rows="2" placeholder="Ex: Compra NF 1234, fornecedor ABC…"></textarea>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" onclick="fecharModal('modal-movimento')">Cancelar</button>
+          <button type="submit" class="btn btn--primary" id="btn-salvar-mov">Salvar Movimentação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Produto (criar/editar) -->
+<div class="modal-overlay" id="modal-produto">
+  <div class="modal" style="max-width:600px">
+    <div class="modal__header">
+      <h3 class="modal__titulo" id="modal-produto-titulo">Novo Produto</h3>
+      <button class="modal__close" onclick="fecharModal('modal-produto')">&times;</button>
+    </div>
+    <div class="modal__body">
+      <form id="form-produto" onsubmit="salvarProduto(event)">
+        <input type="hidden" id="prod-id">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Nome do Produto *</label>
+            <input class="form-input" type="text" id="prod-nome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoria *</label>
+            <select class="form-input" id="prod-categoria" required>
+              <option value="cesta">Cesta</option>
+              <option value="embalagem">Embalagem</option>
+              <option value="insumo">Insumo</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <textarea class="form-input" id="prod-descricao" rows="2"></textarea>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Preço de Venda (R$) *</label>
+            <input class="form-input" type="number" id="prod-preco" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Custo (R$)</label>
+            <input class="form-input" type="number" id="prod-custo" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Estoque Atual *</label>
+            <input class="form-input" type="number" id="prod-estoque" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estoque Mínimo *</label>
+            <input class="form-input" type="number" id="prod-minimo" min="0" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unidade</label>
+          <select class="form-input" id="prod-unidade">
+            <option value="un">Unidade (un)</option>
+            <option value="kg">Quilograma (kg)</option>
+            <option value="cx">Caixa (cx)</option>
+            <option value="pç">Peça (pç)</option>
+          </select>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:.5rem">
+          <input type="checkbox" id="prod-ativo" checked style="width:16px;height:16px">
+          <label class="form-label" style="margin:0" for="prod-ativo">Produto ativo</label>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" onclick="fecharModal('modal-produto')">Cancelar</button>
+          <button type="submit" class="btn btn--primary">Salvar Produto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+let todosProdutos = [];
+let filtroStatusAtivo = 'todos';
+let movOffset = 0;
+const MOV_LIMIT = 30;
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  const perfil = await requireAuth(['admin','logistica']);
+  if (!perfil) return;
+  renderSidebar('estoque');
+  await Promise.all([carregarProdutos(), carregarMovimentos()]);
+  subscribeRealtime();
+});
+
+// ── Realtime ──────────────────────────────────────────────────
+function subscribeRealtime() {
+  db.channel('estoque-watch')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'produtos' }, () => carregarProdutos())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'estoque_movimentos' }, () => carregarMovimentos())
+    .subscribe();
+}
+
+// ── Carregar produtos ─────────────────────────────────────────
+async function carregarProdutos() {
+  const { data, error } = await db
+    .from('produtos')
+    .select('*')
+    .order('nome');
+
+  if (error) { toast('Erro ao carregar produtos', 'error'); return; }
+
+  todosProdutos = data || [];
+  calcularKPIs();
+  renderizarProdutos();
+  popularSelectProduto();
+  verificarAlertas();
+}
+
+function calcularKPIs() {
+  const ativos = todosProdutos.filter(p => p.ativo);
+  const valorTotal = ativos.reduce((s,p) => s + (p.custo * p.estoque_atual), 0);
+  const abaixoMin = ativos.filter(p => p.estoque_atual <= p.estoque_minimo).length;
+  const margens = ativos.filter(p => p.preco > 0 && p.custo > 0).map(p => ((p.preco - p.custo) / p.preco) * 100);
+  const margemMedia = margens.length ? margens.reduce((a,b) => a+b, 0) / margens.length : 0;
+
+  document.getElementById('kpi-total-prod').textContent = ativos.length;
+  document.getElementById('kpi-valor-estoque').textContent = fmtR$(valorTotal);
+  document.getElementById('kpi-abaixo-min').textContent = abaixoMin;
+  document.getElementById('kpi-margem').textContent = margemMedia.toFixed(1) + '%';
+}
+
+async function calcularMovHoje() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const { count } = await db.from('estoque_movimentos')
+    .select('*', { count:'exact', head:true })
+    .gte('criado_em', hoje + 'T00:00:00');
+  document.getElementById('kpi-mov-hoje').textContent = count || 0;
+}
+
+function verificarAlertas() {
+  const criticos = todosProdutos.filter(p => p.ativo && p.estoque_atual <= p.estoque_minimo);
+  const el = document.getElementById('alerta-critico');
+  if (criticos.length > 0) {
+    document.getElementById('alerta-critico-nomes').textContent = criticos.map(p => `${p.nome} (${p.estoque_atual} unid.)`).join(', ');
+    el.style.display = '';
+    atualizarBadgeEstoque(criticos.length);
+  } else {
+    el.style.display = 'none';
+    atualizarBadgeEstoque(0);
+  }
+}
+
+function statusEstoque(p) {
+  if (p.estoque_atual === 0) return { cls: 'badge--cancelado', txt: 'Zerado' };
+  if (p.estoque_atual <= p.estoque_minimo) return { cls: 'badge--pendente', txt: 'Crítico' };
+  if (p.estoque_atual <= p.estoque_minimo * 1.5) return { cls: 'badge--em_preparo', txt: 'Alerta' };
+  return { cls: 'badge--entregue', txt: 'Normal' };
+}
+
+function renderizarProdutos() {
+  let lista = todosProdutos.filter(p => {
+    if (filtroStatusAtivo === 'ok') { const s = statusEstoque(p); return s.txt === 'Normal'; }
+    if (filtroStatusAtivo === 'alerta') { const s = statusEstoque(p); return s.txt === 'Alerta'; }
+    if (filtroStatusAtivo === 'critico') { const s = statusEstoque(p); return ['Crítico','Zerado'].includes(s.txt); }
+    return true;
+  });
+
+  const busca = document.getElementById('busca-produto')?.value.toLowerCase() || '';
+  const cat   = document.getElementById('filtro-categoria')?.value || '';
+  if (busca) lista = lista.filter(p => p.nome.toLowerCase().includes(busca));
+  if (cat)   lista = lista.filter(p => p.categoria === cat);
+
+  const tbody = document.getElementById('tbody-produtos');
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum produto encontrado.</td></tr>`;
+    return;
+  }
+  const s = statusEstoque;
+  tbody.innerHTML = lista.map(p => {
+    const st = s(p);
+    const margem = p.preco > 0 && p.custo > 0 ? ((p.preco - p.custo) / p.preco * 100).toFixed(1) + '%' : '—';
+    const valorTotal = fmtR$(p.custo * p.estoque_atual);
+    const barPct = p.estoque_minimo > 0 ? Math.min(100, Math.round((p.estoque_atual / (p.estoque_minimo * 3)) * 100)) : 100;
+    const barCor = st.txt === 'Normal' ? '#22c55e' : st.txt === 'Alerta' ? '#f59e0b' : '#ef4444';
+    return `<tr>
+      <td><strong>${p.nome}</strong>${!p.ativo ? ' <span style="color:#999;font-size:.75rem">(inativo)</span>' : ''}</td>
+      <td><span style="background:#f1f5f9;padding:2px 8px;border-radius:12px;font-size:.75rem">${p.categoria}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <strong style="min-width:2rem;text-align:right">${p.estoque_atual}</strong>
+          <div style="flex:1;height:6px;background:#e5e7eb;border-radius:3px;min-width:60px">
+            <div style="width:${barPct}%;height:100%;background:${barCor};border-radius:3px;transition:width .3s"></div>
+          </div>
+        </div>
+      </td>
+      <td>${p.estoque_minimo} ${p.unidade}</td>
+      <td><span class="badge ${st.cls}">${st.txt}</span></td>
+      <td>${fmtR$(p.preco)}</td>
+      <td>${p.custo ? fmtR$(p.custo) : '—'}</td>
+      <td>${margem}</td>
+      <td>${valorTotal}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn--ghost btn--sm" onclick="abrirMovimento('${p.id}')">+ Mov.</button>
+        <button class="btn btn--ghost btn--sm" onclick="editarProduto('${p.id}')">Editar</button>
+      </td>
+    </tr>`;
+  }).join('');
+  calcularMovHoje();
+}
+
+// ── Filtros ───────────────────────────────────────────────────
+function filtrarStatus(status, btn) {
+  filtroStatusAtivo = status;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('filter-tab--ativo'));
+  btn.classList.add('filter-tab--ativo');
+  renderizarProdutos();
+}
+
+function filtrarBusca() { renderizarProdutos(); }
+
+// ── Movimentações ─────────────────────────────────────────────
+async function carregarMovimentos(reset = true) {
+  if (reset) movOffset = 0;
+  const tipo = document.getElementById('filtro-mov-tipo')?.value || '';
+  let q = db.from('estoque_movimentos')
+    .select('*, produtos(nome), profiles(nome)')
+    .order('criado_em', { ascending: false })
+    .range(movOffset, movOffset + MOV_LIMIT - 1);
+  if (tipo) q = q.eq('tipo', tipo);
+
+  const { data, error } = await q;
+  if (error) return;
+
+  const tbody = document.getElementById('tbody-movimentos');
+  const rows = (data || []).map(m => {
+    const cor = m.tipo === 'entrada' ? '#22c55e' : m.tipo === 'saida' ? '#ef4444' : m.tipo === 'perda' ? '#f97316' : '#6366f1';
+    const sinal = m.tipo === 'entrada' ? '+' : '-';
+    const labels = { entrada: 'Entrada', saida: 'Saída', ajuste: 'Ajuste', perda: 'Perda' };
+    return `<tr>
+      <td>${fmtDataHora(m.criado_em)}</td>
+      <td>${m.produtos?.nome || '—'}</td>
+      <td><span style="background:${cor}22;color:${cor};padding:2px 8px;border-radius:12px;font-size:.8rem;font-weight:600">${labels[m.tipo] || m.tipo}</span></td>
+      <td style="color:${cor};font-weight:700">${sinal}${Math.abs(m.quantidade)}</td>
+      <td>${m.observacao || '—'}</td>
+      <td>${m.profiles?.nome || 'Sistema'}</td>
+    </tr>`;
+  }).join('');
+
+  if (reset) {
+    tbody.innerHTML = rows || `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhuma movimentação.</td></tr>`;
+  } else {
+    tbody.innerHTML += rows;
+  }
+
+  document.getElementById('btn-mais-mov').style.display = (data?.length < MOV_LIMIT) ? 'none' : '';
+}
+
+async function carregarMaisMovimentos() {
+  movOffset += MOV_LIMIT;
+  await carregarMovimentos(false);
+}
+
+// ── Salvar Movimento ──────────────────────────────────────────
+function abrirMovimento(produtoId) {
+  document.getElementById('mov-produto').value = produtoId;
+  abrirModal('modal-movimento');
+}
+
+function popularSelectProduto() {
+  const sel = document.getElementById('mov-produto');
+  if (!sel) return;
+  sel.innerHTML = todosProdutos.filter(p => p.ativo).map(p =>
+    `<option value="${p.id}">${p.nome} (${p.estoque_atual} em estoque)</option>`
+  ).join('');
+}
+
+function atualizarLabelQtd() {
+  const tipo = document.getElementById('mov-tipo').value;
+  const labels = { entrada: 'Quantidade a Adicionar *', saida: 'Quantidade a Retirar *', ajuste: 'Nova Quantidade Total *', perda: 'Quantidade Perdida *' };
+  document.getElementById('label-qtd').textContent = labels[tipo] || 'Quantidade *';
+}
+
+async function salvarMovimento(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-salvar-mov');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+
+  const produtoId = document.getElementById('mov-produto').value;
+  const tipo      = document.getElementById('mov-tipo').value;
+  const qtd       = parseInt(document.getElementById('mov-qtd').value);
+  const obs       = document.getElementById('mov-obs').value.trim();
+
+  const produto = todosProdutos.find(p => p.id === produtoId);
+  if (!produto) { toast('Produto não encontrado', 'error'); btn.disabled = false; btn.textContent = 'Salvar Movimentação'; return; }
+
+  let novoEstoque;
+  if (tipo === 'entrada') novoEstoque = produto.estoque_atual + qtd;
+  else if (tipo === 'saida' || tipo === 'perda') novoEstoque = Math.max(0, produto.estoque_atual - qtd);
+  else if (tipo === 'ajuste') novoEstoque = qtd;
+
+  const { error: e1 } = await db.from('estoque_movimentos').insert({
+    produto_id: produtoId,
+    tipo, quantidade: qtd,
+    observacao: obs || null,
+    user_id: currentUser?.id || null,
+  });
+  if (e1) { toast('Erro: ' + e1.message, 'error'); btn.disabled = false; btn.textContent = 'Salvar Movimentação'; return; }
+
+  const { error: e2 } = await db.from('produtos').update({ estoque_atual: novoEstoque }).eq('id', produtoId);
+  if (e2) { toast('Erro ao atualizar estoque: ' + e2.message, 'error'); btn.disabled = false; btn.textContent = 'Salvar Movimentação'; return; }
+
+  toast('Movimentação registrada!');
+  fecharModal('modal-movimento');
+  document.getElementById('form-movimento').reset();
+  btn.disabled = false; btn.textContent = 'Salvar Movimentação';
+}
+
+// ── Produto CRUD ──────────────────────────────────────────────
+function editarProduto(id) {
+  const p = todosProdutos.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-produto-titulo').textContent = 'Editar Produto';
+  document.getElementById('prod-id').value        = p.id;
+  document.getElementById('prod-nome').value      = p.nome;
+  document.getElementById('prod-categoria').value = p.categoria;
+  document.getElementById('prod-descricao').value = p.descricao || '';
+  document.getElementById('prod-preco').value     = p.preco;
+  document.getElementById('prod-custo').value     = p.custo || '';
+  document.getElementById('prod-estoque').value   = p.estoque_atual;
+  document.getElementById('prod-minimo').value    = p.estoque_minimo;
+  document.getElementById('prod-unidade').value   = p.unidade || 'un';
+  document.getElementById('prod-ativo').checked   = p.ativo;
+  abrirModal('modal-produto');
+}
+
+document.getElementById('modal-produto').querySelector('.modal__close').addEventListener('click', () => {
+  document.getElementById('modal-produto-titulo').textContent = 'Novo Produto';
+  document.getElementById('prod-id').value = '';
+  document.getElementById('form-produto').reset();
+});
+
+async function salvarProduto(e) {
+  e.preventDefault();
+  const id = document.getElementById('prod-id').value;
+  const payload = {
+    nome:           document.getElementById('prod-nome').value.trim(),
+    categoria:      document.getElementById('prod-categoria').value,
+    descricao:      document.getElementById('prod-descricao').value.trim() || null,
+    preco:          parseFloat(document.getElementById('prod-preco').value),
+    custo:          parseFloat(document.getElementById('prod-custo').value) || 0,
+    estoque_atual:  parseInt(document.getElementById('prod-estoque').value),
+    estoque_minimo: parseInt(document.getElementById('prod-minimo').value),
+    unidade:        document.getElementById('prod-unidade').value,
+    ativo:          document.getElementById('prod-ativo').checked,
+  };
+
+  let error;
+  if (id) {
+    ({ error } = await db.from('produtos').update(payload).eq('id', id));
+  } else {
+    ({ error } = await db.from('produtos').insert(payload));
+  }
+
+  if (error) { toast('Erro: ' + error.message, 'error'); return; }
+  toast(id ? 'Produto atualizado!' : 'Produto criado!');
+  fecharModal('modal-produto');
+  document.getElementById('form-produto').reset();
+  document.getElementById('prod-id').value = '';
+}
+
+// ── Exportar CSV ──────────────────────────────────────────────
+function exportarCSV() {
+  const header = 'Produto,Categoria,Estoque,Mínimo,Preço,Custo,Margem,Valor Total\n';
+  const rows = todosProdutos.map(p => {
+    const margem = p.preco > 0 && p.custo > 0 ? ((p.preco - p.custo) / p.preco * 100).toFixed(1) + '%' : '';
+    return `"${p.nome}","${p.categoria}",${p.estoque_atual},${p.estoque_minimo},${p.preco},${p.custo || 0},"${margem}",${p.custo * p.estoque_atual}`;
+  }).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `estoque_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>

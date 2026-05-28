@@ -141,6 +141,7 @@
   const profile = await requireAuth(['admin']);
   if (!profile) return;
   atualizarBadgePendentes();
+  verificarEstoqueCritico();
 
   document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' });
 
