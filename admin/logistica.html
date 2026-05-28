@@ -15,7 +15,7 @@
         <button class="btn-hamburguer" onclick="toggleSidebar()">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <span class="admin-header__titulo">Logística — Pedidos</span>
+        <span class="admin-header__titulo" id="titulo-pagina">Logística — Pedidos</span>
       </div>
       <div class="admin-header__right">
         <div class="realtime-pill"><span class="realtime-dot"></span>Ao vivo</div>
@@ -25,14 +25,30 @@
     <main class="admin-content">
       <div id="banner-novo-pedido"></div>
 
-      <!-- KPIs operacionais -->
-      <div class="stats-grid mb-15" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+      <!-- KPIs operacionais — admin/logistica -->
+      <div class="stats-grid mb-15" id="kpis-admin" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
         <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-card__label">Pedidos Hoje</div><div class="stat-card__valor" id="kpi-hoje">—</div></div>
         <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Aguardando</div><div class="stat-card__valor" id="kpi-aguardando" style="color:#f59e0b">—</div></div>
         <div class="stat-card"><div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div><div class="stat-card__label">Em Rota Agora</div><div class="stat-card__valor" id="kpi-rota" style="color:#6366f1">—</div></div>
         <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Entregues Hoje</div><div class="stat-card__valor" id="kpi-entregues" style="color:#22c55e">—</div></div>
         <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Receita Hoje</div><div class="stat-card__valor" id="kpi-receita-hoje" style="font-size:1.1rem">—</div></div>
         <div class="stat-card"><div class="stat-card__icon stat-card__icon--red"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div><div class="stat-card__label">Com Maquineta</div><div class="stat-card__valor" id="kpi-maquineta" style="color:#ef4444">—</div><div class="stat-card__sub">retirar da rota</div></div>
+      </div>
+
+      <!-- KPIs motoboy (visível só para papel=motoboy) -->
+      <div class="stats-grid mb-15" id="kpis-motoboy" style="display:none;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Entregues Hoje</div><div class="stat-card__valor" id="kpi-moto-hoje" style="color:#22c55e">0</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div><div class="stat-card__label">Em Rota Agora</div><div class="stat-card__valor" id="kpi-moto-ativa" style="color:#6366f1">0</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Comissão Hoje</div><div class="stat-card__valor" id="kpi-moto-comissao" style="color:#f59e0b;font-size:1.1rem">R$ 0</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div class="stat-card__label">Com Maquineta</div><div class="stat-card__valor" id="kpi-moto-maquineta" style="color:#ef4444">0</div><div class="stat-card__sub">pagar no local</div></div>
+      </div>
+
+      <!-- KPIs montador (visível só para papel=montador) -->
+      <div class="stats-grid mb-15" id="kpis-montador" style="display:none;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-card__label">Fila de Montagem</div><div class="stat-card__valor" id="kpi-mont-fila" style="color:#f59e0b">0</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></div><div class="stat-card__label">Em Preparo Agora</div><div class="stat-card__valor" id="kpi-mont-preparo" style="color:#6366f1">0</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div class="stat-card__label">Prontos Hoje</div><div class="stat-card__valor" id="kpi-mont-prontos" style="color:#22c55e">0</div></div>
+        <div class="stat-card"><div class="stat-card__icon stat-card__icon--red"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div><div class="stat-card__label">Total Cestas</div><div class="stat-card__valor" id="kpi-mont-cestas" style="color:#ef4444">0</div></div>
       </div>
 
       <!-- Filtros -->
@@ -95,17 +111,22 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../js/admin-core.js"></script>
 <script>
-let todosPedidos  = [];
-let motoboys      = [];
-let filtroAtivo   = 'todos';
-let pedidoComanda = null;
-let comissaoMotoboy = 14;
+let todosPedidos    = [];
+let motoboys        = [];
+let filtroAtivo     = 'todos';
+let pedidoComanda   = null;
+let comissaoMotoboy  = 14;
 let comissaoVendedor = 20;
+let meuPapel         = 'admin';
+let meuProfile       = null;
+let meuMotoboyId     = null;
 
 (async () => {
   renderSidebar('logistica');
   const profile = await requireAuth(['admin', 'logistica', 'montador', 'motoboy']);
   if (!profile) return;
+  meuProfile = profile;
+  meuPapel   = profile.papel || 'admin';
   atualizarBadgePendentes();
   // Carrega comissões configuradas
   const { data: cfgs } = await db.from('configuracoes')
@@ -115,6 +136,7 @@ let comissaoVendedor = 20;
     if (c.chave === 'comissao_motoboy')        comissaoMotoboy  = parseFloat(c.valor) || 14;
     if (c.chave === 'comissao_vendedor_cesta') comissaoVendedor = parseFloat(c.valor) || 20;
   });
+  await adaptarParaPapel(profile);
   await Promise.all([carregarMotoboys(), carregarPedidos()]);
   setupRealtime();
 })();
@@ -150,12 +172,13 @@ async function atualizarKPIs() {
     !['entregue','cancelado'].includes(p.entregas?.[0]?.status || 'pendente')
   ).length;
 
-  document.getElementById('kpi-hoje').textContent        = pedidosHoje.length;
-  document.getElementById('kpi-aguardando').textContent  = aguardando;
-  document.getElementById('kpi-rota').textContent        = emRota;
-  document.getElementById('kpi-entregues').textContent   = entreguesH;
-  document.getElementById('kpi-receita-hoje').textContent= fmtR$(receitaHoje);
-  document.getElementById('kpi-maquineta').textContent   = maquineta;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('kpi-hoje',        pedidosHoje.length);
+  set('kpi-aguardando',  aguardando);
+  set('kpi-rota',        emRota);
+  set('kpi-entregues',   entreguesH);
+  set('kpi-receita-hoje', fmtR$(receitaHoje));
+  set('kpi-maquineta',   maquineta);
 }
 
 function atualizarContadores() {
@@ -178,12 +201,28 @@ function filtrar(status) {
 
 function renderPedidos() {
   const lista = document.getElementById('lista-pedidos');
-  const filtrados = filtroAtivo === 'todos'
-    ? todosPedidos
-    : todosPedidos.filter(p => (p.entregas?.[0]?.status || 'pendente') === filtroAtivo);
+  let filtrados;
+
+  if (meuPapel === 'motoboy') {
+    filtrados = todosPedidos.filter(p => p.entregas?.[0]?.status === 'saiu');
+    if (meuMotoboyId) filtrados = filtrados.filter(p => p.entregas?.[0]?.motoboy_id === meuMotoboyId);
+    atualizarKpisMotoboy(filtrados);
+  } else if (meuPapel === 'montador') {
+    filtrados = todosPedidos.filter(p => ['pendente','em_preparo'].includes(p.entregas?.[0]?.status || 'pendente'));
+    atualizarKpisMontador();
+  } else {
+    filtrados = filtroAtivo === 'todos'
+      ? todosPedidos
+      : todosPedidos.filter(p => (p.entregas?.[0]?.status || 'pendente') === filtroAtivo);
+  }
 
   if (!filtrados.length) {
-    lista.innerHTML = `<div class="empty-state"><div class="empty-state__icon">📦</div><p>Nenhum pedido ${filtroAtivo !== 'todos' ? 'com esse status' : 'encontrado'}.</p></div>`;
+    const msgVazia = meuPapel === 'motoboy'
+      ? '🛵 Nenhuma entrega em rota atribuída a você agora.'
+      : meuPapel === 'montador'
+        ? '✅ Fila de montagem vazia!'
+        : `Nenhum pedido ${filtroAtivo !== 'todos' ? 'com esse status' : 'encontrado'}.`;
+    lista.innerHTML = `<div class="empty-state"><div class="empty-state__icon">${meuPapel === 'motoboy' ? '🛵' : '📦'}</div><p>${msgVazia}</p></div>`;
     return;
   }
   lista.innerHTML = filtrados.map(p => cardPedido(p)).join('');
@@ -230,6 +269,48 @@ function cardPedido(p) {
     ? `<span style="font-size:.72rem;color:var(--text-muted)">🛵 R$${(qtdCestas * comissaoMotoboy + (entrega.taxa||0)).toFixed(0)} motoboy${vendedor ? ` · 🧑‍💼 R$${(qtdCestas * comissaoVendedor).toFixed(0)} vendedor` : ''}</span>`
     : '';
 
+  // Footer actions diferenciado por papel
+  let footerActions;
+  if (meuPapel === 'motoboy') {
+    const comissaoMoto = (qtdCestas * comissaoMotoboy + (entrega.taxa||0)).toFixed(2);
+    footerActions = `
+      <div style="display:flex;flex-direction:column;gap:.25rem">
+        <span class="pedido-card__total">${fmtR$(p.total)}</span>
+        <span style="font-size:.78rem;color:#22c55e;font-weight:600">🛵 Minha comissão: ${fmtR$(parseFloat(comissaoMoto))}</span>
+        ${precisaMaquineta ? '<span style="font-size:.78rem;color:#dc2626;font-weight:700">💳 COBRAR NA MAQUINETA</span>' : ''}
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        ${telLimpo ? `<a href="https://wa.me/55${telLimpo}" target="_blank" class="btn btn--sm" style="background:#25d366;color:#fff;border:none;text-decoration:none">💬 WhatsApp</a>` : ''}
+        ${telLimpo ? `<a href="tel:+55${telLimpo}" class="btn btn--sm" style="background:#3b82f6;color:#fff;border:none;text-decoration:none">📞 Ligar</a>` : ''}
+        <button class="btn btn--primary btn--sm" onclick="confirmarEntrega('${p.id}','${entrega.id||''}')">✅ Confirmar Entrega</button>
+      </div>`;
+  } else if (meuPapel === 'montador') {
+    footerActions = `
+      <span class="pedido-card__total">${fmtR$(p.total)}</span>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        ${status === 'pendente' ? `<button class="btn btn--gold btn--sm" onclick="iniciarMontagem('${p.id}','${entrega.id||''}')">🔧 Iniciar Montagem</button>` : ''}
+        ${status === 'em_preparo' ? `<button class="btn btn--primary btn--sm" onclick="abrirComandaModal('${p.id}')">📋 Ver Comanda</button><span style="font-size:.78rem;color:#6366f1;font-weight:600;padding:4px 10px;background:#ede9fe;border-radius:8px">🔨 Em montagem</span>` : ''}
+      </div>`;
+  } else {
+    footerActions = `
+      <div style="display:flex;flex-direction:column;gap:.2rem">
+        <span class="pedido-card__total">${fmtR$(p.total)}</span>
+        ${comissaoPreview}
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        <select class="status-select" onchange="atualizarStatus('${p.id}','${entrega.id||''}',this.value)">
+          <option value="pendente"   ${status==='pendente'  ?'selected':''}>Pendente</option>
+          <option value="em_preparo" ${status==='em_preparo'?'selected':''}>Em preparo</option>
+          <option value="saiu"       ${status==='saiu'      ?'selected':''}>Saiu p/ entrega</option>
+          <option value="entregue"   ${status==='entregue'  ?'selected':''}>Entregue</option>
+          <option value="cancelado"  ${status==='cancelado' ?'selected':''}>Cancelado</option>
+        </select>
+        ${motoboyOpts ? `<select class="motoboy-select" onchange="atribuirMotoboy('${entrega.id||''}','${p.id}',this.value)"><option value="">🛵 Motoboy</option>${motoboyOpts}</select>` : ''}
+        ${btnMotoboy}
+        <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">📋 Comanda</button>
+      </div>`;
+  }
+
   return `
   <div class="pedido-card ${isNovo ? 'pedido-card--novo':''}" id="card-${p.id}">
     <div class="pedido-card__header">
@@ -266,22 +347,7 @@ function cardPedido(p) {
       <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">${itensHTML}</div>
     </div>
     <div class="pedido-card__footer">
-      <div style="display:flex;flex-direction:column;gap:.2rem">
-        <span class="pedido-card__total">${fmtR$(p.total)}</span>
-        ${comissaoPreview}
-      </div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
-        <select class="status-select" onchange="atualizarStatus('${p.id}','${entrega.id||''}',this.value)">
-          <option value="pendente"   ${status==='pendente'  ?'selected':''}>Pendente</option>
-          <option value="em_preparo" ${status==='em_preparo'?'selected':''}>Em preparo</option>
-          <option value="saiu"       ${status==='saiu'      ?'selected':''}>Saiu p/ entrega</option>
-          <option value="entregue"   ${status==='entregue'  ?'selected':''}>Entregue</option>
-          <option value="cancelado"  ${status==='cancelado' ?'selected':''}>Cancelado</option>
-        </select>
-        ${motoboyOpts ? `<select class="motoboy-select" onchange="atribuirMotoboy('${entrega.id||''}','${p.id}',this.value)"><option value="">🛵 Motoboy</option>${motoboyOpts}</select>` : ''}
-        ${btnMotoboy}
-        <button class="btn btn--gold btn--sm" onclick="abrirComandaModal('${p.id}')">📋 Comanda</button>
-      </div>
+      ${footerActions}
     </div>
   </div>`;
 }
@@ -439,6 +505,99 @@ function enviarParaMotoboy() {
   toast(`Abrindo WhatsApp para ${motoboy.nome}...`);
 }
 
+// ── Adaptação por papel ──────────────────────────────────────────
+async function adaptarParaPapel(profile) {
+  const papel = profile?.papel || 'admin';
+
+  if (papel === 'motoboy') {
+    document.getElementById('titulo-pagina').textContent = '🛵 Minhas Entregas';
+    document.getElementById('filtros').style.display = 'none';
+    document.getElementById('kpis-admin').style.display = 'none';
+    document.getElementById('kpis-motoboy').style.display = '';
+    // Tenta achar o registro de motoboy pelo nome do profile
+    const { data: mbData } = await db.from('motoboys')
+      .select('id,nome')
+      .ilike('nome', `%${profile.nome}%`)
+      .maybeSingle();
+    if (mbData) {
+      meuMotoboyId = mbData.id;
+    }
+  }
+
+  if (papel === 'montador') {
+    document.getElementById('titulo-pagina').textContent = '🔧 Fila de Montagem';
+    document.getElementById('filtros').style.display = 'none';
+    document.getElementById('kpis-admin').style.display = 'none';
+    document.getElementById('kpis-montador').style.display = '';
+  }
+}
+
+async function atualizarKpisMotoboy(minhasEntregas) {
+  const hoje = new Date().toISOString().split('T')[0];
+  const emRota = minhasEntregas.length;
+
+  // Comissão de hoje via lancamentos
+  const nomeQuery = meuProfile?.nome || '';
+  const { data: lc } = await db.from('lancamentos')
+    .select('valor,descricao')
+    .eq('tipo','despesa')
+    .eq('categoria','transporte')
+    .eq('data', hoje);
+
+  const minhasComissoes = (lc || []).filter(l =>
+    nomeQuery && l.descricao?.toLowerCase().includes(nomeQuery.toLowerCase())
+  );
+  const totalComissao = minhasComissoes.reduce((s,l) => s + (l.valor||0), 0);
+  const totalEntregas  = minhasComissoes.length;
+
+  const maquinetaAtiva = minhasEntregas.filter(p => p.forma_pagamento === 'cartao').length;
+
+  document.getElementById('kpi-moto-hoje').textContent    = totalEntregas;
+  document.getElementById('kpi-moto-ativa').textContent   = emRota;
+  document.getElementById('kpi-moto-comissao').textContent = fmtR$(totalComissao);
+  document.getElementById('kpi-moto-maquineta').textContent = maquinetaAtiva;
+}
+
+function atualizarKpisMontador() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const fila     = todosPedidos.filter(p => (p.entregas?.[0]?.status || 'pendente') === 'pendente').length;
+  const preparo  = todosPedidos.filter(p => p.entregas?.[0]?.status === 'em_preparo').length;
+  const prontos  = todosPedidos.filter(p =>
+    p.entregas?.[0]?.status === 'saiu' && p.created_at?.startsWith(hoje)
+  ).length;
+  const totalCestas = todosPedidos
+    .filter(p => ['pendente','em_preparo'].includes(p.entregas?.[0]?.status || 'pendente'))
+    .reduce((s,p) => s + (p.itens_pedido||[]).reduce((ss,i) => ss + (i.quantidade||1), 0), 0);
+
+  document.getElementById('kpi-mont-fila').textContent   = fila;
+  document.getElementById('kpi-mont-preparo').textContent = preparo;
+  document.getElementById('kpi-mont-prontos').textContent = prontos;
+  document.getElementById('kpi-mont-cestas').textContent  = totalCestas;
+}
+
+// Motoboy confirma entrega
+async function confirmarEntrega(pedidoId, entregaId) {
+  if (!confirm('Confirmar entrega realizada?')) return;
+  await atualizarStatus(pedidoId, entregaId, 'entregue');
+}
+
+// Montador inicia montagem (pendente → em_preparo)
+async function iniciarMontagem(pedidoId, entregaId) {
+  if (entregaId) {
+    await db.from('entregas').update({ status:'em_preparo' }).eq('id', entregaId);
+  } else {
+    const { data: nova } = await db.from('entregas').insert({ pedido_id: pedidoId, status:'em_preparo' }).select('id').single();
+    if (nova) todosPedidos = todosPedidos.map(x => x.id === pedidoId ? { ...x, entregas: [{ id: nova.id, status:'em_preparo' }] } : x);
+  }
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (p) {
+    if (!p.entregas) p.entregas = [{}];
+    p.entregas[0].status = 'em_preparo';
+  }
+  renderPedidos();
+  toast('Montagem iniciada!');
+}
+
 function setupRealtime() {
   db.channel('logistica-realtime')
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'pedidos' }, async payload => {
@@ -452,10 +611,11 @@ function setupRealtime() {
       if (novoPedido) {
         todosPedidos.unshift(novoPedido);
         atualizarContadores();
+        atualizarKPIs();
         renderPedidos();
         atualizarBadgePendentes();
-        mostrarBannerNovoPedido(novoPedido);
-        if (Notification.permission === 'granted') {
+        if (meuPapel !== 'motoboy') mostrarBannerNovoPedido(novoPedido);
+        if (meuPapel !== 'motoboy' && Notification.permission === 'granted') {
           new Notification('🛒 Novo pedido — RR Distribuidora', {
             body: `#${novoPedido.numero} | ${novoPedido.clientes?.nome || 'Cliente'} | ${fmtR$(novoPedido.total)}`,
           });
@@ -463,6 +623,15 @@ function setupRealtime() {
       }
     })
     .subscribe();
+
+  // Motoboy/montador: atualiza quando entrega muda de status
+  if (meuPapel === 'motoboy' || meuPapel === 'montador') {
+    db.channel('entregas-realtime')
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'entregas' }, () => {
+        carregarPedidos();
+      })
+      .subscribe();
+  }
 
   if (Notification.permission === 'default') Notification.requestPermission();
 }
