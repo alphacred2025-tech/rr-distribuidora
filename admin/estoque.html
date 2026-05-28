@@ -264,9 +264,10 @@ const MOV_LIMIT = 30;
 
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  renderSidebar('estoque');
   const perfil = await requireAuth(['admin','logistica']);
   if (!perfil) return;
-  renderSidebar('estoque');
+  atualizarBadgePendentes();
   await Promise.all([carregarProdutos(), carregarMovimentos()]);
   subscribeRealtime();
 });

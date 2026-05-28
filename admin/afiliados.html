@@ -258,9 +258,10 @@ let graficoAfil = null;
 
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  renderSidebar('afiliados');
   const perfil = await requireAuth(['admin']);
   if (!perfil) return;
-  renderSidebar('afiliados');
+  atualizarBadgePendentes();
   await Promise.all([carregarAfiliados(), carregarComissoes(), calcularKPIs()]);
 });
 
@@ -481,8 +482,8 @@ async function verDetalheAfiliado(id) {
   document.getElementById('detalhe-afil-nome').textContent = afil.nome;
 
   const { data: pedidos } = await db.from('pedidos')
-    .select('numero, total, criado_em, status')
-    .eq('afiliado_id', id).order('criado_em', { ascending: false }).limit(20);
+    .select('numero, total, created_at, entregas(status)')
+    .eq('afiliado_id', id).order('created_at', { ascending: false }).limit(20);
 
   const base = location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://rr-distribuidora.vercel.app';
   const link = `${base}/?ref=${afil.codigo}`;
@@ -509,9 +510,9 @@ async function verDetalheAfiliado(id) {
           ${(pedidos||[]).length ? (pedidos||[]).map(p => `
             <tr>
               <td>#${p.numero}</td>
-              <td>${fmtData(p.criado_em)}</td>
+              <td>${fmtData(p.created_at)}</td>
               <td>${fmtR$(p.total)}</td>
-              <td>${badgeStatus(p.status)}</td>
+              <td>${badgeStatus(p.entregas?.[0]?.status || 'pendente')}</td>
             </tr>`).join('') : `<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Nenhum pedido ainda.</td></tr>`}
         </tbody>
       </table>

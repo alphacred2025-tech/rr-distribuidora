@@ -36,7 +36,7 @@ const db = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5cWNhcHllemxhbWpmZmJqYWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDU5MTQsImV4cCI6MjA5NTQ4MTkxNH0.JGqb9LFloiQ3fx8RvlH2d3bms1rDld7iEcICuZGfyXs'
 );
 
-const ROTAS = { admin:'painel.html', vendedor:'comercial.html', logistica:'logistica.html', financeiro:'financeiro.html' };
+const ROTAS = { admin:'painel.html', vendedor:'comercial.html', logistica:'logistica.html', financeiro:'financeiro.html', montador:'logistica.html', motoboy:'logistica.html' };
 
 // Se já logado, redireciona
 db.auth.getSession().then(async ({ data: { session } }) => {

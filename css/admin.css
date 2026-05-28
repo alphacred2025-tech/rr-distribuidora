@@ -247,6 +247,10 @@ input, select, textarea { font-family: var(--font); }
 .btn-fechar-modal { padding: .3rem; color: var(--text-muted); border-radius: var(--radius-sm); }
 .btn-fechar-modal:hover { background: var(--gray-100); color: var(--text); }
 .btn-fechar-modal svg { width: 18px; height: 18px; }
+.modal__close { padding: .25rem .55rem; color: var(--text-muted); border-radius: var(--radius-sm); font-size: 1.25rem; line-height: 1; background: none; border: none; cursor: pointer; }
+.modal__close:hover { background: var(--gray-100); color: var(--text); }
+.modal__actions { display: flex; justify-content: flex-end; gap: .625rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200); }
+.card__footer { padding: .75rem 1.25rem; border-top: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
 
 /* ── Comanda ─────────────────────────────────────────────────── */
 .comanda-box { background: #fffef5; border: 1.5px solid #e8d97b; border-radius: var(--radius-sm); padding: 1rem 1.125rem; }

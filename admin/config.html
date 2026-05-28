@@ -389,7 +389,6 @@ async function carregarConfigs() {
   set('cfg-chave-pix', 'chave_pix');
   set('cfg-comissao-vendedor', 'comissao_vendedor_cesta');
   set('cfg-comissao-motoboy',  'comissao_motoboy');
-  set('cfg-comissao-pct',      'comissao_percentual');
   set('cfg-dia-corte',         'comissao_dia_corte');
   set('cfg-meta-fat', 'meta_faturamento');
   set('cfg-meta-clientes', 'meta_clientes');
@@ -447,7 +446,6 @@ document.getElementById('form-comissoes').addEventListener('submit', async e => 
   await upsertConfigs({
     comissao_vendedor_cesta: document.getElementById('cfg-comissao-vendedor').value,
     comissao_motoboy:        document.getElementById('cfg-comissao-motoboy').value,
-    comissao_percentual:     document.getElementById('cfg-comissao-pct').value || '0',
     comissao_dia_corte:      document.getElementById('cfg-dia-corte').value,
   });
   toast('Comissões salvas!');
