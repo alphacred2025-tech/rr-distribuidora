@@ -24,14 +24,60 @@
     </header>
 
     <main class="admin-content">
-      <!-- KPIs -->
-      <div class="stats-grid" id="kpis">
-        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-card__label">Pedidos Hoje</div><div class="stat-card__valor" id="kpi-pedidos-hoje">—</div><div class="stat-card__sub">desde meia-noite</div></div>
-        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Faturamento Hoje</div><div class="stat-card__valor" id="kpi-fat-hoje" style="font-size:1.35rem">—</div><div class="stat-card__sub">receitas confirmadas</div></div>
-        <div class="stat-card"><div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-card__label">Em Aberto</div><div class="stat-card__valor" id="kpi-abertos">—</div><div class="stat-card__sub">pendente + preparo</div></div>
-        <div class="stat-card"><div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div class="stat-card__label">Entregues Hoje</div><div class="stat-card__valor" id="kpi-entregues">—</div><div class="stat-card__sub">concluídos no dia</div></div>
-        <div class="stat-card"><div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div class="stat-card__label">Total Clientes</div><div class="stat-card__valor" id="kpi-clientes">—</div><div class="stat-card__sub">cadastrados</div></div>
-        <div class="stat-card"><div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div><div class="stat-card__label">Faturamento Mês</div><div class="stat-card__valor" id="kpi-fat-mes" style="font-size:1.35rem">—</div><div class="stat-card__sub" id="kpi-mes-label">este mês</div></div>
+
+      <!-- Alertas -->
+      <div id="area-alertas"></div>
+
+      <!-- KPIs Linha 1 -->
+      <div class="stats-grid mb-15">
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+          <div class="stat-card__label">Pedidos Hoje</div>
+          <div class="stat-card__valor" id="kpi-pedidos-hoje">—</div>
+          <div class="stat-card__sub" id="kpi-pedidos-ontem"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div class="stat-card__label">Faturamento Hoje</div>
+          <div class="stat-card__valor" id="kpi-fat-hoje" style="font-size:1.3rem">—</div>
+          <div class="stat-card__sub" id="kpi-ticket-hoje"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div class="stat-card__label">Em Aberto</div>
+          <div class="stat-card__valor" id="kpi-abertos">—</div>
+          <div class="stat-card__sub">pendente + preparo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div>
+          <div class="stat-card__label">Em Rota Agora</div>
+          <div class="stat-card__valor" id="kpi-saiu" style="color:var(--purple)">—</div>
+          <div class="stat-card__sub">saiu para entrega</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+          <div class="stat-card__label">Entregues Hoje</div>
+          <div class="stat-card__valor" id="kpi-entregues">—</div>
+          <div class="stat-card__sub" id="kpi-taxa-conclusao"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--gold"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+          <div class="stat-card__label">Faturamento Mês</div>
+          <div class="stat-card__valor" id="kpi-fat-mes" style="font-size:1.3rem">—</div>
+          <div class="stat-card__sub" id="kpi-mes-label"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--navy"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div class="stat-card__label">Total Clientes</div>
+          <div class="stat-card__valor" id="kpi-clientes">—</div>
+          <div class="stat-card__sub" id="kpi-clientes-novos"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--red"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></div>
+          <div class="stat-card__label">Cancelados Mês</div>
+          <div class="stat-card__valor" id="kpi-cancelados" style="color:var(--red)">—</div>
+          <div class="stat-card__sub">pedidos cancelados</div>
+        </div>
       </div>
 
       <!-- Charts -->
@@ -46,6 +92,27 @@
         </div>
       </div>
 
+      <!-- Linha 3: Top cestas + Motoboys em rota -->
+      <div class="grid-2 mb-15">
+        <!-- Top cestas -->
+        <div class="card">
+          <div class="card__header"><span class="card__titulo">🏆 Top Cestas — Mês</span></div>
+          <div class="card__body" id="top-cestas">
+            <div style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:1rem">Carregando…</div>
+          </div>
+        </div>
+
+        <!-- Motoboys em rota -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__titulo">🛵 Motoboys — Status Hoje</span>
+          </div>
+          <div class="card__body" id="motoboys-status">
+            <div style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:1rem">Carregando…</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Pedidos recentes -->
       <div class="card">
         <div class="card__header">
@@ -53,9 +120,9 @@
           <a href="logistica.html" class="btn btn--outline btn--sm">Ver todos →</a>
         </div>
         <div class="table-wrap">
-          <table class="table" id="tabela-recentes">
+          <table class="table">
             <thead><tr>
-              <th>Nº Pedido</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Entrega</th><th>Status</th><th>Hora</th>
+              <th>Nº</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Entrega</th><th>Status</th><th>Hora</th>
             </tr></thead>
             <tbody id="tbody-recentes"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
           </table>
@@ -75,42 +142,94 @@
   if (!profile) return;
   atualizarBadgePendentes();
 
-  // Data de hoje
   document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' });
 
   await Promise.all([carregarKPIs(), carregarPedidosRecentes()]);
-  await carregarGraficos();
+  await Promise.all([carregarGraficos(), carregarTopCestas(), carregarMotoboys()]);
+  verificarAlertas();
 
   // Realtime
   db.channel('dash-realtime')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, () => {
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'pedidos' }, () => {
       carregarKPIs();
       carregarPedidosRecentes();
       atualizarBadgePendentes();
+      verificarAlertas();
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'entregas' }, () => {
+      carregarKPIs();
+      carregarMotoboys();
     })
     .subscribe();
 })();
 
 async function carregarKPIs() {
-  const hoje = new Date().toISOString().split('T')[0];
-  const mesInicio = hoje.slice(0, 7) + '-01';
+  const hoje     = new Date().toISOString().split('T')[0];
+  const ontem    = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const mesInicio = hoje.slice(0,7) + '-01';
 
-  const [{ count: cHoje }, { data: dHoje }, { count: cAbertos }, { count: cEntregues }, { count: cClientes }, { data: dMes }] = await Promise.all([
-    db.from('pedidos').select('*', { count:'exact', head:true }).gte('created_at', hoje + 'T00:00:00'),
-    db.from('pedidos').select('total').gte('created_at', hoje + 'T00:00:00'),
-    db.from('entregas').select('*', { count:'exact', head:true }).in('status', ['pendente','em_preparo']),
-    db.from('entregas').select('*', { count:'exact', head:true }).eq('status','entregue').gte('created_at', hoje + 'T00:00:00'),
-    db.from('clientes').select('*', { count:'exact', head:true }),
-    db.from('pedidos').select('total').gte('created_at', mesInicio + 'T00:00:00'),
+  const [
+    { count: cHoje }, { data: dHoje },
+    { count: cOntem },
+    { count: cAbertos },
+    { count: cSaiu },
+    { count: cEntregues },
+    { count: cClientes },
+    { count: cNovos },
+    { data: dMes },
+    { count: cCancelados },
+  ] = await Promise.all([
+    db.from('pedidos').select('*',{count:'exact',head:true}).gte('created_at', hoje+'T00:00:00'),
+    db.from('pedidos').select('total').gte('created_at', hoje+'T00:00:00'),
+    db.from('pedidos').select('*',{count:'exact',head:true}).gte('created_at',ontem+'T00:00:00').lt('created_at',hoje+'T00:00:00'),
+    db.from('entregas').select('*',{count:'exact',head:true}).in('status',['pendente','em_preparo']),
+    db.from('entregas').select('*',{count:'exact',head:true}).eq('status','saiu'),
+    db.from('entregas').select('*',{count:'exact',head:true}).eq('status','entregue').gte('updated_at',hoje+'T00:00:00'),
+    db.from('clientes').select('*',{count:'exact',head:true}),
+    db.from('clientes').select('*',{count:'exact',head:true}).gte('created_at',mesInicio+'T00:00:00'),
+    db.from('pedidos').select('total').gte('created_at',mesInicio+'T00:00:00'),
+    db.from('entregas').select('*',{count:'exact',head:true}).eq('status','cancelado').gte('created_at',mesInicio+'T00:00:00'),
   ]);
 
+  const fatHoje   = (dHoje||[]).reduce((s,p)=>s+p.total,0);
+  const fatMes    = (dMes||[]).reduce((s,p)=>s+p.total,0);
+  const ticketHoje = cHoje ? fatHoje/cHoje : 0;
+  const totalHoje  = (cHoje||0) + (cEntregues||0);
+  const taxaConclusao = totalHoje ? Math.round(((cEntregues||0)/totalHoje)*100) : 0;
+
   document.getElementById('kpi-pedidos-hoje').textContent = cHoje || 0;
-  document.getElementById('kpi-fat-hoje').textContent     = fmtR$(dHoje?.reduce((s,p)=>s+p.total,0)||0);
+  document.getElementById('kpi-pedidos-ontem').textContent = `ontem: ${cOntem||0}`;
+  document.getElementById('kpi-fat-hoje').textContent     = fmtR$(fatHoje);
+  document.getElementById('kpi-ticket-hoje').textContent  = cHoje ? 'ticket: ' + fmtR$(ticketHoje) : '';
   document.getElementById('kpi-abertos').textContent      = cAbertos || 0;
+  document.getElementById('kpi-saiu').textContent         = cSaiu || 0;
   document.getElementById('kpi-entregues').textContent    = cEntregues || 0;
+  document.getElementById('kpi-taxa-conclusao').textContent = `${taxaConclusao}% de conclusão`;
   document.getElementById('kpi-clientes').textContent     = cClientes || 0;
-  document.getElementById('kpi-fat-mes').textContent      = fmtR$(dMes?.reduce((s,p)=>s+p.total,0)||0);
+  document.getElementById('kpi-clientes-novos').textContent = `+${cNovos||0} este mês`;
+  document.getElementById('kpi-fat-mes').textContent      = fmtR$(fatMes);
   document.getElementById('kpi-mes-label').textContent    = MESES[new Date().getMonth()];
+  document.getElementById('kpi-cancelados').textContent   = cCancelados || 0;
+}
+
+async function verificarAlertas() {
+  const area = document.getElementById('area-alertas');
+  const alertas = [];
+
+  // Pedidos pendentes há mais de 1h
+  const umaHoraAtras = new Date(Date.now() - 3600000).toISOString();
+  const hoje = new Date().toISOString().split('T')[0];
+  const { count: atrasados } = await db.from('entregas')
+    .select('*',{count:'exact',head:true})
+    .eq('status','pendente')
+    .lt('created_at', umaHoraAtras)
+    .gte('created_at', hoje+'T00:00:00');
+
+  if (atrasados > 0) {
+    alertas.push(`<div class="alerta alerta--warn">⚠️ <strong>${atrasados} pedido${atrasados>1?'s':''}</strong> pendente${atrasados>1?'s':''} há mais de 1 hora — <a href="logistica.html" style="color:inherit;text-decoration:underline">ver logística</a></div>`);
+  }
+
+  area.innerHTML = alertas.join('');
 }
 
 async function carregarPedidosRecentes() {
@@ -122,13 +241,14 @@ async function carregarPedidosRecentes() {
   const tbody = document.getElementById('tbody-recentes');
   if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum pedido ainda.</td></tr>'; return; }
 
+  const pgto = { pix:'PIX', cartao:'Cartão', avista:'À vista', dinheiro:'Dinheiro' };
   tbody.innerHTML = data.map(p => {
     const status = p.entregas?.[0]?.status || 'pendente';
     return `<tr>
-      <td><strong>${p.numero}</strong></td>
+      <td><strong>#${p.numero}</strong></td>
       <td>${p.clientes?.nome || '—'}</td>
       <td><strong>${fmtR$(p.total)}</strong></td>
-      <td>${p.forma_pagamento === 'pix' ? 'PIX' : 'Cartão'}</td>
+      <td>${pgto[p.forma_pagamento] || p.forma_pagamento || '—'}</td>
       <td>${p.forma_entrega === 'entrega' ? '🚚 Entrega' : '🏪 Retirada'}</td>
       <td>${badgeStatus(status)}</td>
       <td style="color:var(--text-muted)">${fmtHora(p.created_at)}</td>
@@ -136,48 +256,107 @@ async function carregarPedidosRecentes() {
   }).join('');
 }
 
+async function carregarTopCestas() {
+  const mesInicio = new Date().toISOString().slice(0,7) + '-01';
+  const { data } = await db.from('itens_pedido')
+    .select('cesta_nome, quantidade, pedidos!inner(created_at)')
+    .gte('pedidos.created_at', mesInicio + 'T00:00:00');
+
+  const map = {};
+  (data||[]).forEach(i => {
+    const n = i.cesta_nome;
+    if (!map[n]) map[n] = { nome: n, qtd: 0 };
+    map[n].qtd += i.quantidade;
+  });
+
+  const top = Object.values(map).sort((a,b)=>b.qtd-a.qtd).slice(0,5);
+  const max = top[0]?.qtd || 1;
+  const el  = document.getElementById('top-cestas');
+
+  if (!top.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:1rem">Nenhum pedido este mês.</div>'; return; }
+
+  el.innerHTML = top.map((c,i) => `
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+      <div style="width:22px;height:22px;border-radius:50%;background:${['#ffd700','#c0c0c0','#cd7f32','#e8eef8','#f3e8ff'][i]};display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:${i<3?'#333':'var(--navy)'};flex-shrink:0">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:.85rem;font-weight:600;margin-bottom:.2rem">${c.nome}</div>
+        <div style="height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,var(--navy),var(--gold));border-radius:3px;width:${Math.round(c.qtd/max*100)}%"></div></div>
+      </div>
+      <div style="font-size:.85rem;font-weight:700;color:var(--navy);min-width:40px;text-align:right">${c.qtd}×</div>
+    </div>`).join('');
+}
+
+async function carregarMotoboys() {
+  const hoje = new Date().toISOString().split('T')[0];
+
+  const { data: motoboys } = await db.from('motoboys').select('*').eq('ativo', true).order('nome');
+  if (!motoboys?.length) {
+    document.getElementById('motoboys-status').innerHTML = '<div style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:1rem">Nenhum motoboy cadastrado. <a href="config.html" style="color:var(--navy)">Cadastrar →</a></div>';
+    return;
+  }
+
+  const counts = await Promise.all(motoboys.map(m => Promise.all([
+    db.from('entregas').select('*',{count:'exact',head:true}).eq('motoboy_id',m.id).eq('status','saiu'),
+    db.from('entregas').select('*',{count:'exact',head:true}).eq('motoboy_id',m.id).eq('status','entregue').gte('updated_at',hoje+'T00:00:00'),
+  ])));
+
+  const el = document.getElementById('motoboys-status');
+  el.innerHTML = motoboys.map((m,i) => {
+    const [{ count: emRota }, { count: entregues }] = counts[i];
+    const status = emRota > 0 ? 'saiu' : 'pendente';
+    return `
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--gray-200)">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:1.1rem">🛵</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:.875rem">${m.nome}</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">${m.telefone || '—'}</div>
+      </div>
+      <div style="text-align:right">
+        ${emRota > 0 ? `<span class="badge badge--saiu" style="margin-bottom:.2rem">${emRota} em rota</span>` : '<span class="badge badge--inativo">livre</span>'}
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem">${entregues||0} entregues hoje</div>
+      </div>
+    </div>`;
+  }).join('') + `<div style="text-align:right;padding-top:.5rem"><a href="config.html" style="font-size:.78rem;color:var(--navy)">Gerenciar motoboys →</a></div>`;
+}
+
 let chartFat, chartStatus;
 
 async function carregarGraficos() {
-  // Faturamento 7 dias
-  const dias = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+  const dias = Array.from({length:7}, (_,i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6-i));
     return d.toISOString().split('T')[0];
   });
 
-  const { data: pedidosDias } = await db.from('pedidos').select('total, created_at')
-    .gte('created_at', dias[0] + 'T00:00:00');
+  const { data: pedidosDias } = await db.from('pedidos').select('total,created_at')
+    .gte('created_at', dias[0]+'T00:00:00');
 
-  const fatPorDia = dias.map(d => {
-    return (pedidosDias || []).filter(p => p.created_at.startsWith(d)).reduce((s, p) => s + p.total, 0);
-  });
+  const fatPorDia = dias.map(d => (pedidosDias||[]).filter(p=>p.created_at.startsWith(d)).reduce((s,p)=>s+p.total,0));
 
   const ctxFat = document.getElementById('chart-fat').getContext('2d');
   if (chartFat) chartFat.destroy();
   chartFat = new Chart(ctxFat, {
     type: 'bar',
     data: {
-      labels: dias.map(d => { const dt = new Date(d + 'T12:00:00'); return dt.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }); }),
-      datasets: [{ label: 'Faturamento', data: fatPorDia, backgroundColor: '#1B3A87', borderRadius: 6 }],
+      labels: dias.map(d => { const dt = new Date(d+'T12:00:00'); return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); }),
+      datasets: [{ label:'Faturamento', data: fatPorDia, backgroundColor: '#1B3A87', borderRadius: 6 }],
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-               scales: { y: { ticks: { callback: v => 'R$' + v.toLocaleString('pt-BR') }, grid: { color: '#eef' } }, x: { grid: { display: false } } } },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+               scales:{ y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')},grid:{color:'#eef'}}, x:{grid:{display:false}} } },
   });
 
-  // Status
   const { data: statusData } = await db.from('entregas').select('status');
   const counts = { pendente:0, em_preparo:0, saiu:0, entregue:0, cancelado:0 };
-  (statusData || []).forEach(e => { if (counts[e.status] !== undefined) counts[e.status]++; });
+  (statusData||[]).forEach(e => { if (counts[e.status]!==undefined) counts[e.status]++; });
 
   const ctxS = document.getElementById('chart-status').getContext('2d');
   if (chartStatus) chartStatus.destroy();
   chartStatus = new Chart(ctxS, {
     type: 'doughnut',
     data: {
-      labels: ['Pendente', 'Em preparo', 'Saiu', 'Entregue', 'Cancelado'],
-      datasets: [{ data: Object.values(counts), backgroundColor: ['#f59e0b','#1B3A87','#7c3aed','#388e3c','#d93025'], borderWidth: 0 }],
+      labels: ['Pendente','Em preparo','Saiu','Entregue','Cancelado'],
+      datasets: [{ data: Object.values(counts), backgroundColor:['#f59e0b','#1B3A87','#7c3aed','#388e3c','#d93025'], borderWidth:0 }],
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Poppins', size: 11 } } } } },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{font:{family:'Poppins',size:11}}}} },
   });
 }
 </script>
