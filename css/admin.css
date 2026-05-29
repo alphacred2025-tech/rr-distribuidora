@@ -201,7 +201,6 @@ input, select, textarea { font-family: var(--font); }
 /* ── Filter Tabs ─────────────────────────────────────────────── */
 .filter-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 1.25rem; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .filter-tabs::-webkit-scrollbar { display: none; }
-.aba-content { display: none; }
 .filter-tab { padding: .575rem 1.1rem; font-size: .835rem; font-weight: 500; color: var(--text-muted); background: none; border: none; border-bottom: 2.5px solid transparent; margin-bottom: -2px; cursor: pointer; white-space: nowrap; transition: all .18s; }
 .filter-tab:hover   { color: var(--navy); }
 .filter-tab--ativo,

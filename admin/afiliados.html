@@ -586,7 +586,7 @@ function copiarLink(link) {
 
 function mudarAba(aba, btn) {
   ['afiliados','comissoes','relatorio'].forEach(a => {
-    document.getElementById(`aba-${a}`).style.display = a === aba ? '' : 'none';
+    document.getElementById(`aba-${a}`).style.display = a === aba ? 'block' : 'none';
   });
   document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('filter-tab--ativo'));
   btn.classList.add('filter-tab--ativo');

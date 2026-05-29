@@ -387,13 +387,14 @@ let bairrosList  = [];
   const profile = await requireAuth(['admin']);
   if (!profile) return;
   atualizarBadgePendentes();
+  mudarAba('empresa', document.querySelector('.filter-tab'));
   await Promise.all([carregarConfigs(), carregarUsuarios(), carregarMotoboys()]);
 })();
 
 function mudarAba(aba, btn) {
   document.querySelectorAll('.aba-content').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.filter-tab').forEach(el => el.classList.remove('filter-tab--active'));
-  document.getElementById('aba-' + aba).style.display = '';
+  document.getElementById('aba-' + aba).style.display = 'block';
   if (btn) btn.classList.add('filter-tab--active');
   if (aba === 'bairros') carregarBairros();
 }
