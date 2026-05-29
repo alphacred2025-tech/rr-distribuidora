@@ -543,19 +543,34 @@ INSERT INTO public.configuracoes (chave, valor) VALUES
   ('bonus_faixa3_valor',       '700')
 ON CONFLICT (chave) DO NOTHING;
 
--- Cestas RR (produtos iniciais)
+-- Cestas RR — nomes idênticos ao dados.js para integração de estoque
 INSERT INTO public.produtos (nome, descricao, preco, custo, estoque_atual, estoque_minimo, unidade, categoria) VALUES
-  ('Cesta 1kg',  'Cesta básica 1kg',   25.00,  18.00, 50, 10, 'un', 'cesta'),
-  ('Cesta 2kg',  'Cesta básica 2kg',   45.00,  32.00, 40,  8, 'un', 'cesta'),
-  ('Cesta 3kg',  'Cesta básica 3kg',   65.00,  47.00, 35,  8, 'un', 'cesta'),
-  ('Cesta 4kg',  'Cesta básica 4kg',   80.00,  58.00, 30,  5, 'un', 'cesta'),
-  ('Cesta 5kg',  'Cesta básica 5kg',   95.00,  69.00, 25,  5, 'un', 'cesta'),
-  ('Cesta 6kg',  'Cesta básica 6kg',  110.00,  79.00, 20,  5, 'un', 'cesta'),
-  ('Cesta 7kg',  'Cesta básica 7kg',  125.00,  90.00, 20,  5, 'un', 'cesta'),
-  ('Cesta 8kg',  'Cesta básica 8kg',  140.00, 100.00, 15,  5, 'un', 'cesta'),
-  ('Cesta 9kg',  'Cesta básica 9kg',  155.00, 111.00, 15,  3, 'un', 'cesta'),
-  ('Cesta 10kg', 'Cesta básica 10kg', 170.00, 122.00, 10,  3, 'un', 'cesta'),
-  ('Cesta 11kg', 'Cesta básica 11kg', 185.00, 133.00, 10,  3, 'un', 'cesta')
+  ('Cesta Simples 1kg',   'Cesta básica simples 1kg',  133.00, 96.00, 50,10,'un','cesta'),
+  ('Cesta Simples 2kg',   'Cesta básica simples 2kg',  145.00,104.00, 40, 8,'un','cesta'),
+  ('Cesta Simples 3kg',   'Cesta básica simples 3kg',  170.00,122.00, 35, 8,'un','cesta'),
+  ('Cesta Simples 4kg',   'Cesta básica simples 4kg',  190.00,137.00, 30, 5,'un','cesta'),
+  ('Cesta Simples 5kg',   'Cesta básica simples 5kg',  210.00,151.00, 25, 5,'un','cesta'),
+  ('Cesta Simples 6kg',   'Cesta básica simples 6kg',  230.00,166.00, 20, 5,'un','cesta'),
+  ('Cesta Simples 7kg',   'Cesta básica simples 7kg',  250.00,180.00, 20, 5,'un','cesta'),
+  ('Cesta Simples 8kg',   'Cesta básica simples 8kg',  270.00,194.00, 15, 5,'un','cesta'),
+  ('Cesta Simples 9kg',   'Cesta básica simples 9kg',  290.00,209.00, 15, 3,'un','cesta'),
+  ('Cesta Simples 10kg',  'Cesta básica simples 10kg', 310.00,223.00, 10, 3,'un','cesta'),
+  ('Cesta Simples 11kg',  'Cesta básica simples 11kg', 325.00,234.00, 10, 3,'un','cesta'),
+  ('Cesta Completa 1kg',  'Cesta completa 1kg',        160.00,115.00, 30, 8,'un','cesta'),
+  ('Cesta Completa 2kg',  'Cesta completa 2kg',        180.00,129.00, 25, 8,'un','cesta'),
+  ('Cesta Completa 3kg',  'Cesta completa 3kg',        205.00,147.00, 20, 5,'un','cesta'),
+  ('Cesta Completa 4kg',  'Cesta completa 4kg',        225.00,162.00, 20, 5,'un','cesta'),
+  ('Cesta Completa 5kg',  'Cesta completa 5kg',        250.00,180.00, 15, 5,'un','cesta'),
+  ('Cesta Completa 6kg',  'Cesta completa 6kg',        265.00,191.00, 15, 5,'un','cesta'),
+  ('Cesta Completa 7kg',  'Cesta completa 7kg',        285.00,205.00, 12, 3,'un','cesta'),
+  ('Cesta Completa 8kg',  'Cesta completa 8kg',        305.00,220.00, 10, 3,'un','cesta'),
+  ('Cesta Completa 9kg',  'Cesta completa 9kg',        320.00,230.00, 10, 3,'un','cesta'),
+  ('Cesta Completa 10kg', 'Cesta completa 10kg',       340.00,245.00,  8, 3,'un','cesta'),
+  ('Cesta Completa 11kg', 'Cesta completa 11kg',       360.00,259.00,  8, 3,'un','cesta'),
+  ('Cesta Popular',       'Cesta acessível essencial', 100.00, 72.00, 20, 5,'un','especial'),
+  ('Cesta Diferenciada',  'Cesta especial diferenciada',260.00,187.00,10, 3,'un','especial'),
+  ('Cesta Montada',       'Cesta montada com critério', 390.00,281.00, 8, 3,'un','especial'),
+  ('Cesta Top RR',        'Nossa cesta premium',       410.00,295.00,  5, 2,'un','especial')
 ON CONFLICT DO NOTHING;
 
 -- ================================================================

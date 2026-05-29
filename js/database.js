@@ -114,26 +114,15 @@ async function salvarPedido(pedido) {
     });
     if (e5) console.warn('[DB] Aviso ao criar lançamento:', e5.message);
 
-    // 7. Decrementar estoque para cada item do pedido
+    // 7. Decrementar estoque via RPC (SECURITY DEFINER — seguro para anon)
     try {
       for (const item of (pedido.carrinho || [])) {
-        const nomeCesta = (item.nome || '').trim();
-        const { data: prod } = await db
-          .from('produtos')
-          .select('id, estoque_atual')
-          .ilike('nome', nomeCesta)
-          .maybeSingle();
-        if (prod) {
-          const novoEst = Math.max(0, prod.estoque_atual - (item.quantidade || 1));
-          await db.from('produtos').update({ estoque_atual: novoEst }).eq('id', prod.id);
-          await db.from('estoque_movimentos').insert({
-            produto_id:  prod.id,
-            pedido_id:   pedidoId,
-            tipo:        'saida',
-            quantidade:  item.quantidade || 1,
-            observacao:  `Pedido #${pedido.numero}`,
-          });
-        }
+        await db.rpc('decrementar_estoque_pedido', {
+          p_nome:       (item.nome || '').trim(),
+          p_quantidade: item.quantidade || 1,
+          p_pedido_id:  pedidoId,
+          p_numero:     pedido.numero,
+        });
       }
     } catch(e) { console.warn('[DB] Aviso ao atualizar estoque:', e.message); }
 
