@@ -114,15 +114,19 @@ async function salvarPedido(pedido) {
     });
     if (e5) console.warn('[DB] Aviso ao criar lançamento:', e5.message);
 
-    // 7. Decrementar estoque via RPC (SECURITY DEFINER — seguro para anon)
+    // 7. Decrementar ingredientes do estoque via RPC (SECURITY DEFINER)
+    // itens_selecionados = nomes dos ingredientes escolhidos pelo cliente
     try {
       for (const item of (pedido.carrinho || [])) {
-        await db.rpc('decrementar_estoque_pedido', {
-          p_nome:       (item.nome || '').trim(),
-          p_quantidade: item.quantidade || 1,
-          p_pedido_id:  pedidoId,
-          p_numero:     pedido.numero,
-        });
+        const ingredientes = item.itens || [];
+        if (ingredientes.length > 0) {
+          await db.rpc('decrementar_ingredientes_pedido', {
+            p_itens:      ingredientes,
+            p_quantidade: item.quantidade || 1,
+            p_pedido_id:  pedidoId,
+            p_numero:     pedido.numero,
+          });
+        }
       }
     } catch(e) { console.warn('[DB] Aviso ao atualizar estoque:', e.message); }
 
