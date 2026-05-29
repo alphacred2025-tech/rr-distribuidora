@@ -117,9 +117,29 @@ let filtroAtivo     = 'todos';
 let pedidoComanda   = null;
 let comissaoMotoboy  = 14;
 let comissaoVendedor = 20;
+let configTaxaEntrega = 5;
 let meuPapel         = 'admin';
 let meuProfile       = null;
 let meuMotoboyId     = null;
+
+// Normaliza entregas: Supabase retorna objeto (UNIQUE FK) ou array — trata os dois casos
+function getEntrega(p) {
+  const e = p?.entregas;
+  if (!e) return {};
+  return Array.isArray(e) ? (e[0] || {}) : e;
+}
+
+// Atualiza a entrega local no objeto do pedido (funciona com objeto ou array)
+function setEntregaLocal(p, changes) {
+  if (!p) return;
+  if (!p.entregas) { p.entregas = changes; return; }
+  if (Array.isArray(p.entregas)) {
+    if (!p.entregas[0]) p.entregas[0] = {};
+    Object.assign(p.entregas[0], changes);
+  } else {
+    Object.assign(p.entregas, changes);
+  }
+}
 
 (async () => {
   renderSidebar('logistica');
@@ -128,13 +148,14 @@ let meuMotoboyId     = null;
   meuProfile = profile;
   meuPapel   = profile.papel || 'admin';
   atualizarBadgePendentes();
-  // Carrega comissões configuradas
+  // Carrega configurações
   const { data: cfgs } = await db.from('configuracoes')
     .select('chave,valor')
-    .in('chave', ['comissao_motoboy','comissao_vendedor_cesta']);
+    .in('chave', ['comissao_motoboy','comissao_vendedor_cesta','taxa_entrega']);
   (cfgs || []).forEach(c => {
-    if (c.chave === 'comissao_motoboy')        comissaoMotoboy  = parseFloat(c.valor) || 14;
-    if (c.chave === 'comissao_vendedor_cesta') comissaoVendedor = parseFloat(c.valor) || 20;
+    if (c.chave === 'comissao_motoboy')        comissaoMotoboy   = parseFloat(c.valor) || 14;
+    if (c.chave === 'comissao_vendedor_cesta') comissaoVendedor  = parseFloat(c.valor) || 20;
+    if (c.chave === 'taxa_entrega')            configTaxaEntrega = parseFloat(c.valor) || 5;
   });
   await adaptarParaPapel(profile);
   await Promise.all([carregarMotoboys(), carregarPedidos()]);
@@ -163,13 +184,13 @@ async function carregarPedidos() {
 async function atualizarKPIs() {
   const hoje = new Date().toISOString().split('T')[0];
   const pedidosHoje = todosPedidos.filter(p => p.created_at?.startsWith(hoje));
-  const aguardando  = todosPedidos.filter(p => ['pendente','em_preparo'].includes(p.entregas?.[0]?.status || 'pendente')).length;
-  const emRota      = todosPedidos.filter(p => p.entregas?.[0]?.status === 'saiu').length;
-  const entreguesH  = pedidosHoje.filter(p => p.entregas?.[0]?.status === 'entregue').length;
+  const aguardando  = todosPedidos.filter(p => ['pendente','em_preparo'].includes(getEntrega(p).status || 'pendente')).length;
+  const emRota      = todosPedidos.filter(p => getEntrega(p).status === 'saiu').length;
+  const entreguesH  = pedidosHoje.filter(p => getEntrega(p).status === 'entregue').length;
   const receitaHoje = pedidosHoje.reduce((s,p) => s + (p.total || 0), 0);
   const maquineta   = todosPedidos.filter(p =>
     p.forma_pagamento === 'cartao' &&
-    !['entregue','cancelado'].includes(p.entregas?.[0]?.status || 'pendente')
+    !['entregue','cancelado'].includes(getEntrega(p).status || 'pendente')
   ).length;
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -184,7 +205,7 @@ async function atualizarKPIs() {
 function atualizarContadores() {
   const counts = { todos: todosPedidos.length, pendente:0, em_preparo:0, saiu:0, entregue:0, cancelado:0 };
   todosPedidos.forEach(p => {
-    const s = p.entregas?.[0]?.status || 'pendente';
+    const s = getEntrega(p).status || 'pendente';
     if (counts[s] !== undefined) counts[s]++;
   });
   Object.entries(counts).forEach(([k,v]) => {
@@ -204,16 +225,16 @@ function renderPedidos() {
   let filtrados;
 
   if (meuPapel === 'motoboy') {
-    filtrados = todosPedidos.filter(p => p.entregas?.[0]?.status === 'saiu');
-    if (meuMotoboyId) filtrados = filtrados.filter(p => p.entregas?.[0]?.motoboy_id === meuMotoboyId);
+    filtrados = todosPedidos.filter(p => getEntrega(p).status === 'saiu');
+    if (meuMotoboyId) filtrados = filtrados.filter(p => getEntrega(p).motoboy_id === meuMotoboyId);
     atualizarKpisMotoboy(filtrados);
   } else if (meuPapel === 'montador') {
-    filtrados = todosPedidos.filter(p => ['pendente','em_preparo'].includes(p.entregas?.[0]?.status || 'pendente'));
+    filtrados = todosPedidos.filter(p => ['pendente','em_preparo'].includes(getEntrega(p).status || 'pendente'));
     atualizarKpisMontador();
   } else {
     filtrados = filtroAtivo === 'todos'
       ? todosPedidos
-      : todosPedidos.filter(p => (p.entregas?.[0]?.status || 'pendente') === filtroAtivo);
+      : todosPedidos.filter(p => (getEntrega(p).status || 'pendente') === filtroAtivo);
   }
 
   if (!filtrados.length) {
@@ -229,7 +250,7 @@ function renderPedidos() {
 }
 
 function cardPedido(p) {
-  const entrega  = p.entregas?.[0] || {};
+  const entrega  = getEntrega(p);
   const status   = entrega.status || 'pendente';
   const cliente  = p.clientes || {};
   const isNovo   = (Date.now() - new Date(p.created_at)) < 5 * 60 * 1000;
@@ -359,31 +380,41 @@ async function atualizarStatus(pedidoId, entregaId, novoStatus) {
 
   const p = todosPedidos.find(x => x.id === pedidoId);
 
-  // Bloqueia "saiu" sem motoboy atribuído
-  if (novoStatus === 'saiu' && p && !p.entregas?.[0]?.motoboy_id) {
-    toast('Atribua um motoboy antes de marcar como saiu!', 'error');
-    // Reverte o select
-    const card = document.getElementById('card-' + pedidoId);
-    if (card) { const sel = card.querySelector('.status-select'); if (sel) sel.value = p.entregas?.[0]?.status || 'pendente'; }
-    return;
+  // Aviso (não bloqueio) se marcar "saiu" sem motoboy
+  if (novoStatus === 'saiu' && p && !getEntrega(p).motoboy_id) {
+    toast('Aviso: nenhum motoboy atribuído — prosseguindo mesmo assim.', 'warning');
   }
 
-  if (entregaId) {
-    const { error } = await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', entregaId);
+  let eid = entregaId;
+
+  if (eid) {
+    const { error } = await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', eid);
     if (error) { toast('Erro ao atualizar status', 'error'); return; }
   } else {
-    const { data: nova, error } = await db.from('entregas').insert({ pedido_id: pedidoId, status: novoStatus }).select('id').single();
-    if (error) { toast('Erro ao criar entrega', 'error'); return; }
-    if (nova) todosPedidos = todosPedidos.map(x => x.id === pedidoId ? { ...x, entregas: [{ id: nova.id, status: novoStatus }] } : x);
+    // entregaId não veio no card — busca pelo pedido_id antes de tentar inserir
+    const { data: existente } = await db.from('entregas').select('id').eq('pedido_id', pedidoId).maybeSingle();
+    if (existente?.id) {
+      eid = existente.id;
+      const { error } = await db.from('entregas').update({ status: novoStatus, ...extra }).eq('id', eid);
+      if (error) { toast('Erro ao atualizar status', 'error'); return; }
+      setEntregaLocal(p, { id: eid, status: novoStatus, ...extra });
+    } else {
+      const { data: nova, error } = await db.from('entregas').insert({ pedido_id: pedidoId, status: novoStatus }).select('id').single();
+      if (error) { toast('Erro ao criar entrega', 'error'); return; }
+      if (nova) {
+        eid = nova.id;
+        todosPedidos = todosPedidos.map(x => x.id === pedidoId ? { ...x, entregas: { id: nova.id, status: novoStatus } } : x);
+      }
+    }
   }
 
-  if (p && p.entregas?.[0]) p.entregas[0].status = novoStatus;
+  setEntregaLocal(p, { status: novoStatus, ...extra });
 
   // ── Quando SAI: WhatsApp automático pro motoboy ──────────────
   if (novoStatus === 'saiu' && p) {
-    const motoboy = motoboys.find(m => m.id === p.entregas?.[0]?.motoboy_id);
+    const motoboy = motoboys.find(m => m.id === getEntrega(p).motoboy_id);
     if (motoboy?.telefone) {
-      const comanda = gerarComanda(p, p.profiles?.nome || 'Logística', p.entregas?.[0]?.taxa || '');
+      const comanda = gerarComanda(p, p.profiles?.nome || 'Logística', getEntrega(p).taxa || '');
       const tel = '55' + motoboy.telefone.replace(/\D/g,'');
       toast(`🛵 Enviando comanda para ${motoboy.nome}...`, 'success');
       setTimeout(() => window.open(`https://wa.me/${tel}?text=${encodeURIComponent(comanda)}`, '_blank'), 700);
@@ -392,7 +423,7 @@ async function atualizarStatus(pedidoId, entregaId, novoStatus) {
 
   // ── Quando ENTREGUE: cria comissões automaticamente ──────────
   if (novoStatus === 'entregue' && p) {
-    const entrega   = p.entregas?.[0] || {};
+    const entrega   = getEntrega(p);
     const motoboy   = motoboys.find(m => m.id === entrega.motoboy_id);
     const qtdCestas = (p.itens_pedido || []).reduce((s,i) => s + (i.quantidade||1), 0);
     const hoje      = new Date().toISOString().split('T')[0];
@@ -433,17 +464,20 @@ async function atualizarStatus(pedidoId, entregaId, novoStatus) {
 }
 
 async function atribuirMotoboy(entregaId, pedidoId, motoboyId) {
-  if (!entregaId) {
-    await db.from('entregas').insert({ pedido_id: pedidoId, status:'em_preparo', motoboy_id: motoboyId || null });
+  let eid = entregaId;
+  if (!eid) {
+    const { data: ex } = await db.from('entregas').select('id').eq('pedido_id', pedidoId).maybeSingle();
+    eid = ex?.id;
+  }
+  if (eid) {
+    await db.from('entregas').update({ motoboy_id: motoboyId || null }).eq('id', eid);
   } else {
-    await db.from('entregas').update({ motoboy_id: motoboyId || null }).eq('id', entregaId);
+    await db.from('entregas').insert({ pedido_id: pedidoId, status:'pendente', motoboy_id: motoboyId || null });
   }
   const p = todosPedidos.find(x => x.id === pedidoId);
   if (p) {
-    if (!p.entregas) p.entregas = [{}];
-    p.entregas[0].motoboy_id = motoboyId;
     const mb = motoboys.find(m => m.id === motoboyId);
-    p.entregas[0].motoboys = mb || null;
+    setEntregaLocal(p, { motoboy_id: motoboyId, motoboys: mb || null });
   }
   renderPedidos();
   toast('Motoboy atribuído!');
@@ -452,9 +486,9 @@ async function atribuirMotoboy(entregaId, pedidoId, motoboyId) {
 function notificarMotoboy(pedidoId) {
   const p = todosPedidos.find(x => x.id === pedidoId);
   if (!p) return;
-  const motoboy = motoboys.find(m => m.id === p.entregas?.[0]?.motoboy_id);
+  const motoboy = motoboys.find(m => m.id === getEntrega(p).motoboy_id);
   if (!motoboy?.telefone) { toast('Motoboy sem telefone cadastrado', 'warning'); return; }
-  const comanda = gerarComanda(p, 'Logística', p.entregas?.[0]?.taxa || '');
+  const comanda = gerarComanda(p, 'Logística', getEntrega(p).taxa || '');
   const tel = '55' + motoboy.telefone.replace(/\D/g,'');
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(comanda)}`, '_blank');
 }
@@ -462,10 +496,12 @@ function notificarMotoboy(pedidoId) {
 function abrirComandaModal(pedidoId) {
   pedidoComanda = todosPedidos.find(p => p.id === pedidoId);
   if (!pedidoComanda) return;
+  const entrega = getEntrega(pedidoComanda);
   document.getElementById('comanda-numero').textContent = pedidoComanda.numero;
-  document.getElementById('comanda-taxa').value = pedidoComanda.entregas?.[0]?.taxa || '';
+  // Auto-preenche com a taxa salva, ou a taxa padrão das configurações
+  document.getElementById('comanda-taxa').value = entrega.taxa || configTaxaEntrega || '';
 
-  const motoboy = motoboys.find(m => m.id === pedidoComanda.entregas?.[0]?.motoboy_id);
+  const motoboy = motoboys.find(m => m.id === entrega.motoboy_id);
   const btnMoto = document.getElementById('btn-enviar-motoboy');
   if (motoboy?.telefone) {
     btnMoto.style.display = '';
@@ -489,7 +525,7 @@ async function copiarComanda() {
   const texto = document.getElementById('comanda-texto').textContent;
   await navigator.clipboard.writeText(texto);
   const taxa    = document.getElementById('comanda-taxa').value;
-  const entrega = pedidoComanda?.entregas?.[0];
+  const entrega = getEntrega(pedidoComanda);
   if (entrega?.id && taxa) await db.from('entregas').update({ taxa: parseFloat(taxa) || 0 }).eq('id', entrega.id);
   toast('Comanda copiada! Cole no grupo 👍');
   fecharModal('modal-comanda');
@@ -497,7 +533,7 @@ async function copiarComanda() {
 
 function enviarParaMotoboy() {
   if (!pedidoComanda) return;
-  const motoboy = motoboys.find(m => m.id === pedidoComanda.entregas?.[0]?.motoboy_id);
+  const motoboy = motoboys.find(m => m.id === getEntrega(pedidoComanda).motoboy_id);
   if (!motoboy?.telefone) { toast('Motoboy sem telefone cadastrado', 'warning'); return; }
   const texto = document.getElementById('comanda-texto').textContent;
   const tel   = '55' + motoboy.telefone.replace(/\D/g,'');
@@ -560,13 +596,13 @@ async function atualizarKpisMotoboy(minhasEntregas) {
 
 function atualizarKpisMontador() {
   const hoje = new Date().toISOString().split('T')[0];
-  const fila     = todosPedidos.filter(p => (p.entregas?.[0]?.status || 'pendente') === 'pendente').length;
-  const preparo  = todosPedidos.filter(p => p.entregas?.[0]?.status === 'em_preparo').length;
+  const fila     = todosPedidos.filter(p => (getEntrega(p).status || 'pendente') === 'pendente').length;
+  const preparo  = todosPedidos.filter(p => getEntrega(p).status === 'em_preparo').length;
   const prontos  = todosPedidos.filter(p =>
-    p.entregas?.[0]?.status === 'saiu' && p.created_at?.startsWith(hoje)
+    getEntrega(p).status === 'saiu' && p.created_at?.startsWith(hoje)
   ).length;
   const totalCestas = todosPedidos
-    .filter(p => ['pendente','em_preparo'].includes(p.entregas?.[0]?.status || 'pendente'))
+    .filter(p => ['pendente','em_preparo'].includes(getEntrega(p).status || 'pendente'))
     .reduce((s,p) => s + (p.itens_pedido||[]).reduce((ss,i) => ss + (i.quantidade||1), 0), 0);
 
   document.getElementById('kpi-mont-fila').textContent   = fila;
@@ -583,17 +619,21 @@ async function confirmarEntrega(pedidoId, entregaId) {
 
 // Montador inicia montagem (pendente → em_preparo)
 async function iniciarMontagem(pedidoId, entregaId) {
-  if (entregaId) {
-    await db.from('entregas').update({ status:'em_preparo' }).eq('id', entregaId);
+  let eid = entregaId;
+  if (!eid) {
+    const { data: ex } = await db.from('entregas').select('id').eq('pedido_id', pedidoId).maybeSingle();
+    eid = ex?.id;
+  }
+  if (eid) {
+    await db.from('entregas').update({ status:'em_preparo' }).eq('id', eid);
   } else {
     const { data: nova } = await db.from('entregas').insert({ pedido_id: pedidoId, status:'em_preparo' }).select('id').single();
-    if (nova) todosPedidos = todosPedidos.map(x => x.id === pedidoId ? { ...x, entregas: [{ id: nova.id, status:'em_preparo' }] } : x);
+    if (nova) {
+      todosPedidos = todosPedidos.map(x => x.id === pedidoId ? { ...x, entregas: { id: nova.id, status:'em_preparo' } } : x);
+    }
   }
   const p = todosPedidos.find(x => x.id === pedidoId);
-  if (p) {
-    if (!p.entregas) p.entregas = [{}];
-    p.entregas[0].status = 'em_preparo';
-  }
+  setEntregaLocal(p, { status: 'em_preparo' });
   renderPedidos();
   toast('Montagem iniciada!');
 }
