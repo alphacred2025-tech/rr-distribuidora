@@ -114,18 +114,13 @@
         <div class="card">
           <div class="card__header">
             <span class="card__titulo">Usuários do Sistema</span>
-            <button class="btn btn--outline btn--sm" onclick="abrirModal('modal-papel')" style="display:none">+ Novo Usuário</button>
+            <button class="btn btn--primary btn--sm" onclick="abrirNovoUsuario()">+ Novo Usuário</button>
           </div>
           <div class="table-wrap">
             <table class="table">
               <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Status</th><th>Desde</th><th></th></tr></thead>
               <tbody id="tbody-usuarios"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr></tbody>
             </table>
-          </div>
-          <div class="card__body" style="padding-top:0;border-top:1px solid var(--border)">
-            <p style="font-size:.8rem;color:var(--text-muted);margin:0">
-              ℹ️ Para criar novos usuários, acesse o <strong>Supabase Dashboard → Authentication → Users → Add User</strong>. Após criar, selecione o papel desejado aqui na tabela acima.
-            </p>
           </div>
         </div>
       </div>
@@ -253,6 +248,45 @@
       </div>
 
     </main>
+  </div>
+</div>
+
+<!-- Modal: Novo Usuário -->
+<div class="modal-overlay" id="modal-add-usuario">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__titulo">Novo Usuário</span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-add-usuario')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input class="form-input" type="text" id="new-user-nome" placeholder="João da Silva">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input class="form-input" type="email" id="new-user-email" placeholder="joao@email.com" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input class="form-input" type="password" id="new-user-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Papel / Área de acesso</label>
+        <select class="form-input" id="new-user-papel">
+          <option value="vendedor">Vendedor — Comercial + pedidos</option>
+          <option value="logistica">Logística — Pedidos e entregas</option>
+          <option value="financeiro">Financeiro — Lançamentos</option>
+          <option value="montador">Montador — Fila de montagem</option>
+          <option value="motoboy">Motoboy — Entregas e comissões</option>
+          <option value="admin">Admin — Acesso total</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-add-usuario')">Cancelar</button>
+      <button class="btn btn--primary" id="btn-criar-usuario" onclick="criarUsuario()">Criar Usuário</button>
+    </div>
   </div>
 </div>
 
@@ -546,6 +580,61 @@ document.getElementById('form-bonus').addEventListener('submit', async e => {
 });
 
 // ─── Usuários ────────────────────────────────────────────────────────────────
+
+// Client secundário para criar usuários sem derrubar a sessão do admin
+const dbNew = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+});
+
+function abrirNovoUsuario() {
+  document.getElementById('new-user-nome').value  = '';
+  document.getElementById('new-user-email').value = '';
+  document.getElementById('new-user-senha').value = '';
+  document.getElementById('new-user-papel').value = 'vendedor';
+  const btn = document.getElementById('btn-criar-usuario');
+  btn.disabled = false;
+  btn.textContent = 'Criar Usuário';
+  abrirModal('modal-add-usuario');
+}
+
+async function criarUsuario() {
+  const nome  = document.getElementById('new-user-nome').value.trim();
+  const email = document.getElementById('new-user-email').value.trim();
+  const senha = document.getElementById('new-user-senha').value;
+  const papel = document.getElementById('new-user-papel').value;
+
+  if (!nome)          { toast('Informe o nome.', 'error'); return; }
+  if (!email)         { toast('Informe o e-mail.', 'error'); return; }
+  if (senha.length < 6) { toast('Senha mínima de 6 caracteres.', 'error'); return; }
+
+  const btn = document.getElementById('btn-criar-usuario');
+  btn.disabled = true;
+  btn.textContent = 'Criando…';
+
+  const { data, error } = await dbNew.auth.signUp({
+    email,
+    password: senha,
+    options: { data: { nome, papel } }
+  });
+
+  if (error) {
+    toast('Erro: ' + error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Criar Usuário';
+    return;
+  }
+
+  // Garante que o perfil ficou com os dados corretos
+  if (data.user) {
+    await db.from('profiles').upsert({ id: data.user.id, nome, email, papel, ativo: true });
+  }
+
+  fecharModal('modal-add-usuario');
+  toast('Usuário criado com sucesso!');
+  carregarUsuarios();
+  btn.disabled = false;
+  btn.textContent = 'Criar Usuário';
+}
 
 async function carregarUsuarios() {
   const { data } = await db.from('profiles').select('id, nome, email, papel, ativo, created_at').order('created_at');
