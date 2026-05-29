@@ -114,7 +114,7 @@
         <div class="card">
           <div class="card__header">
             <span class="card__titulo">Usuários do Sistema</span>
-            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-add-usuario')">+ Novo Usuário</button>
+            <button class="btn btn--outline btn--sm" onclick="abrirModal('modal-papel')" style="display:none">+ Novo Usuário</button>
           </div>
           <div class="table-wrap">
             <table class="table">
@@ -135,7 +135,7 @@
         <div class="card">
           <div class="card__header">
             <span class="card__titulo">Taxas de Entrega por Bairro / Região</span>
-            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-add-bairro')">+ Adicionar</button>
+            <button class="btn btn--primary btn--sm" onclick="abrirNovoBairro()">+ Adicionar</button>
           </div>
           <div class="alerta alerta--info" style="margin:0 1rem .5rem">
             Essas taxas aparecem automaticamente no checkout quando o cliente informa o CEP. Configure de acordo com a região de entrega.
@@ -154,7 +154,7 @@
         <div class="card">
           <div class="card__header">
             <span class="card__titulo">Motoboys Cadastrados</span>
-            <button class="btn btn--primary btn--sm" onclick="abrirModal('modal-add-motoboy')">+ Adicionar</button>
+            <button class="btn btn--primary btn--sm" onclick="abrirNovoMotoboy()">+ Adicionar</button>
           </div>
           <div class="table-wrap">
             <table class="table">
@@ -495,6 +495,7 @@ function abrirNovoBairro() {
   document.getElementById('bairro-municipio').value = '';
   document.getElementById('bairro-taxa').value = '';
   document.getElementById('titulo-modal-bairro').textContent = 'Adicionar Bairro';
+  abrirModal('modal-add-bairro');
 }
 
 async function salvarBairro() {
@@ -635,7 +636,7 @@ async function salvarMotoboy() {
   const telefone = document.getElementById('motoboy-telefone').value.trim();
   const placa    = document.getElementById('motoboy-placa').value.trim().toUpperCase();
 
-  if (!nome) { toast('Informe o nome do motoboy.', 'erro'); return; }
+  if (!nome) { toast('Informe o nome do motoboy.', 'error'); return; }
 
   if (id) {
     await db.from('motoboys').update({ nome, telefone, placa }).eq('id', id);

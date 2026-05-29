@@ -1339,7 +1339,8 @@ input#quantidade {
 
 .categorias-tabs .tab-btn:hover { color: var(--navy); }
 
-.categorias-tabs .tab-btn--active {
+.categorias-tabs .tab-btn--active,
+.categorias-tabs .tab-btn--ativo {
   color: var(--navy);
   font-weight: 700;
   border-bottom-color: var(--gold);

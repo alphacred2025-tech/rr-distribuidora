@@ -94,7 +94,7 @@ async function buscarCEP(cep) {
 
 function construirMensagemWhatsApp(pedido) {
   const itens = pedido.carrinho.map(item => {
-    const itensNomes = item.itens.join(', ');
+    const itensNomes = (item.itens || []).join(', ');
     return `• ${item.nome} (${item.quantidade}x) — ${formatarPreco(item.preco * item.quantidade)}\n  Itens: ${itensNomes}`;
   }).join('\n');
 
@@ -161,8 +161,8 @@ function initTabs() {
   const tabs = document.querySelectorAll('.tab-btn');
   tabs.forEach(btn => {
     btn.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('tab-btn--active'));
-      btn.classList.add('tab-btn--active');
+      tabs.forEach(t => t.classList.remove('tab-btn--ativo'));
+      btn.classList.add('tab-btn--ativo');
       renderProducts(btn.dataset.cat);
     });
   });
@@ -186,7 +186,7 @@ function initProduto() {
 
   // Preenche dados do produto
   document.getElementById('produto-nome').textContent = cesta.nome;
-  document.getElementById('produto-peso').textContent = cesta.peso;
+  document.getElementById('produto-peso').textContent = cesta.peso || '—';
   document.getElementById('produto-preco').textContent = formatarPreco(cesta.preco);
   document.getElementById('produto-descricao').textContent = cesta.descricao;
   document.title = `${cesta.nome} — RR Distribuidora`;
@@ -294,10 +294,10 @@ function renderCart() {
     <div class="carrinho-item" data-index="${index}">
       <div class="carrinho-item__info">
         <h3 class="carrinho-item__nome">${item.nome}</h3>
-        <p class="carrinho-item__peso">Peso: ${item.peso}</p>
+        <p class="carrinho-item__peso">Peso: ${item.peso || '—'}</p>
         <div class="carrinho-item__itens">
           <span class="carrinho-item__itens-label">Itens selecionados:</span>
-          <span class="carrinho-item__itens-lista">${item.itens.join(', ')}</span>
+          <span class="carrinho-item__itens-lista">${(item.itens || []).join(', ')}</span>
         </div>
       </div>
       <div class="carrinho-item__acoes">

@@ -115,6 +115,8 @@ CREATE TABLE IF NOT EXISTS public.entregas (
                 CHECK (status IN ('pendente','em_preparo','saiu','entregue','cancelado')),
   taxa        NUMERIC(10,2),
   obs_entrega TEXT,
+  saiu_em     TIMESTAMPTZ,
+  entregue_em TIMESTAMPTZ,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -513,28 +515,32 @@ CREATE INDEX IF NOT EXISTS idx_afiliados_codigo   ON public.afiliados(codigo);
 
 -- Configurações padrão
 INSERT INTO public.configuracoes (chave, valor) VALUES
-  ('nome_empresa',       'RR Distribuidora'),
-  ('whatsapp',           '5581996206567'),
-  ('endereco',           'Rua Itaí, 71 — Recife/PE'),
-  ('horario',            'Seg–Sex 08h–18h / Sáb 08h–13h'),
-  ('taxa_entrega',       '5.00'),
-  ('frete_gratis_acima', '0'),
-  ('raio_entrega_km',    '10'),
-  ('pagamento_pix',      'true'),
-  ('pagamento_cartao',   'true'),
-  ('pagamento_dinheiro', 'true'),
-  ('chave_pix',          ''),
-  ('comissao_percentual','5'),
-  ('comissao_dia_corte', '25'),
-  ('meta_faturamento',   '10000'),
-  ('meta_clientes',      '30'),
-  ('meta_pedidos',       '150'),
-  ('bonus_faixa1_min',   '5000'),
-  ('bonus_faixa1_valor', '200'),
-  ('bonus_faixa2_min',   '8000'),
-  ('bonus_faixa2_valor', '400'),
-  ('bonus_faixa3_min',   '12000'),
-  ('bonus_faixa3_valor', '700')
+  ('nome_empresa',             'RR Distribuidora'),
+  ('whatsapp',                 '5581996206567'),
+  ('endereco',                 'Rua Itaí, 71 — Recife/PE'),
+  ('horario',                  'Seg–Sex 08h–18h / Sáb 08h–13h'),
+  ('email',                    'contato@rrdistribuidora.com.br'),
+  ('msg_whatsapp',             'Olá! Gostaria de confirmar meu pedido.'),
+  ('taxa_entrega',             '5.00'),
+  ('frete_gratis_acima',       '0'),
+  ('raio_entrega_km',          '10'),
+  ('pagamento_pix',            'true'),
+  ('pagamento_cartao',         'true'),
+  ('pagamento_dinheiro',       'true'),
+  ('chave_pix',                ''),
+  ('comissao_vendedor_cesta',  '20'),
+  ('comissao_motoboy',         '14'),
+  ('comissao_percentual',      '5'),
+  ('comissao_dia_corte',       '25'),
+  ('meta_faturamento',         '10000'),
+  ('meta_clientes',            '30'),
+  ('meta_pedidos',             '150'),
+  ('bonus_faixa1_min',         '5000'),
+  ('bonus_faixa1_valor',       '200'),
+  ('bonus_faixa2_min',         '8000'),
+  ('bonus_faixa2_valor',       '400'),
+  ('bonus_faixa3_min',         '12000'),
+  ('bonus_faixa3_valor',       '700')
 ON CONFLICT (chave) DO NOTHING;
 
 -- Cestas RR (produtos iniciais)
