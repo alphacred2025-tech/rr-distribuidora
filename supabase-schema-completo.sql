@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   nome       TEXT NOT NULL,
   email      TEXT,
   papel      TEXT NOT NULL DEFAULT 'vendedor'
-               CHECK (papel IN ('admin','vendedor','logistica','financeiro')),
+               CHECK (papel IN ('admin','vendedor','logistica','financeiro','montador','motoboy')),
   ativo      BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
