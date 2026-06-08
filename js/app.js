@@ -579,6 +579,17 @@ function initPagamento() {
         if (!res.ok || !data.init_point) throw new Error(data.error || 'Erro ao criar sessão');
         pedido.pagamento = 'mercadopago';
         localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+
+        // Salva pedido ANTES de redirecionar ao MP
+        // → pedidos com PIX gerado mas não pago ficam visíveis no admin
+        if (typeof salvarPedido === 'function' && !pedido.savedToDb) {
+          const savedId = await salvarPedido(pedido);
+          if (savedId) {
+            pedido.savedToDb = true;
+            localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+          }
+        }
+
         window.location.href = data.init_point;
       } catch (err) {
         btnMP.disabled = false;
@@ -673,8 +684,15 @@ function initConfirmacao() {
 
   document.getElementById('conf-total').textContent = formatarPreco(pedido.total);
 
-  // Salva pedido no Supabase (em background, não bloqueia o fluxo)
-  if (typeof salvarPedido === 'function') salvarPedido(pedido);
+  // Se veio do MP (payment_id na URL) → só atualiza status (pedido já foi salvo antes do redirect)
+  // Se não veio do MP (PIX manual) → salva agora
+  if (mpPaymentId && pedido.savedToDb) {
+    if (typeof registrarPagamentoConfirmado === 'function') {
+      registrarPagamentoConfirmado(pedido.numero, mpPaymentId, mpPaymentType);
+    }
+  } else if (!pedido.savedToDb && typeof salvarPedido === 'function') {
+    salvarPedido(pedido);
+  }
 
   // Botão WhatsApp
   const msg = construirMensagemWhatsApp(pedido);

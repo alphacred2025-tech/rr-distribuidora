@@ -166,10 +166,26 @@ async function salvarPedido(pedido) {
     }
 
     console.log('[DB] Pedido salvo com sucesso:', pedidoId);
-    return true;
+    return pedidoId; // retorna ID para saber que foi salvo
   } catch (err) {
-    // Silencioso pro cliente — fluxo WhatsApp segue mesmo se o DB falhar
     console.error('[DB] Erro ao salvar pedido:', err?.message || err);
     return false;
+  }
+}
+
+// Chamada em confirmacao.html após retorno do MP — só atualiza status
+// (o webhook server-side faz o mesmo, mas isso garante atualização imediata)
+async function registrarPagamentoConfirmado(numero, mpPaymentId, mpPaymentType) {
+  try {
+    const _map = { credit_card:'cartao', debit_card:'cartao', pix:'pix', mercadopago:'pix' };
+    const formaPgto = _map[mpPaymentType] || 'pix';
+    await db.from('pedidos').update({
+      status_pagamento: 'pago',
+      mp_payment_id:    mpPaymentId ? String(mpPaymentId) : null,
+      forma_pagamento:  formaPgto,
+    }).eq('numero', numero);
+    console.log('[DB] Pagamento confirmado para pedido:', numero);
+  } catch (err) {
+    console.warn('[DB] Aviso ao confirmar pagamento:', err?.message || err);
   }
 }
