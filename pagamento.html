@@ -66,28 +66,21 @@
         <!-- Formulário de pagamento -->
         <div class="pagamento-form-box">
 
-          <!-- Loading inicial do Brick -->
-          <div id="brick-loading" style="text-align:center;padding:2rem;color:var(--text-muted)">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24" style="animation:spin .8s linear infinite;vertical-align:middle;margin-right:.5rem"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Carregando formas de pagamento…
-          </div>
-
-          <!-- Container do MP Payment Brick -->
-          <div id="payment-brick-container"></div>
-
-          <!-- Resultado PIX (QR Code) -->
-          <div id="pix-result" style="display:none;text-align:center;padding:1rem">
-            <div style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--navy)">📱 PIX gerado — escaneie para pagar</div>
-            <img id="pix-qr-img" src="" alt="QR Code PIX" style="width:200px;height:200px;margin:0 auto 1rem;display:block;border:4px solid #e2e8f0;border-radius:8px">
-            <div style="background:#f1f5f9;padding:.75rem 1rem;border-radius:8px;font-size:.78rem;word-break:break-all;margin-bottom:.75rem" id="pix-copia-cola"></div>
-            <button id="btn-copiar-pix-code" class="btn btn--outline btn--sm" style="margin-bottom:1rem">Copiar código PIX</button>
-            <div id="pix-status" style="padding:.75rem;border-radius:8px;background:#fef9c3;color:#854d0e;font-size:.9rem">
-              ⏳ Aguardando confirmação do pagamento…
+          <div class="mp-checkout-box">
+            <div class="mp-checkout-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#009ee3"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <span>Pagamento seguro via <strong>Mercado Pago</strong></span>
             </div>
+            <div class="mp-metodos">
+              <span class="mp-metodo-tag">📱 PIX</span>
+              <span class="mp-metodo-tag">💳 Cartão</span>
+              <span class="mp-metodo-tag">🏦 Boleto</span>
+            </div>
+            <button class="btn btn--primary btn--full btn--lg" id="btn-pagar-mp" type="button">
+              Pagar <span id="mp-total-valor">R$ 0,00</span> →
+            </button>
+            <div id="mp-erro" style="display:none;background:#fef2f2;color:#d93025;border-radius:8px;padding:.75rem 1rem;font-size:.88rem;margin-top:.5rem"></div>
           </div>
-
-          <!-- Erro geral -->
-          <div id="mp-erro" style="display:none;background:#fef2f2;color:#d93025;border-radius:8px;padding:.75rem 1rem;font-size:.88rem;margin-top:.5rem"></div>
 
         </div>
 
@@ -146,13 +139,11 @@
     </div>
   </footer>
 
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script src="js/dados.js?v=2"></script>
   <script src="js/carrinho.js?v=2"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/app.js?v=5"></script>
   <script>
-  // ── MP Payment Brick (Checkout Transparente) ─────────────────
-  let _pixPollTimer = null;
+  // removido — Brick substituído por Checkout Pro
 
   async function initMPBrick() {
     const pedido = JSON.parse(localStorage.getItem('rr_pedido') || 'null');

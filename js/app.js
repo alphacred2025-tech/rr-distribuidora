@@ -386,17 +386,59 @@ function initCheckout() {
 function preencherEndereco(dados) {
   const campos = {
     logradouro: document.getElementById('logradouro'),
-    bairro: document.getElementById('bairro'),
-    cidade: document.getElementById('cidade'),
-    uf: document.getElementById('uf'),
+    bairro:     document.getElementById('bairro'),
+    cidade:     document.getElementById('cidade'),
+    uf:         document.getElementById('uf'),
   };
   if (campos.logradouro) campos.logradouro.value = dados.logradouro || '';
-  if (campos.bairro) campos.bairro.value = dados.bairro || '';
-  if (campos.cidade) campos.cidade.value = dados.localidade || '';
-  if (campos.uf) campos.uf.value = dados.uf || '';
+  if (campos.bairro)     campos.bairro.value     = dados.bairro     || '';
+  if (campos.cidade)     campos.cidade.value     = dados.localidade || '';
+  if (campos.uf)         campos.uf.value         = dados.uf         || '';
 
   const numeroInput = document.getElementById('numero');
   if (numeroInput) numeroInput.focus();
+
+  // Calcula taxa de entrega pelo bairro/cidade
+  calcularFrete(dados.bairro || '', dados.localidade || '');
+}
+
+let _taxasEntrega = null;
+
+async function calcularFrete(bairro, cidade) {
+  const freteEl = document.getElementById('frete-info');
+  if (!freteEl) return;
+
+  if (!_taxasEntrega) {
+    try {
+      const res = await fetch('/api/taxas-entrega');
+      const { taxas } = await res.json();
+      _taxasEntrega = taxas || [];
+    } catch (e) { _taxasEntrega = []; }
+  }
+
+  const bairroNorm = (bairro || '').toLowerCase().trim();
+  const cidadeNorm = (cidade  || '').toLowerCase().trim();
+
+  const encontrado = _taxasEntrega.find(t =>
+    t.bairro.toLowerCase().trim() === bairroNorm ||
+    (t.municipio && t.municipio.toLowerCase().trim() === cidadeNorm && !_taxasEntrega.some(x => x.bairro.toLowerCase().trim() === bairroNorm))
+  );
+
+  const freteTxt  = document.getElementById('frete-valor');
+  const freteHide = document.getElementById('frete-aviso');
+
+  if (encontrado) {
+    const taxa = parseFloat(encontrado.taxa) || 0;
+    window._taxaEntregaAtual = taxa;
+    if (freteTxt) freteTxt.textContent = taxa === 0 ? 'Grátis' : 'R$ ' + taxa.toFixed(2).replace('.', ',');
+    if (freteHide) freteHide.style.display = 'none';
+    freteEl.style.display = '';
+  } else {
+    window._taxaEntregaAtual = 0;
+    if (freteTxt) freteTxt.textContent = 'Consultar';
+    if (freteHide) freteHide.style.display = '';
+    freteEl.style.display = '';
+  }
 }
 
 function toggleEntrega() {
@@ -484,7 +526,8 @@ function submitCheckout(e) {
       uf: document.getElementById('uf').value,
     } : {},
     carrinho: getCart(),
-    total: getTotal(),
+    taxaEntrega: tipo === 'entrega' ? (window._taxaEntregaAtual || 0) : 0,
+    total: getTotal() + (tipo === 'entrega' ? (window._taxaEntregaAtual || 0) : 0),
     pagamento: null,
   };
 
@@ -514,7 +557,36 @@ function initPagamento() {
 
   document.getElementById('pagamento-numero-pedido').textContent = pedido.numero;
   document.getElementById('pagamento-total').textContent = formatarPreco(pedido.total);
-  // O MP Payment Brick é inicializado pelo script inline em pagamento.html
+
+  const totalEl = document.getElementById('mp-total-valor');
+  if (totalEl) totalEl.textContent = formatarPreco(pedido.total);
+
+  // Botão Mercado Pago (Checkout Pro)
+  const btnMP = document.getElementById('btn-pagar-mp');
+  if (btnMP) {
+    btnMP.addEventListener('click', async () => {
+      const erroEl = document.getElementById('mp-erro');
+      btnMP.disabled = true;
+      btnMP.textContent = 'Aguarde…';
+      if (erroEl) erroEl.style.display = 'none';
+      try {
+        const res  = await fetch('/api/create-preference', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(pedido),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.init_point) throw new Error(data.error || 'Erro ao criar sessão');
+        pedido.pagamento = 'mercadopago';
+        localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+        window.location.href = data.init_point;
+      } catch (err) {
+        btnMP.disabled = false;
+        btnMP.innerHTML = 'Pagar <span id="mp-total-valor">' + formatarPreco(pedido.total) + '</span> →';
+        if (erroEl) { erroEl.textContent = err.message; erroEl.style.display = ''; }
+      }
+    });
+  }
 }
 
 function detectarBandeira(numero) {
