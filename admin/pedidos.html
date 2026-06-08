@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="admin-header__titulo">Pedidos</span>
+      </div>
+      <div class="admin-header__right">
+        <div class="realtime-pill"><span class="realtime-dot"></span>Tempo real</div>
+        <button class="btn btn--ghost btn--sm" onclick="exportarCSV()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Exportar CSV
+        </button>
+      </div>
+    </header>
+
+    <main class="admin-content">
+
+      <!-- KPIs -->
+      <div class="stats-grid mb-15" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--navy">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          </div>
+          <div class="stat-card__label">Total Pedidos</div>
+          <div class="stat-card__valor" id="kpi-total">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--gold">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="stat-card__label">Faturamento Total</div>
+          <div class="stat-card__valor" id="kpi-fat" style="font-size:1.15rem">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--purple">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="stat-card__label">Ticket Médio</div>
+          <div class="stat-card__valor" id="kpi-ticket" style="font-size:1.15rem">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="stat-card__label">✅ Pagos</div>
+          <div class="stat-card__valor" id="kpi-pagos" style="color:#16a34a">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon" style="background:#fef9c3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#a16207"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="stat-card__label">⏳ Aguardando</div>
+          <div class="stat-card__valor" id="kpi-aguardando" style="color:#a16207">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--red">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"/></svg>
+          </div>
+          <div class="stat-card__label">Abandonados</div>
+          <div class="stat-card__valor" id="kpi-abandonados" style="color:#dc2626">—</div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="card mb-15">
+        <div class="card__body" style="padding:.75rem 1rem;display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap">
+          <div class="form-group" style="margin-bottom:0;flex:1;min-width:130px">
+            <label class="form-label" style="font-size:.78rem;margin-bottom:.25rem">Data início</label>
+            <input class="form-input" type="date" id="filtro-inicio">
+          </div>
+          <div class="form-group" style="margin-bottom:0;flex:1;min-width:130px">
+            <label class="form-label" style="font-size:.78rem;margin-bottom:.25rem">Data fim</label>
+            <input class="form-input" type="date" id="filtro-fim">
+          </div>
+          <div class="form-group" style="margin-bottom:0;flex:1;min-width:140px">
+            <label class="form-label" style="font-size:.78rem;margin-bottom:.25rem">Status entrega</label>
+            <select class="form-input" id="filtro-status-entrega">
+              <option value="">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="em_preparo">Em preparo</option>
+              <option value="saiu">Saiu para entrega</option>
+              <option value="entregue">Entregue</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;flex:1;min-width:140px">
+            <label class="form-label" style="font-size:.78rem;margin-bottom:.25rem">Status pagamento</label>
+            <select class="form-input" id="filtro-status-pgto">
+              <option value="">Todos</option>
+              <option value="pago">Pago</option>
+              <option value="pendente">Pendente</option>
+              <option value="falhou">Falhou</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;flex:2;min-width:200px">
+            <label class="form-label" style="font-size:.78rem;margin-bottom:.25rem">Buscar</label>
+            <input class="form-input" type="text" id="filtro-busca" placeholder="Nº pedido ou nome do cliente…">
+          </div>
+          <button class="btn btn--primary" onclick="aplicarFiltros()" style="white-space:nowrap">Filtrar</button>
+          <button class="btn btn--ghost" onclick="limparFiltros()" style="white-space:nowrap">Limpar</button>
+        </div>
+      </div>
+
+      <!-- Tabela de pedidos -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__titulo">Pedidos <span id="label-contagem" style="font-size:.8rem;color:var(--text-muted)"></span></span>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-pedidos">
+            <thead>
+              <tr>
+                <th>#Pedido</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Forma Pgto</th>
+                <th>Status Pgto</th>
+                <th>Entrega</th>
+                <th>Status Entrega</th>
+                <th>Data/Hora</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-pedidos">
+              <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal Detalhes do Pedido -->
+<div class="modal-overlay" id="modal-pedido">
+  <div class="modal modal--lg">
+    <div class="modal__header">
+      <span class="modal__titulo">Detalhes do Pedido <span id="modal-numero"></span></span>
+      <button class="btn-fechar-modal" onclick="fecharModal('modal-pedido')">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="modal-corpo">
+      <div style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="fecharModal('modal-pedido')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+let todosPedidos = [];
+
+// ── Init ──────────────────────────────────────────────────────
+(async () => {
+  renderSidebar('pedidos');
+  const profile = await requireAuth(['admin','vendedor','logistica']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+
+  // Default: últimos 30 dias
+  const hoje = new Date();
+  const inicio = new Date(hoje); inicio.setDate(hoje.getDate() - 30);
+  document.getElementById('filtro-inicio').value = inicio.toISOString().split('T')[0];
+  document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
+
+  await carregarPedidos();
+  setupRealtime();
+})();
+
+// ── Carregamento ──────────────────────────────────────────────
+async function carregarPedidos() {
+  const inicio  = document.getElementById('filtro-inicio').value;
+  const fim     = document.getElementById('filtro-fim').value;
+  const stEnt   = document.getElementById('filtro-status-entrega').value;
+  const stPgto  = document.getElementById('filtro-status-pgto').value;
+  const busca   = document.getElementById('filtro-busca').value.trim().toLowerCase();
+
+  let q = db.from('pedidos')
+    .select('*, clientes(id, nome, telefone, email), entregas(id, status, motoboy_id, taxa, saiu_em, entregue_em, motoboys(nome)), itens_pedido(cesta_nome, preco, quantidade)')
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  if (inicio) q = q.gte('created_at', inicio + 'T00:00:00');
+  if (fim)    q = q.lte('created_at', fim + 'T23:59:59');
+  if (stPgto) q = q.eq('status_pagamento', stPgto);
+
+  const { data, error } = await q;
+  if (error) { toast('Erro ao carregar pedidos: ' + error.message, 'error'); return; }
+
+  let lista = data || [];
+
+  // Filtro de status de entrega (lado cliente pois é join)
+  if (stEnt) {
+    lista = lista.filter(p => {
+      const e = Array.isArray(p.entregas) ? p.entregas[0] : p.entregas;
+      return (e?.status || 'pendente') === stEnt;
+    });
+  }
+
+  // Filtro de busca por numero ou nome do cliente
+  if (busca) {
+    lista = lista.filter(p =>
+      String(p.numero).includes(busca) ||
+      (p.clientes?.nome || '').toLowerCase().includes(busca)
+    );
+  }
+
+  todosPedidos = lista;
+  calcularKPIs(lista);
+  renderTabela(lista);
+}
+
+function calcularKPIs(lista) {
+  const total = lista.length;
+  const fat   = lista.reduce((s,p) => s + (p.total || 0), 0);
+  const ticket = total ? fat / total : 0;
+  const pagos  = lista.filter(p => p.status_pagamento === 'pago').length;
+  const aguard = lista.filter(p => p.status_pagamento === 'pendente').length;
+  const duasHAtras = new Date(Date.now() - 2 * 3600000);
+  const abandono = lista.filter(p => p.status_pagamento === 'pendente' && new Date(p.created_at) < duasHAtras).length;
+
+  document.getElementById('kpi-total').textContent      = total;
+  document.getElementById('kpi-fat').textContent        = fmtR$(fat);
+  document.getElementById('kpi-ticket').textContent     = fmtR$(ticket);
+  document.getElementById('kpi-pagos').textContent      = pagos;
+  document.getElementById('kpi-aguardando').textContent = aguard;
+  document.getElementById('kpi-abandonados').textContent = abandono;
+  document.getElementById('label-contagem').textContent = `(${total} resultado${total !== 1 ? 's' : ''})`;
+}
+
+function renderTabela(lista) {
+  const tbody = document.getElementById('tbody-pedidos');
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum pedido encontrado.</td></tr>';
+    return;
+  }
+
+  const pgto = { pix:'PIX', cartao:'Cartão', avista:'À vista', dinheiro:'Dinheiro', mercadopago:'Mercado Pago' };
+
+  tbody.innerHTML = lista.map(p => {
+    const entrega = Array.isArray(p.entregas) ? p.entregas[0] : (p.entregas || {});
+    const stEnt   = entrega?.status || 'pendente';
+    const stPgto  = p.status_pagamento || 'pendente';
+
+    const badgePgto = stPgto === 'pago'
+      ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:.74rem;font-weight:700">✅ Pago</span>'
+      : stPgto === 'falhou'
+      ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:.74rem;font-weight:700">❌ Falhou</span>'
+      : '<span style="background:#fef9c3;color:#a16207;padding:2px 8px;border-radius:10px;font-size:.74rem;font-weight:600">⏳ Pendente</span>';
+
+    const formaEnt = p.forma_entrega === 'entrega' ? '🚚 Entrega' : '🏪 Retirada';
+
+    return `<tr style="cursor:pointer" onclick="abrirDetalhe('${p.id}')">
+      <td><strong>#${p.numero}</strong></td>
+      <td>${p.clientes?.nome || '—'}</td>
+      <td><strong>${fmtR$(p.total)}</strong></td>
+      <td>${pgto[p.forma_pagamento] || p.forma_pagamento || '—'}</td>
+      <td>${badgePgto}</td>
+      <td>${formaEnt}</td>
+      <td>${badgeStatus(stEnt)}</td>
+      <td style="color:var(--text-muted);font-size:.82rem">${fmtDataHora(p.created_at)}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn btn--ghost btn--sm" onclick="abrirDetalhe('${p.id}')">Ver</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Modal Detalhe ─────────────────────────────────────────────
+async function abrirDetalhe(pedidoId) {
+  document.getElementById('modal-numero').textContent = '';
+  document.getElementById('modal-corpo').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted)">Carregando…</div>';
+  abrirModal('modal-pedido');
+
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (!p) { document.getElementById('modal-corpo').innerHTML = '<div style="color:var(--red);padding:1rem">Pedido não encontrado.</div>'; return; }
+
+  document.getElementById('modal-numero').textContent = '#' + p.numero;
+
+  const entrega = Array.isArray(p.entregas) ? p.entregas[0] : (p.entregas || {});
+  const cliente = p.clientes || {};
+  const itens   = p.itens_pedido || [];
+  const stPgto  = p.status_pagamento || 'pendente';
+
+  const badgePgto = stPgto === 'pago'
+    ? '<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:10px;font-size:.8rem;font-weight:700">✅ Pago</span>'
+    : stPgto === 'falhou'
+    ? '<span style="background:#fee2e2;color:#dc2626;padding:3px 10px;border-radius:10px;font-size:.8rem;font-weight:700">❌ Falhou</span>'
+    : '<span style="background:#fef9c3;color:#a16207;padding:3px 10px;border-radius:10px;font-size:.8rem;font-weight:600">⏳ Pendente</span>';
+
+  const pgtoLabels = { pix:'PIX', cartao:'Cartão', avista:'À vista', dinheiro:'Dinheiro', mercadopago:'Mercado Pago' };
+  const enderecoStr = p.forma_entrega === 'entrega'
+    ? [p.logradouro, p.numero_end, p.complemento, p.bairro, p.cidade].filter(Boolean).join(', ')
+    : 'Retirada na loja';
+
+  const telLimpo = (cliente.telefone || '').replace(/\D/g,'');
+  const telLink  = telLimpo
+    ? `<a href="https://wa.me/55${telLimpo}" target="_blank" style="color:var(--navy)">${cliente.telefone}</a>`
+    : '—';
+
+  const itensHTML = itens.map(i => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-weight:600">${i.cesta_nome}</div>
+        <div style="font-size:.8rem;color:var(--text-muted)">Qtd: ${i.quantidade} × ${fmtR$(i.preco)}</div>
+      </div>
+      <strong>${fmtR$(i.preco * i.quantidade)}</strong>
+    </div>`).join('') || '<div style="color:var(--text-muted);font-size:.85rem;padding:.5rem 0">Sem itens registrados.</div>';
+
+  document.getElementById('modal-corpo').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+      <!-- Coluna 1: cliente + entrega -->
+      <div>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Cliente</div>
+        <div style="margin-bottom:.3rem"><strong>${cliente.nome || '—'}</strong></div>
+        <div style="font-size:.85rem;color:var(--text-muted)">Tel: ${telLink}</div>
+        ${cliente.email ? `<div style="font-size:.82rem;color:var(--text-muted)">${cliente.email}</div>` : ''}
+
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin:.875rem 0 .5rem">Endereço</div>
+        <div style="font-size:.875rem">${enderecoStr || '—'}</div>
+
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin:.875rem 0 .5rem">Logística</div>
+        <div style="font-size:.875rem;display:flex;flex-direction:column;gap:.2rem">
+          <div>${badgeStatus(entrega?.status || 'pendente')}</div>
+          ${entrega?.motoboys?.nome ? `<div style="font-size:.82rem;color:var(--text-muted)">🛵 ${entrega.motoboys.nome}</div>` : ''}
+          ${entrega?.taxa ? `<div style="font-size:.82rem;color:var(--text-muted)">Taxa: ${fmtR$(entrega.taxa)}</div>` : ''}
+          ${entrega?.saiu_em ? `<div style="font-size:.82rem;color:var(--text-muted)">Saiu: ${fmtDataHora(entrega.saiu_em)}</div>` : ''}
+          ${entrega?.entregue_em ? `<div style="font-size:.82rem;color:var(--text-muted)">Entregue: ${fmtDataHora(entrega.entregue_em)}</div>` : ''}
+        </div>
+      </div>
+
+      <!-- Coluna 2: pagamento + horários -->
+      <div>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Pagamento</div>
+        <div style="margin-bottom:.5rem">${badgePgto}</div>
+        <div style="font-size:.875rem;color:var(--text-muted)">Forma: ${pgtoLabels[p.forma_pagamento] || p.forma_pagamento || '—'}</div>
+        ${p.mp_payment_id ? `<div style="font-size:.78rem;color:var(--text-muted)">MP ID: ${p.mp_payment_id}</div>` : ''}
+        ${p.troco_para ? `<div style="font-size:.85rem;color:#16a34a;font-weight:600">Troco p/ ${fmtR$(p.troco_para)}</div>` : ''}
+
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin:.875rem 0 .5rem">Horários</div>
+        <div style="font-size:.82rem;color:var(--text-muted)">Pedido: ${fmtDataHora(p.created_at)}</div>
+        <div style="font-size:.82rem;color:var(--text-muted)">Há: ${tempoAtras(p.created_at)}</div>
+
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin:.875rem 0 .5rem">Resumo</div>
+        <div style="font-size:.875rem"><strong>Total:</strong> <span style="font-size:1.1rem;font-weight:700;color:var(--navy)">${fmtR$(p.total)}</span></div>
+        ${p.bairro ? `<div style="font-size:.82rem;color:var(--text-muted)">Bairro: ${p.bairro}${p.cidade ? ', ' + p.cidade : ''}</div>` : ''}
+      </div>
+    </div>
+
+    <!-- Itens -->
+    <div style="margin-top:1.25rem">
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Itens do Pedido</div>
+      ${itensHTML}
+      <div style="display:flex;justify-content:flex-end;padding:.5rem 0">
+        <strong style="font-size:1rem">Total: ${fmtR$(p.total)}</strong>
+      </div>
+    </div>
+  `;
+}
+
+// ── Filtros ───────────────────────────────────────────────────
+function aplicarFiltros() { carregarPedidos(); }
+
+function limparFiltros() {
+  const hoje = new Date();
+  const inicio = new Date(hoje); inicio.setDate(hoje.getDate() - 30);
+  document.getElementById('filtro-inicio').value = inicio.toISOString().split('T')[0];
+  document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
+  document.getElementById('filtro-status-entrega').value = '';
+  document.getElementById('filtro-status-pgto').value = '';
+  document.getElementById('filtro-busca').value = '';
+  carregarPedidos();
+}
+
+// ── Busca ao pressionar Enter ─────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('filtro-busca').addEventListener('keydown', e => {
+    if (e.key === 'Enter') carregarPedidos();
+  });
+});
+
+// ── Exportar CSV ──────────────────────────────────────────────
+function exportarCSV() {
+  if (!todosPedidos.length) { toast('Nenhum pedido para exportar.', 'warning'); return; }
+  const header = 'Nº Pedido,Cliente,Telefone,Total,Forma Pgto,Status Pgto,Forma Entrega,Status Entrega,Bairro,Cidade,Data\n';
+  const rows = todosPedidos.map(p => {
+    const ent = Array.isArray(p.entregas) ? p.entregas[0] : (p.entregas || {});
+    return `"${p.numero}","${p.clientes?.nome || ''}","${p.clientes?.telefone || ''}",${p.total},"${p.forma_pagamento || ''}","${p.status_pagamento || ''}","${p.forma_entrega || ''}","${ent?.status || ''}","${p.bairro || ''}","${p.cidade || ''}","${fmtDataHora(p.created_at)}"`;
+  }).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pedidos_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exportado!');
+}
+
+// ── Realtime ──────────────────────────────────────────────────
+function setupRealtime() {
+  db.channel('pedidos-realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, () => {
+      carregarPedidos();
+      atualizarBadgePendentes();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'pedidos' }, () => {
+      carregarPedidos();
+    })
+    .subscribe();
+}
+</script>
+</body>
+</html>

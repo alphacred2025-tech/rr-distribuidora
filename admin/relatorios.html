@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios — RR Distribuidora</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-wrap"></div>
+  <div class="main-wrap">
+    <header class="admin-header">
+      <div class="admin-header__left">
+        <button class="btn-hamburguer" onclick="toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="admin-header__titulo">Relatórios</span>
+      </div>
+      <div class="admin-header__right">
+        <span id="label-periodo" style="font-size:.8rem;color:var(--text-muted)"></span>
+      </div>
+    </header>
+
+    <main class="admin-content">
+
+      <!-- Seletor de Período -->
+      <div class="card mb-15">
+        <div class="card__body" style="padding:.75rem 1rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <div class="filter-tabs" style="flex-wrap:wrap">
+            <button class="filter-tab filter-tab--active" onclick="setPeriodo('hoje',this)">Hoje</button>
+            <button class="filter-tab" onclick="setPeriodo('7d',this)">7 dias</button>
+            <button class="filter-tab" onclick="setPeriodo('30d',this)">30 dias</button>
+            <button class="filter-tab" onclick="setPeriodo('mes',this)">Este mês</button>
+            <button class="filter-tab" onclick="setPeriodo('custom',this)">Custom</button>
+          </div>
+          <div id="custom-range" style="display:none;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+            <input class="form-input" type="date" id="custom-inicio" style="max-width:150px">
+            <span style="color:var(--text-muted)">até</span>
+            <input class="form-input" type="date" id="custom-fim" style="max-width:150px">
+            <button class="btn btn--primary btn--sm" onclick="aplicarCustom()">Aplicar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 1: KPIs -->
+      <div class="stats-grid mb-15" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--gold">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="stat-card__label">Faturamento</div>
+          <div class="stat-card__valor" id="kpi-fat" style="font-size:1.15rem">—</div>
+          <div class="stat-card__sub" id="kpi-fat-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--navy">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          </div>
+          <div class="stat-card__label">Pedidos</div>
+          <div class="stat-card__valor" id="kpi-pedidos">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--purple">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="stat-card__label">Ticket Médio</div>
+          <div class="stat-card__valor" id="kpi-ticket" style="font-size:1.15rem">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <div class="stat-card__label">Taxa Conversão</div>
+          <div class="stat-card__valor" id="kpi-conversao" style="color:#16a34a">—</div>
+          <div class="stat-card__sub">pedidos gerados vs pagos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--red">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"/></svg>
+          </div>
+          <div class="stat-card__label">Valor Abandonado</div>
+          <div class="stat-card__valor" id="kpi-abandono" style="font-size:1.1rem;color:#dc2626">—</div>
+          <div class="stat-card__sub" id="kpi-abandono-cnt"></div>
+        </div>
+      </div>
+
+      <!-- Seção 2: Receita por Dia -->
+      <div class="card mb-15">
+        <div class="card__header">
+          <span class="card__titulo">Receita por Dia</span>
+          <button class="btn btn--ghost btn--sm" onclick="exportarSecao('dia')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            CSV
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-dia">
+            <thead>
+              <tr><th>Data</th><th>Pedidos</th><th>Faturamento</th><th>Ticket Médio</th></tr>
+            </thead>
+            <tbody id="tbody-dia">
+              <tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seção 3: Top Cestas -->
+      <div class="card mb-15">
+        <div class="card__header">
+          <span class="card__titulo">🏆 Top Cestas Vendidas</span>
+          <button class="btn btn--ghost btn--sm" onclick="exportarSecao('cestas')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            CSV
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-cestas">
+            <thead>
+              <tr><th>Cesta</th><th>Qtd Vendida</th><th>Receita Total</th><th>% do Total</th></tr>
+            </thead>
+            <tbody id="tbody-cestas">
+              <tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seção 4: Receita por Bairro -->
+      <div class="card mb-15">
+        <div class="card__header">
+          <span class="card__titulo">📍 Receita por Bairro</span>
+          <button class="btn btn--ghost btn--sm" onclick="exportarSecao('bairro')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            CSV
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-bairro">
+            <thead>
+              <tr><th>Bairro</th><th>Cidade</th><th>Pedidos</th><th>Faturamento</th><th>Taxa Média</th></tr>
+            </thead>
+            <tbody id="tbody-bairro">
+              <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seção 5: Performance Motoboys -->
+      <div class="card mb-15">
+        <div class="card__header">
+          <span class="card__titulo">🛵 Performance Motoboys</span>
+          <button class="btn btn--ghost btn--sm" onclick="exportarSecao('motoboys')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            CSV
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-motoboys">
+            <thead>
+              <tr><th>Motoboy</th><th>Entregas</th><th>Tempo Médio</th><th>Comissão Estimada</th></tr>
+            </thead>
+            <tbody id="tbody-motoboys">
+              <tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seção 6: Top Clientes -->
+      <div class="card mb-15">
+        <div class="card__header">
+          <span class="card__titulo">⭐ Top Clientes</span>
+          <button class="btn btn--ghost btn--sm" onclick="exportarSecao('clientes')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            CSV
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="tabela-clientes">
+            <thead>
+              <tr><th>Nome</th><th>Telefone</th><th>Pedidos</th><th>Gasto Total</th><th>Último Pedido</th></tr>
+            </thead>
+            <tbody id="tbody-clientes">
+              <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/admin-core.js"></script>
+<script>
+// ── Estado ────────────────────────────────────────────────────
+let periodoAtivo = 'hoje';
+let dataInicio   = '';
+let dataFim      = '';
+
+// Dados para exportar por seção
+let dadosDia      = [];
+let dadosCestas   = [];
+let dadosBairro   = [];
+let dadosMotoboys = [];
+let dadosClientes = [];
+
+// Comissão motoboy padrão (carregado das configurações)
+let comissaoMotoboy = 14;
+
+// ── Init ──────────────────────────────────────────────────────
+(async () => {
+  renderSidebar('relatorios');
+  const profile = await requireAuth(['admin','financeiro']);
+  if (!profile) return;
+  atualizarBadgePendentes();
+
+  const { data: cfgs } = await db.from('configuracoes').select('chave,valor').eq('chave','comissao_motoboy');
+  if (cfgs?.[0]) comissaoMotoboy = parseFloat(cfgs[0].valor) || 14;
+
+  setPeriodo('hoje', document.querySelector('.filter-tab'));
+})();
+
+// ── Período ───────────────────────────────────────────────────
+function setPeriodo(periodo, btn) {
+  periodoAtivo = periodo;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('filter-tab--active'));
+  if (btn) btn.classList.add('filter-tab--active');
+
+  const customRange = document.getElementById('custom-range');
+
+  const hoje = new Date();
+  const hojeStr = hoje.toISOString().split('T')[0];
+
+  if (periodo === 'hoje') {
+    dataInicio = hojeStr; dataFim = hojeStr;
+    customRange.style.display = 'none';
+  } else if (periodo === '7d') {
+    const d = new Date(hoje); d.setDate(hoje.getDate() - 6);
+    dataInicio = d.toISOString().split('T')[0]; dataFim = hojeStr;
+    customRange.style.display = 'none';
+  } else if (periodo === '30d') {
+    const d = new Date(hoje); d.setDate(hoje.getDate() - 29);
+    dataInicio = d.toISOString().split('T')[0]; dataFim = hojeStr;
+    customRange.style.display = 'none';
+  } else if (periodo === 'mes') {
+    dataInicio = hojeStr.slice(0,7) + '-01'; dataFim = hojeStr;
+    customRange.style.display = 'none';
+  } else if (periodo === 'custom') {
+    customRange.style.display = 'flex';
+    document.getElementById('custom-inicio').value = dataInicio || hojeStr;
+    document.getElementById('custom-fim').value    = dataFim || hojeStr;
+    return; // Aguarda o clique em Aplicar
+  }
+
+  atualizarLabelPeriodo();
+  carregarTodos();
+}
+
+function aplicarCustom() {
+  dataInicio = document.getElementById('custom-inicio').value;
+  dataFim    = document.getElementById('custom-fim').value;
+  if (!dataInicio || !dataFim) { toast('Informe as duas datas.', 'warning'); return; }
+  if (dataInicio > dataFim) { toast('Data início deve ser anterior ao fim.', 'warning'); return; }
+  atualizarLabelPeriodo();
+  carregarTodos();
+}
+
+function atualizarLabelPeriodo() {
+  const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  const label = dataInicio === dataFim ? fmt(dataInicio) : `${fmt(dataInicio)} → ${fmt(dataFim)}`;
+  document.getElementById('label-periodo').textContent = label;
+}
+
+// ── Carregamentos ─────────────────────────────────────────────
+async function carregarTodos() {
+  await Promise.all([
+    carregarKPIs(),
+    carregarReceitaDia(),
+    carregarTopCestas(),
+    carregarReceitaBairro(),
+    carregarPerformanceMotoboys(),
+    carregarTopClientes(),
+  ]);
+}
+
+async function carregarKPIs() {
+  const { data: pedidos, error } = await db.from('pedidos')
+    .select('total, status_pagamento, created_at')
+    .gte('created_at', dataInicio + 'T00:00:00')
+    .lte('created_at', dataFim   + 'T23:59:59');
+
+  if (error) { toast('Erro ao carregar KPIs', 'error'); return; }
+
+  const lista   = pedidos || [];
+  const total   = lista.length;
+  const pagos   = lista.filter(p => p.status_pagamento === 'pago');
+  const fat     = pagos.reduce((s,p) => s + (p.total || 0), 0);
+  const ticket  = pagos.length ? fat / pagos.length : 0;
+  const conv    = total ? Math.round((pagos.length / total) * 100) : 0;
+  const duasHAtras = new Date(Date.now() - 2 * 3600000);
+  const abandonoList = lista.filter(p => p.status_pagamento === 'pendente' && new Date(p.created_at) < duasHAtras);
+  const valAbandono  = abandonoList.reduce((s,p) => s + (p.total || 0), 0);
+
+  document.getElementById('kpi-fat').textContent       = fmtR$(fat);
+  document.getElementById('kpi-fat-sub').textContent   = `${pagos.length} pedidos pagos`;
+  document.getElementById('kpi-pedidos').textContent   = total;
+  document.getElementById('kpi-ticket').textContent    = fmtR$(ticket);
+  document.getElementById('kpi-conversao').textContent = conv + '%';
+  document.getElementById('kpi-abandono').textContent  = fmtR$(valAbandono);
+  document.getElementById('kpi-abandono-cnt').textContent = abandonoList.length + ' pedidos';
+}
+
+async function carregarReceitaDia() {
+  const { data, error } = await db.from('pedidos')
+    .select('total, status_pagamento, created_at')
+    .gte('created_at', dataInicio + 'T00:00:00')
+    .lte('created_at', dataFim   + 'T23:59:59')
+    .eq('status_pagamento', 'pago')
+    .order('created_at', { ascending: true });
+
+  if (error) { toast('Erro receita por dia', 'error'); return; }
+
+  // Agrupa por data
+  const map = {};
+  (data || []).forEach(p => {
+    const d = p.created_at.split('T')[0];
+    if (!map[d]) map[d] = { data: d, pedidos: 0, fat: 0 };
+    map[d].pedidos++;
+    map[d].fat += p.total || 0;
+  });
+
+  dadosDia = Object.values(map).sort((a,b) => a.data.localeCompare(b.data));
+  const tbody = document.getElementById('tbody-dia');
+
+  if (!dadosDia.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Sem dados no período.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = dadosDia.map(r => {
+    const ticket = r.pedidos ? r.fat / r.pedidos : 0;
+    const dtFmt  = new Date(r.data + 'T12:00:00').toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'2-digit' });
+    return `<tr>
+      <td>${dtFmt}</td>
+      <td>${r.pedidos}</td>
+      <td><strong>${fmtR$(r.fat)}</strong></td>
+      <td>${fmtR$(ticket)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function carregarTopCestas() {
+  const { data, error } = await db.from('itens_pedido')
+    .select('cesta_nome, quantidade, preco, pedidos!inner(created_at, status_pagamento)')
+    .gte('pedidos.created_at', dataInicio + 'T00:00:00')
+    .lte('pedidos.created_at', dataFim   + 'T23:59:59')
+    .eq('pedidos.status_pagamento', 'pago');
+
+  if (error) { toast('Erro top cestas', 'error'); return; }
+
+  const map = {};
+  (data || []).forEach(i => {
+    const n = i.cesta_nome;
+    if (!map[n]) map[n] = { nome: n, qtd: 0, receita: 0 };
+    map[n].qtd     += i.quantidade || 1;
+    map[n].receita += (i.preco || 0) * (i.quantidade || 1);
+  });
+
+  dadosCestas = Object.values(map).sort((a,b) => b.qtd - a.qtd);
+  const totalReceita = dadosCestas.reduce((s,c) => s + c.receita, 0);
+  const tbody = document.getElementById('tbody-cestas');
+
+  if (!dadosCestas.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Sem dados no período.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = dadosCestas.map((c, i) => {
+    const pct = totalReceita ? ((c.receita / totalReceita) * 100).toFixed(1) : '0.0';
+    const medalha = ['🥇','🥈','🥉'][i] || `${i+1}º`;
+    return `<tr>
+      <td>${medalha} <strong>${c.nome}</strong></td>
+      <td>${c.qtd}</td>
+      <td><strong>${fmtR$(c.receita)}</strong></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div style="flex:1;height:6px;background:var(--gray-200);border-radius:3px;min-width:60px"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--navy),var(--gold));border-radius:3px"></div></div>
+          <span style="font-size:.8rem;font-weight:600;min-width:38px">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function carregarReceitaBairro() {
+  const { data, error } = await db.from('pedidos')
+    .select('bairro, cidade, total, entregas(taxa)')
+    .gte('created_at', dataInicio + 'T00:00:00')
+    .lte('created_at', dataFim   + 'T23:59:59')
+    .eq('status_pagamento', 'pago')
+    .not('bairro', 'is', null);
+
+  if (error) { toast('Erro receita por bairro', 'error'); return; }
+
+  const map = {};
+  (data || []).forEach(p => {
+    const key = (p.bairro || '').trim().toLowerCase();
+    if (!key) return;
+    if (!map[key]) map[key] = { bairro: p.bairro, cidade: p.cidade || '—', pedidos: 0, fat: 0, taxas: [] };
+    map[key].pedidos++;
+    map[key].fat += p.total || 0;
+    const taxa = Array.isArray(p.entregas) ? p.entregas[0]?.taxa : p.entregas?.taxa;
+    if (taxa) map[key].taxas.push(taxa);
+  });
+
+  dadosBairro = Object.values(map).sort((a,b) => b.fat - a.fat);
+  const tbody = document.getElementById('tbody-bairro');
+
+  if (!dadosBairro.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Sem dados no período.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = dadosBairro.map(r => {
+    const taxaMedia = r.taxas.length ? r.taxas.reduce((a,b)=>a+b,0) / r.taxas.length : 0;
+    return `<tr>
+      <td><strong>${r.bairro}</strong></td>
+      <td>${r.cidade}</td>
+      <td>${r.pedidos}</td>
+      <td><strong>${fmtR$(r.fat)}</strong></td>
+      <td>${taxaMedia ? fmtR$(taxaMedia) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function carregarPerformanceMotoboys() {
+  const { data, error } = await db.from('entregas')
+    .select('motoboy_id, saiu_em, entregue_em, taxa, pedidos!inner(created_at, itens_pedido(quantidade)), motoboys(id, nome)')
+    .gte('pedidos.created_at', dataInicio + 'T00:00:00')
+    .lte('pedidos.created_at', dataFim   + 'T23:59:59')
+    .eq('status', 'entregue')
+    .not('motoboy_id', 'is', null);
+
+  if (error) { toast('Erro performance motoboys', 'error'); return; }
+
+  const map = {};
+  (data || []).forEach(e => {
+    const mb = e.motoboys;
+    if (!mb) return;
+    const key = mb.id;
+    if (!map[key]) map[key] = { nome: mb.nome, entregas: 0, tempos: [], cestas: 0 };
+    map[key].entregas++;
+    // Tempo de entrega (saiu_em → entregue_em)
+    if (e.saiu_em && e.entregue_em) {
+      const mins = Math.floor((new Date(e.entregue_em) - new Date(e.saiu_em)) / 60000);
+      if (mins > 0 && mins < 300) map[key].tempos.push(mins);
+    }
+    // Cestas para comissão
+    const itens = Array.isArray(e.pedidos?.itens_pedido) ? e.pedidos.itens_pedido : [];
+    const qtd   = itens.reduce((s,i) => s + (i.quantidade || 1), 0);
+    map[key].cestas += qtd;
+  });
+
+  dadosMotoboys = Object.values(map).sort((a,b) => b.entregas - a.entregas);
+  const tbody = document.getElementById('tbody-motoboys');
+
+  if (!dadosMotoboys.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Sem dados no período.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = dadosMotoboys.map(r => {
+    const tempoMedio = r.tempos.length ? Math.round(r.tempos.reduce((a,b)=>a+b,0) / r.tempos.length) : null;
+    const tempoStr   = tempoMedio ? (tempoMedio >= 60 ? Math.floor(tempoMedio/60) + 'h ' + (tempoMedio%60) + 'min' : tempoMedio + ' min') : '—';
+    const comissao   = r.cestas * comissaoMotoboy;
+    return `<tr>
+      <td><strong>${r.nome}</strong></td>
+      <td>${r.entregas}</td>
+      <td>${tempoStr}</td>
+      <td><strong style="color:#16a34a">${fmtR$(comissao)}</strong></td>
+    </tr>`;
+  }).join('');
+}
+
+async function carregarTopClientes() {
+  const { data, error } = await db.from('pedidos')
+    .select('total, created_at, cliente_id, clientes(id, nome, telefone)')
+    .gte('created_at', dataInicio + 'T00:00:00')
+    .lte('created_at', dataFim   + 'T23:59:59')
+    .eq('status_pagamento', 'pago')
+    .not('cliente_id', 'is', null);
+
+  if (error) { toast('Erro top clientes', 'error'); return; }
+
+  const map = {};
+  (data || []).forEach(p => {
+    const key = p.cliente_id;
+    if (!key) return;
+    if (!map[key]) map[key] = { nome: p.clientes?.nome || '—', telefone: p.clientes?.telefone || '—', pedidos: 0, gasto: 0, ultimo: '' };
+    map[key].pedidos++;
+    map[key].gasto += p.total || 0;
+    if (!map[key].ultimo || p.created_at > map[key].ultimo) map[key].ultimo = p.created_at;
+  });
+
+  dadosClientes = Object.values(map).sort((a,b) => b.gasto - a.gasto).slice(0, 50);
+  const tbody = document.getElementById('tbody-clientes');
+
+  if (!dadosClientes.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Sem dados no período.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = dadosClientes.map((c, i) => {
+    const tel = (c.telefone || '').replace(/\D/g,'');
+    const telEl = tel
+      ? `<a href="https://wa.me/55${tel}" target="_blank" style="color:var(--navy)">${c.telefone}</a>`
+      : c.telefone;
+    return `<tr>
+      <td>${i < 3 ? ['🥇','🥈','🥉'][i] + ' ' : ''}<strong>${c.nome}</strong></td>
+      <td>${telEl}</td>
+      <td>${c.pedidos}</td>
+      <td><strong>${fmtR$(c.gasto)}</strong></td>
+      <td style="font-size:.82rem;color:var(--text-muted)">${fmtDataHora(c.ultimo)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Exportar CSV por seção ────────────────────────────────────
+function exportarSecao(secao) {
+  let header, rows, filename;
+
+  if (secao === 'dia') {
+    if (!dadosDia.length) { toast('Sem dados para exportar.', 'warning'); return; }
+    header = 'Data,Pedidos,Faturamento,Ticket Médio\n';
+    rows = dadosDia.map(r => `"${r.data}",${r.pedidos},${r.fat.toFixed(2)},${r.pedidos ? (r.fat/r.pedidos).toFixed(2) : 0}`).join('\n');
+    filename = 'receita_por_dia';
+  } else if (secao === 'cestas') {
+    if (!dadosCestas.length) { toast('Sem dados para exportar.', 'warning'); return; }
+    header = 'Cesta,Qtd Vendida,Receita Total\n';
+    rows = dadosCestas.map(c => `"${c.nome}",${c.qtd},${c.receita.toFixed(2)}`).join('\n');
+    filename = 'top_cestas';
+  } else if (secao === 'bairro') {
+    if (!dadosBairro.length) { toast('Sem dados para exportar.', 'warning'); return; }
+    header = 'Bairro,Cidade,Pedidos,Faturamento,Taxa Média\n';
+    rows = dadosBairro.map(r => {
+      const taxaMedia = r.taxas.length ? (r.taxas.reduce((a,b)=>a+b,0) / r.taxas.length).toFixed(2) : '';
+      return `"${r.bairro}","${r.cidade}",${r.pedidos},${r.fat.toFixed(2)},${taxaMedia}`;
+    }).join('\n');
+    filename = 'receita_por_bairro';
+  } else if (secao === 'motoboys') {
+    if (!dadosMotoboys.length) { toast('Sem dados para exportar.', 'warning'); return; }
+    header = 'Motoboy,Entregas,Tempo Médio (min),Comissão Estimada\n';
+    rows = dadosMotoboys.map(r => {
+      const tempoMedio = r.tempos.length ? Math.round(r.tempos.reduce((a,b)=>a+b,0) / r.tempos.length) : '';
+      return `"${r.nome}",${r.entregas},${tempoMedio},${(r.cestas * comissaoMotoboy).toFixed(2)}`;
+    }).join('\n');
+    filename = 'performance_motoboys';
+  } else if (secao === 'clientes') {
+    if (!dadosClientes.length) { toast('Sem dados para exportar.', 'warning'); return; }
+    header = 'Nome,Telefone,Pedidos,Gasto Total,Último Pedido\n';
+    rows = dadosClientes.map(c => `"${c.nome}","${c.telefone}",${c.pedidos},${c.gasto.toFixed(2)},"${fmtDataHora(c.ultimo)}"`).join('\n');
+    filename = 'top_clientes';
+  } else return;
+
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${filename}_${dataInicio}_${dataFim}.csv`;
+  a.click();
+  toast('CSV exportado!');
+}
+</script>
+</body>
+</html>
