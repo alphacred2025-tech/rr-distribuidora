@@ -59,9 +59,6 @@ module.exports = async function handler(req, res) {
         external_reference: pedido.numero,
         notification_url: `${baseUrl}/api/mp-webhook`,
         statement_descriptor: 'RR DISTRIBUIDORA',
-        payment_methods: {
-          installments: 3,
-        },
       },
     });
 
