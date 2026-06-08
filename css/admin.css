@@ -372,3 +372,162 @@ input, select, textarea { font-family: var(--font); }
   .stats-grid { grid-template-columns: 1fr; }
   .admin-header__titulo { font-size: .85rem; }
 }
+
+/* ================================================================
+   RESPONSIVIDADE COMPLETA — mobile-first improvements
+   ================================================================ */
+
+/* ── Previne zoom no iOS ao focar em inputs (font-size < 16px) ── */
+@media (max-width: 768px) {
+  .form-input,
+  .form-input[type="text"],
+  .form-input[type="number"],
+  .form-input[type="email"],
+  .form-input[type="tel"],
+  .form-input[type="date"],
+  .form-input[type="password"],
+  .form-input[type="search"],
+  select.form-input,
+  textarea.form-input,
+  input, select, textarea { font-size: 16px !important; }
+}
+
+/* ── Touch targets mínimos (44px) ────────────────────────────── */
+@media (max-width: 900px) {
+  .btn         { min-height: 44px; }
+  .nav-link    { min-height: 44px; }
+  .filter-tab  { min-height: 40px; padding: .5rem .875rem; }
+  .btn-hamburguer { min-height: 44px; min-width: 44px; }
+}
+
+/* ── Modal como bottom-sheet no mobile ───────────────────────── */
+@media (max-width: 600px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    width: 100%;
+    max-width: 100%;
+    transform: translateY(100%);
+    margin: 0;
+  }
+  .modal-overlay--aberta .modal {
+    transform: translateY(0);
+  }
+  .modal__header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+    padding-top: 1.25rem;
+  }
+  /* Handle bar visual */
+  .modal__header::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 2px;
+    margin: 0 auto .75rem;
+  }
+}
+
+/* ── Admin header — esconde texto de botões no mobile ────────── */
+@media (max-width: 540px) {
+  .admin-header__right .btn span,
+  .admin-header__right .btn-text { display: none; }
+  .admin-header__right .btn { min-width: 44px; padding: 0 .625rem; }
+  .admin-header { padding: .75rem 1rem; }
+}
+
+/* ── Filtros — empilha em coluna no mobile ───────────────────── */
+@media (max-width: 768px) {
+  /* Cards de filtro com flex inline */
+  .card__body > [style*="display:flex"],
+  .card__body > [style*="display: flex"] {
+    flex-wrap: wrap !important;
+    gap: .5rem !important;
+  }
+  .card__body > [style*="display:flex"] > *,
+  .card__body > [style*="display: flex"] > * {
+    flex: 1 1 140px !important;
+    min-width: 0 !important;
+  }
+  /* Data inputs lado a lado */
+  .card__body input[type="date"] { flex: 1 1 120px !important; }
+}
+
+/* ── Stats-grid — 2 colunas em telas pequenas ────────────────── */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: .625rem;
+  }
+  .stat-card { padding: .875rem; }
+  .stat-card__valor { font-size: 1.4rem; }
+}
+
+/* ── Tabela — fonte menor no mobile ─────────────────────────── */
+@media (max-width: 600px) {
+  .table th,
+  .table td { font-size: .75rem; padding: .5rem .625rem; }
+  .table th { white-space: nowrap; }
+}
+
+/* ── Pedido card — melhor em telas pequenas ──────────────────── */
+@media (max-width: 480px) {
+  .pedido-card { padding: .875rem; }
+  .pedido-card__header { gap: .35rem; }
+  .pedido-card__body   { padding: .75rem 0; }
+}
+
+/* ── Admin content — padding menor no mobile ─────────────────── */
+@media (max-width: 480px) {
+  .admin-content { padding: .875rem .75rem; }
+  .mb-15 { margin-bottom: .875rem !important; }
+  .card__header { padding: .75rem 1rem; }
+  .card__body   { padding: .875rem 1rem; }
+}
+
+/* ── Realtime pill — esconde no mobile menor ─────────────────── */
+@media (max-width: 400px) {
+  .realtime-pill { display: none; }
+}
+
+/* ── Barra de filtros — empilha completamente no mobile ──────── */
+@media (max-width: 600px) {
+  .filtros-bar,
+  .card__body[style*="flex-wrap:wrap"],
+  .card__body[style*="flex-wrap: wrap"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .filtros-bar > *,
+  .card__body[style*="flex-wrap:wrap"] > *,
+  .card__body[style*="flex-wrap: wrap"] > * {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .filtros-bar .btn,
+  .card__body[style*="flex-wrap:wrap"] .btn,
+  .card__body[style*="flex-wrap: wrap"] .btn {
+    width: 100%;
+  }
+}
+
+/* ── Period tabs no relatórios — scroll no mobile ────────────── */
+@media (max-width: 600px) {
+  .periodo-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+    padding-bottom: .25rem;
+  }
+  .periodo-tabs::-webkit-scrollbar { display: none; }
+}

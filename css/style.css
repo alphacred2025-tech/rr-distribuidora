@@ -1417,3 +1417,102 @@ body { overflow-x: hidden; }
   font-size: .82rem;
   font-weight: 500;
 }
+
+/* ================================================================
+   RESPONSIVIDADE COMPLETA — mobile-first improvements
+   ================================================================ */
+
+/* ── Previne zoom no iOS ao focar em inputs ──────────────────── */
+@media (max-width: 768px) {
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  input, select, textarea { font-size: 16px !important; }
+}
+
+/* ── Touch targets mínimos (44px) ────────────────────────────── */
+.btn { min-height: 44px; }
+.tab-btn { min-height: 44px; }
+.header__cart { min-height: 44px; min-width: 44px; }
+
+/* ── Stepper — compacto no mobile ───────────────────────────── */
+@media (max-width: 600px) {
+  .stepper { gap: .25rem; padding: .75rem 0; }
+  .step__num { width: 26px; height: 26px; font-size: .75rem; }
+  .step span { font-size: .7rem; }
+  .step-sep { width: 20px; }
+}
+
+/* ── Checkout + Pagamento — single column abaixo de 700px ───── */
+@media (max-width: 700px) {
+  .checkout-layout { grid-template-columns: 1fr; }
+  .pagamento-layout { grid-template-columns: 1fr; }
+  .checkout-resumo,
+  .pagamento-resumo-box { order: -1; } /* resumo aparece em cima no mobile */
+}
+
+/* ── Checkout form — labels e inputs mobile ──────────────────── */
+@media (max-width: 600px) {
+  .checkout-form-box { padding: 1rem; }
+  .checkout-page { padding: 1.5rem 0; }
+  .pagamento-page { padding: 1.5rem 0; }
+  .pagamento-form-box { padding: 1rem; }
+  .form-grid--2 { grid-template-columns: 1fr; }
+}
+
+/* ── Produto page — mobile ───────────────────────────────────── */
+@media (max-width: 700px) {
+  .produto-layout { flex-direction: column; }
+  .produto-img-box { width: 100%; max-width: 100%; }
+  .produto-actions { flex-wrap: wrap; }
+  .produto-actions .btn { flex: 1 1 calc(50% - .5rem); min-width: 140px; }
+}
+
+/* ── Carrinho — mobile ───────────────────────────────────────── */
+@media (max-width: 700px) {
+  .carrinho-layout { flex-direction: column; }
+  .carrinho-resumo { order: -1; position: relative; top: auto; }
+}
+
+/* ── Confirmação — centraliza no mobile ─────────────────────── */
+@media (max-width: 600px) {
+  .confirmacao-box { padding: 1.25rem 1rem; }
+  .conf-titulo { font-size: 1.3rem; }
+  .conf-wa-section .btn--whatsapp { font-size: .9rem; }
+}
+
+/* ── Hero — mobile ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hero { padding: 2rem 0; }
+  .hero h1 { font-size: 1.75rem; }
+  .hero__actions { flex-direction: column; }
+  .hero__actions .btn { width: 100%; text-align: center; }
+  .hero__right { display: none; } /* esconde imagem no mobile menor */
+}
+
+/* ── Header — mobile ─────────────────────────────────────────── */
+@media (max-width: 500px) {
+  .header__logo-img { height: 40px; }
+  .header__cart span.cart-badge { font-size: .65rem; }
+}
+
+/* ── MP Checkout box — mobile ────────────────────────────────── */
+@media (max-width: 600px) {
+  .mp-checkout-box { padding: 1rem; }
+  .mp-metodos { gap: .35rem; }
+  .mp-metodo-tag { font-size: .75rem; padding: .25rem .65rem; }
+}
+
+/* ── Seção de produtos — grid mobile ─────────────────────────── */
+@media (max-width: 480px) {
+  .produtos-grid { grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .produto-card__nome { font-size: .82rem; }
+  .produto-card__preco { font-size: 1rem; }
+  .produto-card__img { height: 130px; }
+}
+
+/* ── Footer — single column no mobile ───────────────────────── */
+@media (max-width: 600px) {
+  .footer__grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .footer { padding: 2rem 0 1.5rem; }
+}
