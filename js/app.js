@@ -102,14 +102,21 @@ function construirMensagemWhatsApp(pedido) {
     ? `Entrega em: ${pedido.endereco.logradouro}, ${pedido.endereco.numero}${pedido.endereco.complemento ? ' / ' + pedido.endereco.complemento : ''} — CEP ${pedido.endereco.cep} — ${pedido.endereco.bairro}, ${pedido.endereco.cidade}/${pedido.endereco.uf}`
     : 'Retirada na loja';
 
+  const subtotal  = (pedido.carrinho || []).reduce((s, i) => s + i.preco * (i.quantidade || 1), 0);
+  const taxaFrete = pedido.taxaEntrega || 0;
+  const freteStr  = taxaFrete > 0 ? `\n*Taxa de entrega:* ${formatarPreco(taxaFrete)}` : '';
+
+  const pgtoLabel = { pix:'PIX', cartao:'Cartão', mercadopago:'Mercado Pago', avista:'À vista', dinheiro:'Dinheiro' };
+
   const msg = [
     `Olá! Acabei de realizar o pedido *#${pedido.numero}* na RR Distribuidora. 🛒`,
     ``,
     `*Pedido:*`,
     itens,
     ``,
+    `*Subtotal:* ${formatarPreco(subtotal)}${freteStr}`,
     `*Total:* ${formatarPreco(pedido.total)}`,
-    `*Pagamento:* ${pedido.pagamento === 'pix' ? 'PIX' : 'Cartão de Crédito'}`,
+    `*Pagamento:* ${pgtoLabel[pedido.pagamento] || pedido.pagamento || 'A definir'}`,
     ``,
     `*${entrega}*`,
     ``,
@@ -684,14 +691,10 @@ function initConfirmacao() {
 
   document.getElementById('conf-total').textContent = formatarPreco(pedido.total);
 
-  // Se veio do MP (payment_id na URL) → só atualiza status (pedido já foi salvo antes do redirect)
-  // Se não veio do MP (PIX manual) → salva agora
-  if (mpPaymentId && pedido.savedToDb) {
-    if (typeof registrarPagamentoConfirmado === 'function') {
-      registrarPagamentoConfirmado(pedido.numero, mpPaymentId, mpPaymentType);
-    }
-  } else if (!pedido.savedToDb && typeof salvarPedido === 'function') {
-    salvarPedido(pedido);
+  // Salva pedido se ainda não foi salvo (PIX manual, ou se o save pré-MP falhou)
+  // O status_pagamento é atualizado pelo webhook server-side (anon não tem UPDATE em pedidos)
+  if (!pedido.savedToDb && typeof salvarPedido === 'function') {
+    await salvarPedido(pedido);
   }
 
   // Botão WhatsApp

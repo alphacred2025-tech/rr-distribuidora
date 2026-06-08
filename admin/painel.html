@@ -295,12 +295,14 @@ async function carregarKPIsPagamento() {
 }
 
 async function carregarAbandonados() {
-  const duasHAtras = new Date(Date.now() - 2 * 3600000).toISOString();
+  // Apenas últimos 7 dias para evitar acúmulo de pedidos antigos na tabela
+  const seteDiasAtras = new Date(Date.now() - 7 * 24 * 3600000).toISOString();
   const { data } = await db.from('pedidos')
     .select('*, clientes(nome, telefone)')
     .eq('status_pagamento', 'pendente')
+    .gte('created_at', seteDiasAtras)
     .order('created_at', { ascending: false })
-    .limit(20);
+    .limit(50);
 
   const tbody = document.getElementById('tbody-abandonados');
   if (!tbody) return;
@@ -361,7 +363,7 @@ async function carregarPedidosRecentes() {
     .limit(10);
 
   const tbody = document.getElementById('tbody-recentes');
-  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum pedido ainda.</td></tr>'; return; }
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum pedido ainda.</td></tr>'; return; }
 
   const pgto = { pix:'PIX', cartao:'Cartão', avista:'À vista', dinheiro:'Dinheiro', mercadopago:'MP' };
   tbody.innerHTML = data.map(p => {

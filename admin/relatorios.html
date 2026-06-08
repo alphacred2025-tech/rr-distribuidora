@@ -34,7 +34,7 @@
             <button class="filter-tab" onclick="setPeriodo('mes',this)">Este mês</button>
             <button class="filter-tab" onclick="setPeriodo('custom',this)">Custom</button>
           </div>
-          <div id="custom-range" style="display:none;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <div id="custom-range" style="display:none;gap:.5rem;align-items:center;flex-wrap:wrap">
             <input class="form-input" type="date" id="custom-inicio" style="max-width:150px">
             <span style="color:var(--text-muted)">até</span>
             <input class="form-input" type="date" id="custom-fim" style="max-width:150px">
@@ -450,8 +450,8 @@ async function carregarPerformanceMotoboys() {
 
   const map = {};
   (data || []).forEach(e => {
-    const mb = e.motoboys;
-    if (!mb) return;
+    const mb = Array.isArray(e.motoboys) ? e.motoboys[0] : e.motoboys;
+    if (!mb?.id) return;
     const key = mb.id;
     if (!map[key]) map[key] = { nome: mb.nome, entregas: 0, tempos: [], cestas: 0 };
     map[key].entregas++;

@@ -196,7 +196,7 @@ async function carregarPedidos() {
   let q = db.from('pedidos')
     .select('*, clientes(id, nome, telefone, email), entregas(id, status, motoboy_id, taxa, saiu_em, entregue_em, motoboys(nome)), itens_pedido(cesta_nome, preco, quantidade)')
     .order('created_at', { ascending: false })
-    .limit(500);
+    .limit(1000);
 
   if (inicio) q = q.gte('created_at', inicio + 'T00:00:00');
   if (fim)    q = q.lte('created_at', fim + 'T23:59:59');
@@ -390,11 +390,9 @@ function limparFiltros() {
   carregarPedidos();
 }
 
-// ── Busca ao pressionar Enter ─────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('filtro-busca').addEventListener('keydown', e => {
-    if (e.key === 'Enter') carregarPedidos();
-  });
+// Script está no final do body — DOM já está pronto, não precisa de DOMContentLoaded
+document.getElementById('filtro-busca').addEventListener('keydown', e => {
+  if (e.key === 'Enter') carregarPedidos();
 });
 
 // ── Exportar CSV ──────────────────────────────────────────────

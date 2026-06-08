@@ -220,12 +220,14 @@ function renderSidebar(paginaAtiva) {
 // Atualiza badge de pendentes na sidebar
 async function atualizarBadgePendentes() {
   const [
-    { count: cEntregas },
-    { count: cPgtoPendente },
+    { count: cEntregas,    error: e1 },
+    { count: cPgtoPendente, error: e2 },
   ] = await Promise.all([
     db.from('entregas').select('*', { count:'exact', head:true }).in('status', ['pendente','em_preparo']),
     db.from('pedidos').select('*', { count:'exact', head:true }).eq('status_pagamento', 'pendente'),
   ]);
+  if (e1) console.warn('[badge] entregas:', e1.message);
+  if (e2) console.warn('[badge] pedidos pgto:', e2.message);
 
   const badgeLog = document.getElementById('badge-pendentes');
   if (badgeLog) {

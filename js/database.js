@@ -173,19 +173,5 @@ async function salvarPedido(pedido) {
   }
 }
 
-// Chamada em confirmacao.html após retorno do MP — só atualiza status
-// (o webhook server-side faz o mesmo, mas isso garante atualização imediata)
-async function registrarPagamentoConfirmado(numero, mpPaymentId, mpPaymentType) {
-  try {
-    const _map = { credit_card:'cartao', debit_card:'cartao', pix:'pix', mercadopago:'pix' };
-    const formaPgto = _map[mpPaymentType] || 'pix';
-    await db.from('pedidos').update({
-      status_pagamento: 'pago',
-      mp_payment_id:    mpPaymentId ? String(mpPaymentId) : null,
-      forma_pagamento:  formaPgto,
-    }).eq('numero', numero);
-    console.log('[DB] Pagamento confirmado para pedido:', numero);
-  } catch (err) {
-    console.warn('[DB] Aviso ao confirmar pagamento:', err?.message || err);
-  }
-}
+// Nota: atualização de status_pagamento é feita exclusivamente pelo webhook
+// (api/mp-webhook.js com SUPABASE_SERVICE_KEY) pois anon não tem UPDATE em pedidos
