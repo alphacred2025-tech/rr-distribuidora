@@ -501,7 +501,7 @@ function initPagamento() {
     return;
   }
 
-  // Resumo
+  // Resumo lateral
   const resumoEl = document.getElementById('pagamento-resumo');
   if (resumoEl) {
     resumoEl.innerHTML = pedido.carrinho.map(item => `
@@ -515,69 +515,64 @@ function initPagamento() {
   document.getElementById('pagamento-numero-pedido').textContent = pedido.numero;
   document.getElementById('pagamento-total').textContent = formatarPreco(pedido.total);
 
-  // Tabs PIX / Cartão
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--ativo'));
-      document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('tab-painel--ativo'));
-      btn.classList.add('tab-btn--ativo');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('tab-painel--ativo');
-    });
-  });
+  const totalEl = document.getElementById('mp-total-valor');
+  if (totalEl) totalEl.textContent = formatarPreco(pedido.total);
 
-  // Copiar chave PIX
+  // ── Botão Mercado Pago ────────────────────────────────────────
+  const btnMP = document.getElementById('btn-pagar-mp');
+  if (btnMP) {
+    btnMP.addEventListener('click', async () => {
+      const loading = document.getElementById('mp-loading');
+      const erroEl  = document.getElementById('mp-erro');
+      btnMP.disabled = true;
+      if (loading) loading.style.display = '';
+      if (erroEl)  erroEl.style.display  = 'none';
+
+      try {
+        const res = await fetch('/api/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pedido),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.init_point) {
+          throw new Error(data.error || 'Erro ao criar sessão de pagamento');
+        }
+
+        // Salva pedido antes de sair (estará em localStorage ao voltar)
+        pedido.pagamento = 'mercadopago';
+        localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+
+        window.location.href = data.init_point;
+      } catch (err) {
+        btnMP.disabled = false;
+        if (loading) loading.style.display = 'none';
+        if (erroEl) {
+          erroEl.textContent = err.message || 'Erro ao conectar com Mercado Pago. Tente novamente.';
+          erroEl.style.display = '';
+        }
+      }
+    });
+  }
+
+  // ── PIX manual (fallback) ────────────────────────────────────
   const btnCopiar = document.getElementById('btn-copiar-pix');
   if (btnCopiar) {
     btnCopiar.addEventListener('click', () => {
       const chave = document.getElementById('pix-chave').textContent;
       navigator.clipboard.writeText(chave).then(() => {
         btnCopiar.textContent = 'Copiado!';
-        setTimeout(() => btnCopiar.textContent = 'Copiar Chave', 2000);
+        setTimeout(() => btnCopiar.textContent = 'Copiar', 2000);
       });
     });
   }
 
-  // Máscara cartão
-  const numCartao = document.getElementById('numero-cartao');
-  if (numCartao) {
-    numCartao.addEventListener('input', e => {
-      e.target.value = e.target.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim().slice(0, 19);
-      detectarBandeira(e.target.value.replace(/\s/g, ''));
-    });
-  }
-  const validade = document.getElementById('validade');
-  if (validade) {
-    validade.addEventListener('input', e => {
-      e.target.value = e.target.value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2').slice(0, 5);
-    });
-  }
-  const cvv = document.getElementById('cvv');
-  if (cvv) cvv.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); });
-
-  // Já paguei (PIX)
   const btnJaPaguei = document.getElementById('btn-ja-paguei');
   if (btnJaPaguei) {
     btnJaPaguei.addEventListener('click', () => {
       pedido.pagamento = 'pix';
-      localStorage.setItem('rr_pedido', JSON.stringify(pedido));
-      window.location.href = 'confirmacao.html';
-    });
-  }
-
-  // Confirmar pagamento cartão
-  const formCartao = document.getElementById('form-cartao');
-  if (formCartao) {
-    formCartao.addEventListener('submit', e => {
-      e.preventDefault();
-      // ── MERCADO PAGO INTEGRATION PLACEHOLDER ──────────────────────
-      // TODO: Inicializar SDK do Mercado Pago:
-      //   const mp = new MercadoPago('YOUR_PUBLIC_KEY', { locale: 'pt-BR' });
-      //   const cardForm = mp.cardForm({ amount: pedido.total, ... });
-      //   cardForm.mount();
-      // Ao receber aprovação, salvar resposta e redirecionar para confirmacao.html
-      // ──────────────────────────────────────────────────────────────
-
-      pedido.pagamento = 'cartao';
       localStorage.setItem('rr_pedido', JSON.stringify(pedido));
       window.location.href = 'confirmacao.html';
     });
@@ -604,13 +599,47 @@ function detectarBandeira(numero) {
 
 // ─── CONFIRMAÇÃO ─────────────────────────────────────────────
 
+function _labelPagamento(metodo) {
+  const labels = {
+    pix:           'PIX',
+    credit_card:   'Cartão de Crédito',
+    debit_card:    'Cartão de Débito',
+    bolbradesco:   'Boleto Bancário',
+    pec:           'Boleto Bancário',
+    account_money: 'Saldo Mercado Pago',
+    mercadopago:   'Mercado Pago',
+    cartao:        'Cartão de Crédito',
+  };
+  return labels[metodo] || 'Mercado Pago';
+}
+
 function initConfirmacao() {
   const pedido = JSON.parse(localStorage.getItem('rr_pedido') || 'null');
   if (!pedido) { window.location.href = 'index.html'; return; }
 
+  // Detecta retorno do Mercado Pago (parâmetros na URL)
+  const params        = new URLSearchParams(location.search);
+  const mpPaymentId   = params.get('payment_id');
+  const mpStatus      = params.get('status');
+  const mpPaymentType = params.get('payment_type');
+
+  if (mpPaymentId) {
+    pedido.mpPaymentId = mpPaymentId;
+    pedido.mpStatus    = mpStatus;
+    if (mpPaymentType) pedido.pagamento = mpPaymentType;
+    else if (!pedido.pagamento || pedido.pagamento === 'mercadopago') pedido.pagamento = 'mercadopago';
+    localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+
+    // Pagamento pendente (ex: boleto gerado, PIX aguardando)
+    if (mpStatus === 'pending') {
+      const subtitulo = document.querySelector('.conf-subtitulo');
+      if (subtitulo) subtitulo.textContent = 'Seu pagamento está sendo processado. Você receberá a confirmação em breve.';
+    }
+  }
+
   document.getElementById('conf-numero').textContent = pedido.numero;
   document.getElementById('conf-nome').textContent = pedido.cliente.nome;
-  document.getElementById('conf-pagamento').textContent = pedido.pagamento === 'pix' ? 'PIX' : 'Cartão de Crédito';
+  document.getElementById('conf-pagamento').textContent = _labelPagamento(pedido.pagamento);
 
   const entregaEl = document.getElementById('conf-entrega');
   if (entregaEl) {

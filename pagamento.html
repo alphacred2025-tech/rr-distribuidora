@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pagamento — RR Distribuidora</title>
-  <link rel="stylesheet" href="css/style.css?v=3" />
+  <link rel="stylesheet" href="css/style.css?v=4" />
 
 </head>
 <body data-page="pagamento">
@@ -66,85 +66,55 @@
         <!-- Formulário de pagamento -->
         <div class="pagamento-form-box">
 
-          <!-- Tabs -->
-          <div class="tabs" role="tablist">
-            <button class="tab-btn tab-btn--ativo" data-tab="pix" role="tab" aria-selected="true" aria-controls="tab-pix">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M17 14h3M14 17v3"/></svg>
-              PIX
-            </button>
-            <button class="tab-btn" data-tab="cartao" role="tab" aria-selected="false" aria-controls="tab-cartao">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-              Cartão de Crédito
-            </button>
-          </div>
-
-          <!-- Tab PIX -->
-          <div class="tab-painel tab-painel--ativo" id="tab-pix" role="tabpanel">
-            <div class="pix-box">
-              <div class="pix-qr">
-                <div class="pix-qr__icon">📱</div>
-                <span style="font-size:.82rem;color:var(--text-muted)">Escaneie ou use a chave abaixo</span>
-              </div>
-
-              <div class="pix-chave-box">
-                <div>
-                  <div class="pix-chave-label">Chave PIX (Telefone)</div>
-                  <div class="pix-chave-valor" id="pix-chave">81996206567</div>
-                </div>
-                <button class="btn btn--outline" id="btn-copiar-pix" type="button">Copiar</button>
-              </div>
-
-              <ol class="pix-instrucoes">
-                <li>Abra o app do seu banco ou carteira digital</li>
-                <li>Escolha pagar com PIX e escaneie o QR Code</li>
-                <li>Ou cole a chave PIX acima no campo indicado</li>
-                <li>Confirme o pagamento e clique em "Já paguei" abaixo</li>
-              </ol>
+          <!-- Mercado Pago Checkout Pro -->
+          <div class="mp-checkout-box">
+            <div class="mp-checkout-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#009ee3"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <span>Pagamento seguro via <strong>Mercado Pago</strong></span>
             </div>
 
-            <button class="btn btn--primary btn--full btn--lg" id="btn-ja-paguei" type="button" style="margin-top:1.5rem;">
-              ✓ Já realizei o pagamento
+            <div class="mp-metodos">
+              <span class="mp-metodo-tag">📱 PIX</span>
+              <span class="mp-metodo-tag">💳 Cartão</span>
+              <span class="mp-metodo-tag">🏦 Boleto</span>
+            </div>
+
+            <button class="btn btn--primary btn--full btn--lg" id="btn-pagar-mp" type="button">
+              Pagar <span id="mp-total-valor">R$ 0,00</span> →
             </button>
+
+            <div id="mp-loading" style="display:none; text-align:center; padding:.75rem; color:var(--text-muted); font-size:.9rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" style="animation:spin 1s linear infinite;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Criando sessão de pagamento…
+            </div>
+
+            <div id="mp-erro" style="display:none; background:#fef2f2; color:#d93025; border-radius:8px; padding:.75rem 1rem; font-size:.88rem; margin-top:.5rem;"></div>
           </div>
 
-          <!-- Tab Cartão -->
-          <div class="tab-painel" id="tab-cartao" role="tabpanel">
-            <form id="form-cartao" class="card-form" novalidate>
-              <div class="form-group">
-                <label for="nome-cartao">Nome no cartão *</label>
-                <input type="text" id="nome-cartao" name="nome-cartao" placeholder="Igual ao impresso no cartão" autocomplete="cc-name" required />
-              </div>
-              <div class="form-group">
-                <label for="numero-cartao">Número do cartão *</label>
-                <div class="card-numero-wrapper">
-                  <input type="text" id="numero-cartao" name="numero-cartao" placeholder="0000 0000 0000 0000" autocomplete="cc-number" maxlength="19" required />
-                  <span class="bandeira-icone" id="bandeira-icone"></span>
-                </div>
-              </div>
-              <div class="form-grid form-grid--2">
-                <div class="form-group">
-                  <label for="validade">Validade *</label>
-                  <input type="text" id="validade" name="validade" placeholder="MM/AA" autocomplete="cc-exp" maxlength="5" required />
-                </div>
-                <div class="form-group">
-                  <label for="cvv">CVV *</label>
-                  <input type="text" id="cvv" name="cvv" placeholder="000" autocomplete="cc-csc" maxlength="4" required />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="parcelas">Parcelas</label>
-                <select id="parcelas" name="parcelas">
-                  <option value="1">1x sem juros</option>
-                  <option value="2">2x sem juros</option>
-                  <option value="3">3x sem juros</option>
-                  <option value="6">6x com juros (a confirmar)</option>
-                </select>
-              </div>
+          <!-- Separador -->
+          <div style="display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--text-muted);font-size:.82rem">
+            <div style="flex:1;height:1px;background:var(--gray-200)"></div>
+            ou prefere pagar na hora
+            <div style="flex:1;height:1px;background:var(--gray-200)"></div>
+          </div>
 
-              <button type="submit" class="btn btn--primary btn--full btn--lg" style="margin-top:.5rem;">
-                Confirmar Pagamento →
-              </button>
-            </form>
+          <!-- PIX manual (fallback) -->
+          <div class="pix-box" id="pix-manual-box">
+            <div class="pix-chave-box">
+              <div>
+                <div class="pix-chave-label">Chave PIX (Telefone)</div>
+                <div class="pix-chave-valor" id="pix-chave">81996206567</div>
+              </div>
+              <button class="btn btn--outline" id="btn-copiar-pix" type="button">Copiar</button>
+            </div>
+            <ol class="pix-instrucoes">
+              <li>Abra o app do seu banco</li>
+              <li>Pague com PIX usando a chave acima</li>
+              <li>Clique em "Já paguei" para confirmar</li>
+            </ol>
+            <button class="btn btn--ghost btn--full" id="btn-ja-paguei" type="button" style="margin-top:1rem;">
+              ✓ Já paguei (PIX manual)
+            </button>
           </div>
 
         </div>
@@ -152,12 +122,10 @@
         <!-- Resumo do pedido -->
         <aside class="pagamento-resumo-box">
           <h3>Resumo do Pedido</h3>
-          <div id="pagamento-resumo">
-            <!-- Preenchido via JS -->
-          </div>
+          <div id="pagamento-resumo"></div>
           <div style="margin-top:1rem; padding-top:.875rem; border-top:1px solid var(--gray-200);">
             <p style="font-size:.8rem; color:var(--text-muted); text-align:center;">
-              🔒 Pagamento processado com segurança<br>pelo Mercado Pago
+              🔒 Pagamento criptografado e processado<br>com segurança pelo Mercado Pago
             </p>
           </div>
         </aside>
@@ -208,6 +176,6 @@
 
   <script src="js/dados.js?v=2"></script>
   <script src="js/carrinho.js?v=2"></script>
-  <script src="js/app.js?v=3"></script>
+  <script src="js/app.js?v=4"></script>
 </body>
 </html>

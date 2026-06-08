@@ -1386,3 +1386,34 @@ body { overflow-x: hidden; }
   .produto-actions { flex-wrap: wrap; }
   .produto-actions .btn { flex: 1 1 calc(50% - .5rem); }
 }
+
+/* ─── Mercado Pago Checkout ──────────────────────────────────── */
+.mp-checkout-box {
+  background: #f0f9ff;
+  border: 2px solid #bae6fd;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.mp-checkout-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .92rem;
+  color: var(--text-muted);
+}
+.mp-metodos {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+.mp-metodo-tag {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  padding: .3rem .85rem;
+  font-size: .82rem;
+  font-weight: 500;
+}
