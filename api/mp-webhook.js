@@ -1,4 +1,5 @@
 const { MercadoPagoConfig, Payment } = require('mercadopago');
+const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async function handler(req, res) {
   // MP verifica o endpoint com GET antes de enviar eventos
@@ -18,9 +19,27 @@ module.exports = async function handler(req, res) {
       console.log('[MP webhook] payment_id=%s status=%s ref=%s method=%s',
         payment.id, payment.status, payment.external_reference, payment.payment_type_id);
 
-      // Aqui você pode atualizar o Supabase com o status do pagamento.
-      // Ex: marcar pedido como pago quando status === 'approved'
-      // Requer SUPABASE_URL + SUPABASE_SERVICE_KEY como env vars no Vercel.
+      if (payment.external_reference) {
+        const db = createClient(
+          process.env.SUPABASE_URL,
+          process.env.SUPABASE_SERVICE_KEY
+        );
+
+        let statusPagamento;
+        if (payment.status === 'approved')                              statusPagamento = 'pago';
+        else if (['rejected','cancelled'].includes(payment.status))     statusPagamento = 'falhou';
+        else                                                            statusPagamento = 'pendente';
+
+        const { error } = await db.from('pedidos')
+          .update({
+            status_pagamento: statusPagamento,
+            mp_payment_id:    String(payment.id),
+          })
+          .eq('numero', payment.external_reference);
+
+        if (error) console.error('[MP webhook] supabase error:', error.message);
+        else console.log('[MP webhook] pedido %s → %s', payment.external_reference, statusPagamento);
+      }
     }
 
     // Sempre responde 200 para o MP não retentar

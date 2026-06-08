@@ -260,7 +260,13 @@ function cardPedido(p) {
     ? [p.logradouro, p.numero_end, p.bairro].filter(Boolean).join(', ') || '—'
     : '🏪 Retirada na loja';
 
-  const pgto = { pix:'💠 PIX', cartao:'💳 Cartão', avista:'💵 À vista', dinheiro:'💵 Dinheiro' };
+  const pgto = { pix:'💠 PIX', cartao:'💳 Cartão', avista:'💵 À vista', dinheiro:'💵 Dinheiro', mercadopago:'🔵 Mercado Pago' };
+  const statusPgto = p.status_pagamento || 'pendente';
+  const badgePgto = statusPgto === 'pago'
+    ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 10px;border-radius:12px;font-size:.72rem;font-weight:700">✅ PAGO</span>'
+    : statusPgto === 'falhou'
+    ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 10px;border-radius:12px;font-size:.72rem;font-weight:700">❌ FALHOU</span>'
+    : '<span style="background:#fef9c3;color:#a16207;padding:2px 10px;border-radius:12px;font-size:.72rem;font-weight:600">⏳ Aguard. pgto</span>';
   const telLimpo = (cliente.telefone || '').replace(/\D/g,'');
   const qtdCestas = (p.itens_pedido || []).reduce((s,i) => s + (i.quantidade||1), 0);
   const precisaMaquineta = p.forma_pagamento === 'cartao';
@@ -338,6 +344,7 @@ function cardPedido(p) {
       <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
         <span class="pedido-card__num">#${p.numero}</span>
         ${badgeStatus(status)}
+        ${badgePgto}
         ${isNovo ? '<span class="badge" style="background:#fdf6e3;color:#a87e00;font-size:.7rem">🆕 Novo</span>' : ''}
         <span style="background:#e8eef8;color:var(--navy);padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600">${qtdCestas} cesta${qtdCestas>1?'s':''}</span>
         ${precisaMaquineta ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:700">💳 MAQUINETA</span>' : ''}
