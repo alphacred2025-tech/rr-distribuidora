@@ -501,7 +501,7 @@ function initPagamento() {
     return;
   }
 
-  // Resumo lateral
+  // Preenche resumo lateral e header
   const resumoEl = document.getElementById('pagamento-resumo');
   if (resumoEl) {
     resumoEl.innerHTML = pedido.carrinho.map(item => `
@@ -514,69 +514,7 @@ function initPagamento() {
 
   document.getElementById('pagamento-numero-pedido').textContent = pedido.numero;
   document.getElementById('pagamento-total').textContent = formatarPreco(pedido.total);
-
-  const totalEl = document.getElementById('mp-total-valor');
-  if (totalEl) totalEl.textContent = formatarPreco(pedido.total);
-
-  // ── Botão Mercado Pago ────────────────────────────────────────
-  const btnMP = document.getElementById('btn-pagar-mp');
-  if (btnMP) {
-    btnMP.addEventListener('click', async () => {
-      const loading = document.getElementById('mp-loading');
-      const erroEl  = document.getElementById('mp-erro');
-      btnMP.disabled = true;
-      if (loading) loading.style.display = '';
-      if (erroEl)  erroEl.style.display  = 'none';
-
-      try {
-        const res = await fetch('/api/create-preference', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pedido),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.init_point) {
-          throw new Error(data.error || 'Erro ao criar sessão de pagamento');
-        }
-
-        // Salva pedido antes de sair (estará em localStorage ao voltar)
-        pedido.pagamento = 'mercadopago';
-        localStorage.setItem('rr_pedido', JSON.stringify(pedido));
-
-        window.location.href = data.init_point;
-      } catch (err) {
-        btnMP.disabled = false;
-        if (loading) loading.style.display = 'none';
-        if (erroEl) {
-          erroEl.textContent = err.message || 'Erro ao conectar com Mercado Pago. Tente novamente.';
-          erroEl.style.display = '';
-        }
-      }
-    });
-  }
-
-  // ── PIX manual (fallback) ────────────────────────────────────
-  const btnCopiar = document.getElementById('btn-copiar-pix');
-  if (btnCopiar) {
-    btnCopiar.addEventListener('click', () => {
-      const chave = document.getElementById('pix-chave').textContent;
-      navigator.clipboard.writeText(chave).then(() => {
-        btnCopiar.textContent = 'Copiado!';
-        setTimeout(() => btnCopiar.textContent = 'Copiar', 2000);
-      });
-    });
-  }
-
-  const btnJaPaguei = document.getElementById('btn-ja-paguei');
-  if (btnJaPaguei) {
-    btnJaPaguei.addEventListener('click', () => {
-      pedido.pagamento = 'pix';
-      localStorage.setItem('rr_pedido', JSON.stringify(pedido));
-      window.location.href = 'confirmacao.html';
-    });
-  }
+  // O MP Payment Brick é inicializado pelo script inline em pagamento.html
 }
 
 function detectarBandeira(numero) {
