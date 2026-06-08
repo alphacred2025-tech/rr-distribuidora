@@ -65,10 +65,16 @@ async function salvarPedido(pedido) {
     const pedidoId = _uid();
     const end = pedido.tipoEntrega === 'entrega' ? (pedido.endereco || {}) : {};
     // Mapeia tipos do Mercado Pago para os valores aceitos pelo CHECK constraint
-    const _pgtoMap = { credit_card:'cartao', debit_card:'cartao',
-                       account_money:'mercadopago', bolbradesco:'cartao',
-                       pec:'cartao', mercadopago:'mercadopago' };
-    const formaPgto = _pgtoMap[pedido.pagamento] || pedido.pagamento || 'pix';
+    // Qualquer método MP não reconhecido → 'pix' (fallback seguro, aceito pelo CHECK)
+    const _pgtoMap = {
+      credit_card:'cartao', debit_card:'cartao',
+      bolbradesco:'cartao', pec:'cartao',
+      pix:'pix', account_money:'pix',
+      mercadopago:'pix',
+    };
+    const _formasValidas = ['pix','cartao','avista','dinheiro'];
+    const formaPgto = _pgtoMap[pedido.pagamento]
+      || (_formasValidas.includes(pedido.pagamento) ? pedido.pagamento : 'pix');
     const { error: e2 } = await db.from('pedidos').insert({
       id:              pedidoId,
       numero:          pedido.numero,
