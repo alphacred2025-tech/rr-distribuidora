@@ -64,13 +64,18 @@ async function salvarPedido(pedido) {
     // 3. Registrar pedido — UUID gerado aqui, sem SELECT de volta
     const pedidoId = _uid();
     const end = pedido.tipoEntrega === 'entrega' ? (pedido.endereco || {}) : {};
+    // Mapeia tipos do Mercado Pago para os valores aceitos pelo CHECK constraint
+    const _pgtoMap = { credit_card:'cartao', debit_card:'cartao',
+                       account_money:'mercadopago', bolbradesco:'cartao',
+                       pec:'cartao', mercadopago:'mercadopago' };
+    const formaPgto = _pgtoMap[pedido.pagamento] || pedido.pagamento || 'pix';
     const { error: e2 } = await db.from('pedidos').insert({
       id:              pedidoId,
       numero:          pedido.numero,
       cliente_id:      clienteId,
       total:           pedido.total,
       forma_entrega:   pedido.tipoEntrega   || 'entrega',
-      forma_pagamento: pedido.pagamento     || 'pix',
+      forma_pagamento: formaPgto,
       cep:             end.cep         || null,
       logradouro:      end.logradouro  || null,
       numero_end:      end.numero      || null,

@@ -110,22 +110,25 @@ CREATE TABLE public.pedidos (
   cliente_id      UUID REFERENCES public.clientes(id),
   vendedor_id     UUID REFERENCES public.profiles(id),
   afiliado_id     UUID REFERENCES public.afiliados(id) ON DELETE SET NULL,
-  total           NUMERIC(10,2) NOT NULL DEFAULT 0,
-  forma_entrega   TEXT DEFAULT 'entrega'
-                    CHECK (forma_entrega  IN ('entrega','retirada')),
-  forma_pagamento TEXT DEFAULT 'pix'
-                    CHECK (forma_pagamento IN ('pix','cartao','avista','dinheiro')),
-  cep             TEXT,
-  logradouro      TEXT,
-  numero_end      TEXT,
-  complemento     TEXT,
-  bairro          TEXT,
-  cidade          TEXT,
-  uf              TEXT,
-  troco_para      NUMERIC(10,2),
-  obs             TEXT,
-  origem          TEXT DEFAULT 'site',
-  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  total            NUMERIC(10,2) NOT NULL DEFAULT 0,
+  forma_entrega    TEXT DEFAULT 'entrega'
+                     CHECK (forma_entrega  IN ('entrega','retirada')),
+  forma_pagamento  TEXT DEFAULT 'pix'
+                     CHECK (forma_pagamento IN ('pix','cartao','avista','dinheiro','mercadopago')),
+  status_pagamento TEXT NOT NULL DEFAULT 'pendente'
+                     CHECK (status_pagamento IN ('pendente','pago','falhou','estornado')),
+  mp_payment_id    TEXT,
+  cep              TEXT,
+  logradouro       TEXT,
+  numero_end       TEXT,
+  complemento      TEXT,
+  bairro           TEXT,
+  cidade           TEXT,
+  uf               TEXT,
+  troco_para       NUMERIC(10,2),
+  obs              TEXT,
+  origem           TEXT DEFAULT 'site',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Itens de cada pedido
