@@ -228,7 +228,7 @@
     } catch (err) {
       console.error('[initMPBrick]', err);
       document.getElementById('brick-loading').style.display = 'none';
-      mostrarErroBrick('Não foi possível carregar o pagamento. Tente novamente.');
+      mostrarErroBrick('Erro: ' + (err.message || err));
     }
   }
 
