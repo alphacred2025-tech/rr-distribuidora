@@ -169,10 +169,10 @@
         initialization: { amount: pedido.total },
         customization: {
           paymentMethods: {
-            ticket:       'all',
-            creditCard:   'all',
-            debitCard:    'all',
-            mercadoPago:  'all',
+            ticket:      'all',   // PIX + Boleto
+            creditCard:  'all',   // Cartão de crédito
+            debitCard:   'none',  // Remove débito virtual
+            mercadoPago: 'none',  // Remove "Entrar com conta MP"
           },
           visual: { style: { theme: 'default' } },
         },
