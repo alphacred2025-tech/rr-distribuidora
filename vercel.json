@@ -1,6 +1,17 @@
 {
   "cleanUrls": false,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/painel.html",    "destination": "/admin/painel.html",    "permanent": false },
+    { "source": "/afiliados.html", "destination": "/admin/afiliados.html", "permanent": false },
+    { "source": "/comercial.html", "destination": "/admin/comercial.html", "permanent": false },
+    { "source": "/config.html",    "destination": "/admin/config.html",    "permanent": false },
+    { "source": "/estoque.html",   "destination": "/admin/estoque.html",   "permanent": false },
+    { "source": "/financeiro.html","destination": "/admin/financeiro.html","permanent": false },
+    { "source": "/logistica.html", "destination": "/admin/logistica.html","permanent": false },
+    { "source": "/pedidos.html",   "destination": "/admin/pedidos.html",   "permanent": false },
+    { "source": "/relatorios.html","destination": "/admin/relatorios.html","permanent": false }
+  ],
   "headers": [
     {
       "source": "/(.*)",
