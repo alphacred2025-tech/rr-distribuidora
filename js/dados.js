@@ -84,15 +84,129 @@ const CESTAS = [
   { id: 22, nome: 'Cesta Completa 11kg', peso: '11kg', preco: 360.00, categoria: 'completa', descricao: 'A cesta completa mais robusta da RR Distribuidora.', itens: itensBaseCompleta(11) },
 
   // ── OUTRAS OPÇÕES ────────────────────────────────────────
-  { id: 100, nome: 'Cesta Popular',      peso: null, preco: 100.00, categoria: 'especial', descricao: 'Cesta acessível com os produtos mais essenciais para o dia a dia.' },
-  { id: 101, nome: 'Cesta Diferenciada', peso: null, preco: 260.00, categoria: 'especial', descricao: 'Cesta especial com produtos diferenciados e maior variedade.' },
+  {
+    id: 100, nome: 'Cesta Popular', peso: null, preco: 50.00, categoria: 'especial',
+    descricao: 'Cesta acessível com os produtos mais essenciais para o dia a dia.',
+    itens: [
+      { nome: '1 Feijão',         categoria: 'alimento' },
+      { nome: '1 Arroz',          categoria: 'alimento' },
+      { nome: '1 Açúcar',         categoria: 'alimento' },
+      { nome: '1 Sal',            categoria: 'alimento' },
+      { nome: '1 Farinha',        categoria: 'alimento' },
+      { nome: '1 Macarrão',       categoria: 'alimento' },
+      { nome: '2 Flocão',         categoria: 'alimento' },
+      { nome: '1 Bolacha Coquinho', categoria: 'alimento' },
+      { nome: '1 Vinagre',        categoria: 'alimento' },
+      { nome: '1 Suco em Pó',     categoria: 'alimento' },
+      { nome: '1 Biscoito',       categoria: 'alimento' },
+    ],
+  },
+  {
+    id: 101, nome: 'Cesta Diferenciada', peso: null, preco: 260.00, categoria: 'especial',
+    descricao: 'Cesta especial com produtos diferenciados e maior variedade.',
+    itens: [
+      { nome: '2 Feijão Mulatinho', categoria: 'alimento' },
+      { nome: '2 Feijão Preto',     categoria: 'alimento' },
+      { nome: '4 Arroz',            categoria: 'alimento' },
+      { nome: '3 Açúcar',           categoria: 'alimento' },
+      { nome: '4 Macarrão',         categoria: 'alimento' },
+      { nome: '8 Flocão',           categoria: 'alimento' },
+      { nome: '1 Farinha',          categoria: 'alimento' },
+      { nome: '1 Sal',              categoria: 'alimento' },
+      { nome: '2 Óleos',            categoria: 'alimento' },
+      { nome: '2 Leites',           categoria: 'alimento' },
+      { nome: '2 Sardinhas',        categoria: 'alimento' },
+      { nome: '2 Bolachas',         categoria: 'alimento' },
+      { nome: '3 Cafés',            categoria: 'alimento' },
+      { nome: '1 Vinagre',          categoria: 'alimento' },
+      { nome: '2 Margarinas',       categoria: 'alimento' },
+      { nome: '2 Molhos',           categoria: 'alimento' },
+      { nome: '1 Mortadela',        categoria: 'alimento' },
+      { nome: '2 Charques',         categoria: 'alimento' },
+      { nome: '1 Sabão em Pó',           categoria: 'limpeza' },
+      { nome: '1 Detergente',            categoria: 'limpeza' },
+      { nome: '1 Água Sanitária',        categoria: 'limpeza' },
+      { nome: '1 Pct de Papel Higiênico', categoria: 'limpeza' },
+      { nome: '1 Bombril',               categoria: 'limpeza' },
+      { nome: '1 Sabão em Barra',        categoria: 'limpeza' },
+      { nome: '1 Esponja de Prato',      categoria: 'limpeza' },
+      { nome: '1 Creme Dental',   categoria: 'higiene' },
+      { nome: '1 Sabonete',       categoria: 'higiene' },
+    ],
+  },
   { id: 102, nome: 'Cesta Montada',      peso: null, preco: 390.00, categoria: 'especial', descricao: 'Cesta montada com critério, qualidade em cada item escolhido.' },
-  { id: 103, nome: 'Cesta Top RR',       peso: null, preco: 410.00, categoria: 'especial', descricao: 'Nossa cesta premium. O máximo em qualidade e variedade da RR.' },
+  {
+    id: 103, nome: 'Cesta Top RR', peso: null, preco: 410.00, categoria: 'especial',
+    descricao: 'Nossa cesta premium. O máximo em qualidade e variedade da RR.',
+    itens: [
+      { nome: '4kg Feijão Mulatinho', categoria: 'alimento' },
+      { nome: '4kg Feijão Preto',     categoria: 'alimento' },
+      { nome: '10kg Arroz',           categoria: 'alimento' },
+      { nome: '5kg Açúcar',           categoria: 'alimento' },
+      { nome: '10 Pct Macarrão',      categoria: 'alimento' },
+      { nome: '10 Pct Flocão',        categoria: 'alimento' },
+      { nome: '2kg Farinha',          categoria: 'alimento' },
+      { nome: '1kg Sal',              categoria: 'alimento' },
+      { nome: '4 Pct Charque',        categoria: 'alimento' },
+      { nome: '3 Óleos',              categoria: 'alimento' },
+      { nome: '2 Leite',              categoria: 'alimento' },
+      { nome: '3 Sardinha',           categoria: 'alimento' },
+      { nome: '2 Bolacha',            categoria: 'alimento' },
+      { nome: '4 Café',               categoria: 'alimento' },
+      { nome: '2 Margarina',          categoria: 'alimento' },
+      { nome: '2 Doce',               categoria: 'alimento' },
+      { nome: '2 Extrato',            categoria: 'alimento' },
+      { nome: '2 Mortadela',          categoria: 'alimento' },
+      { nome: '1 Sabão em Pó',            categoria: 'limpeza' },
+      { nome: '1 Detergente',             categoria: 'limpeza' },
+      { nome: '1 Água Sanitária',         categoria: 'limpeza' },
+      { nome: '1 Pct Papel Higiênico',    categoria: 'limpeza' },
+      { nome: '1 Bombril',                categoria: 'limpeza' },
+      { nome: '1 Sabão em Barra',         categoria: 'limpeza' },
+      { nome: '1 Esponja de Prato',       categoria: 'limpeza' },
+      { nome: '1 Creme Dental',    categoria: 'higiene' },
+      { nome: '1 Sabonete',        categoria: 'higiene' },
+    ],
+  },
+  {
+    id: 104, nome: 'Cesta Doação 40', peso: null, preco: 40.00, categoria: 'especial',
+    descricao: 'Cesta de doação com itens essenciais.',
+    itens: [
+      { nome: '1 Feijão',  categoria: 'alimento' },
+      { nome: '1 Açúcar',  categoria: 'alimento' },
+      { nome: '1 Arroz',   categoria: 'alimento' },
+      { nome: '1 Sal',     categoria: 'alimento' },
+      { nome: '1 Farinha', categoria: 'alimento' },
+      { nome: '2 Flocão',  categoria: 'alimento' },
+      { nome: '1 Macarrão', categoria: 'alimento' },
+      { nome: '1 Molho',   categoria: 'alimento' },
+    ],
+  },
+  {
+    id: 105, nome: 'Cesta Doação 60', peso: null, preco: 60.00, categoria: 'especial',
+    descricao: 'Cesta de doação com maior variedade de itens essenciais.',
+    itens: [
+      { nome: '1 Feijão',         categoria: 'alimento' },
+      { nome: '1 Arroz',          categoria: 'alimento' },
+      { nome: '1 Açúcar',         categoria: 'alimento' },
+      { nome: '2 Flocão',         categoria: 'alimento' },
+      { nome: '2 Macarrão',       categoria: 'alimento' },
+      { nome: '1 Sal',            categoria: 'alimento' },
+      { nome: '1 Farinha',        categoria: 'alimento' },
+      { nome: '1 Bolacha',        categoria: 'alimento' },
+      { nome: '1 Café',           categoria: 'alimento' },
+      { nome: '1 Sardinha',       categoria: 'alimento' },
+      { nome: '1 Biscoito',       categoria: 'alimento' },
+      { nome: '1 Molho Tomate',   categoria: 'alimento' },
+      { nome: '1 Suco em Pó',     categoria: 'alimento' },
+    ],
+  },
 ];
 
 // ─── Itens disponíveis para personalização (cestas "Outras Opções") ──
-// Mantido para as cestas especiais (100–103), que ainda não têm
-// composição real definida.
+// Mantido apenas para a Cesta Montada (id 102), que ainda não tem
+// composição real definida. As demais cestas especiais já têm sua
+// lista real em CESTAS[].itens.
 
 const ITENS_DISPONIVEIS = [
   { id: 'arroz',        nome: 'Arroz 5kg',                   categoria: 'alimento' },
@@ -116,16 +230,12 @@ const ITENS_DISPONIVEIS = [
   { id: 'sabonete',     nome: 'Sabonete',                    categoria: 'higiene'  },
 ];
 
-// ─── Itens pré-selecionados das cestas especiais (100–103) ───
-// As cestas Simples/Completa (1–22) já trazem sua composição real
-// em CESTAS[].itens — esta tabela só cobre "Outras Opções".
+// ─── Itens pré-selecionados da Cesta Montada (id 102) ────────
+// Única cesta especial ainda sem composição real definida.
 
 const ITENS_POR_PESO = {
   especial: {
-    100: ['arroz', 'feijao', 'acucar', 'sal', 'oleo', 'macarrao'],
-    101: ['arroz', 'feijao', 'acucar', 'sal', 'oleo', 'farinha', 'macarrao', 'molho', 'sardinha', 'cafe', 'biscoito', 'detergente'],
     102: ['arroz', 'feijao', 'acucar', 'sal', 'oleo', 'farinha', 'macarrao', 'molho', 'sardinha', 'cafe', 'biscoito', 'leite', 'achocolatado', 'sabao', 'amaciante', 'detergente', 'papel', 'creme', 'sabonete'],
-    103: ['arroz', 'feijao', 'acucar', 'sal', 'oleo', 'farinha', 'macarrao', 'molho', 'sardinha', 'cafe', 'biscoito', 'leite', 'achocolatado', 'sabao', 'amaciante', 'detergente', 'papel', 'creme', 'sabonete'],
   },
 };
 
