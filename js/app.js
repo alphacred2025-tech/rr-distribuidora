@@ -641,7 +641,7 @@ function _labelPagamento(metodo) {
   return labels[metodo] || 'Mercado Pago';
 }
 
-function initConfirmacao() {
+async function initConfirmacao() {
   const pedido = JSON.parse(localStorage.getItem('rr_pedido') || 'null');
   if (!pedido) { window.location.href = 'index.html'; return; }
 
