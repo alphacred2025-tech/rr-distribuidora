@@ -6,13 +6,18 @@
 const WHATSAPP_NUMBER = '5581996206567';
 
 // ─── Composição real das cestas (Simples e Completa) ──────────
-// Baseado na lista oficial de itens por peso (1kg–11kg).
-// Itens "kg/pct" escalam com o peso da cesta; itens unitários e o
-// kit de limpeza são fixos (óleo dobra a partir da cesta de 11kg).
+// Baseado na lista oficial de itens por peso (1kg–11kg), conforme
+// catálogo fornecido. Arroz/açúcar/macarrão/flocão escalam igual ao
+// peso da cesta; o feijão NÃO escala 1:1 (ver tabela abaixo — segue
+// a quantidade real informada, sem regra linear). Itens unitários e
+// o kit de limpeza são fixos (óleo dobra a partir da cesta de 11kg).
+// 2kg ainda não tem referência exata — usa o mesmo valor de 1kg.
+
+const FEIJAO_POR_KG = { 1:1, 2:1, 3:3, 4:3, 5:4, 6:6, 7:6, 8:7, 9:8, 10:10, 11:10 };
 
 function itensBaseSimples(kg) {
   return [
-    { nome: `Feijão ${kg}kg`,        categoria: 'alimento' },
+    { nome: `Feijão ${FEIJAO_POR_KG[kg]}kg`, categoria: 'alimento' },
     { nome: `Arroz ${kg}kg`,         categoria: 'alimento' },
     { nome: `Açúcar ${kg}kg`,        categoria: 'alimento' },
     { nome: `Macarrão ${kg}pct`,     categoria: 'alimento' },
