@@ -29,7 +29,7 @@ input, select, textarea { font-family: var(--font); }
 
 /* ── Layout ──────────────────────────────────────────────────── */
 .admin-layout { display: flex; min-height: 100vh; }
-.main-wrap    { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; transition: margin-left .3s; }
+.main-wrap    { flex: 1; width: calc(100% - var(--sidebar-w)); margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; transition: margin-left .3s; }
 
 /* ── Sidebar ─────────────────────────────────────────────────── */
 .sidebar {
@@ -353,14 +353,21 @@ input, select, textarea { font-family: var(--font); }
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar--aberta { transform: translateX(0); }
-  .main-wrap { margin-left: 0; }
+  /* min-width:0 é necessário: flex items têm min-width:auto por padrão,
+     que respeita a largura intrínseca dos filhos (cards de KPI, barras
+     de filtro) e impedia o .main-wrap de encolher abaixo da viewport,
+     causando overflow horizontal em toda a página. */
+  .main-wrap { margin-left: 0; width: 100%; min-width: 0; }
   .btn-hamburguer { display: flex; }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .pedido-info-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 540px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
+  /* !important necessário: várias páginas definem grid-template-columns
+     inline (style="...") nos cards de KPI, o que sobrescreve regras de
+     classe normais e causava overflow horizontal em telas pequenas. */
+  .stats-grid { grid-template-columns: 1fr !important; }
   .admin-content { padding: 1rem; }
   .modal { max-width: 100%; }
   .pedido-card__footer { flex-direction: column; align-items: stretch; gap: .75rem; }
@@ -369,8 +376,17 @@ input, select, textarea { font-family: var(--font); }
   .filter-tabs { padding-bottom: .25rem; }
 }
 @media (max-width: 380px) {
-  .stats-grid { grid-template-columns: 1fr; }
   .admin-header__titulo { font-size: .85rem; }
+}
+
+/* Barras de filtro (data início/fim, status, busca) usam flex inline
+   com min-width por item — em telas pequenas a soma excede a viewport.
+   Força cada filtro a ocupar a linha inteira. */
+@media (max-width: 640px) {
+  .card__body[style*="flex-wrap"] > .form-group {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
 }
 
 /* ================================================================
@@ -441,7 +457,14 @@ input, select, textarea { font-family: var(--font); }
   .admin-header__right .btn span,
   .admin-header__right .btn-text { display: none; }
   .admin-header__right .btn { min-width: 44px; padding: 0 .625rem; }
-  .admin-header { padding: .75rem 1rem; }
+  .admin-header { padding: .75rem 1rem; gap: .5rem; }
+  .mes-picker { gap: .25rem; }
+  .mes-picker span { min-width: 70px; font-size: .76rem; }
+  .mes-picker button { padding: .25rem .45rem; }
+}
+@media (max-width: 420px) {
+  .admin-header__right .btn--primary { font-size: .76rem; padding: 0 .55rem; }
+  .admin-header__titulo { font-size: .8rem; }
 }
 
 /* ── Filtros — empilha em coluna no mobile ───────────────────── */
