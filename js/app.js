@@ -198,25 +198,24 @@ function initProduto() {
   document.getElementById('produto-descricao').textContent = cesta.descricao;
   document.title = `${cesta.nome} — RR Distribuidora`;
 
-  const itensPre = getItensParaCesta(cesta.id);
+  const itensCesta = getItensParaCesta(cesta.id);
   const lista = document.getElementById('itens-lista');
 
-  // Agrupa itens por categoria
+  // Agrupa itens reais da cesta por categoria (todos vêm pré-marcados)
   const categorias = { alimento: 'Alimentos', limpeza: 'Limpeza', higiene: 'Higiene' };
   const grupos = {};
-  ITENS_DISPONIVEIS.forEach(item => {
+  itensCesta.forEach(item => {
     if (!grupos[item.categoria]) grupos[item.categoria] = [];
     grupos[item.categoria].push(item);
   });
 
   let html = '';
   Object.entries(grupos).forEach(([cat, itens]) => {
-    html += `<div class="itens-grupo"><h4 class="itens-grupo__titulo">${categorias[cat]}</h4><div class="itens-grupo__lista">`;
-    itens.forEach(item => {
-      const checked = itensPre.includes(item.id) ? 'checked' : '';
+    html += `<div class="itens-grupo"><h4 class="itens-grupo__titulo">${categorias[cat] || cat}</h4><div class="itens-grupo__lista">`;
+    itens.forEach((item, idx) => {
       html += `
-        <label class="item-checkbox ${checked ? 'item-checkbox--checked' : ''}">
-          <input type="checkbox" name="item" value="${item.id}" data-nome="${item.nome}" ${checked}>
+        <label class="item-checkbox item-checkbox--checked">
+          <input type="checkbox" name="item" value="${cat}-${idx}" data-nome="${item.nome}" checked>
           <span class="item-checkbox__box"></span>
           <span class="item-checkbox__nome">${item.nome}</span>
         </label>`;
