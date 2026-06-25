@@ -200,67 +200,82 @@
 
 
   <!-- ═══ POR QUE ESCOLHER ══════════════════════════════════════ -->
-  <section class="section section--why" id="por-que">
-    <div class="container">
-      <div class="section__header" data-reveal>
-        <span class="section__eyebrow">Nossa Diferença</span>
-        <h2>Por que escolher a RR Distribuidora?</h2>
-        <p>Referência em cestas básicas com qualidade, preço justo e atendimento de excelência em toda a região.</p>
+  <section class="section--why" id="por-que">
+    <div class="why__inner">
+
+      <!-- Coluna esquerda: copy -->
+      <div class="why__left" data-reveal="left">
+        <span class="why__eyebrow">Por que a RR?</span>
+        <h2 class="why__titulo">
+          Mais do que uma<br>
+          <span class="why__titulo-accent">cesta básica.</span>
+        </h2>
+        <p class="why__desc">
+          Somos a única distribuidora de Recife que deixa você montar cada cesta do seu jeito — com os produtos que a sua família realmente usa.
+        </p>
+        <a href="#produtos" class="btn btn--gold btn--lg why__cta">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          Montar minha cesta
+        </a>
       </div>
-      <div class="features-grid">
 
-        <div class="feature-card" data-reveal data-delay="100">
-          <div class="feature-card__icon-box feature-card__icon-box--navy">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 4L6 10v10c0 9.2 5.8 17.8 14 20.5C28.2 37.8 34 29.2 34 20V10L20 4z" fill="rgba(255,255,255,.18)" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M13 21.5l5.5 5.5 9-11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Coluna direita: 4 diferenciais em grid 2×2 -->
+      <div class="why__grid">
+
+        <div class="why-item" data-reveal data-delay="100">
+          <div class="why-item__num">01</div>
+          <div class="why-item__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M24 6L8 13v12c0 11 7 21.3 16 24.5C33 46.3 40 36 40 25V13L24 6z" fill="rgba(37,86,212,.15)" stroke="url(#g1)" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M16 26l6.5 6.5 10.5-13" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs><linearGradient id="g1" x1="8" y1="6" x2="40" y2="48"><stop stop-color="#edc235"/><stop offset="1" stop-color="#c49a1a"/></linearGradient></defs>
             </svg>
           </div>
-          <div class="feature-card__stat">100%</div>
-          <h3>Qualidade Garantida</h3>
-          <p>Produtos selecionados das melhores marcas, sempre frescos e com garantia de validade em cada cesta.</p>
+          <h3>Qualidade real</h3>
+          <p>Marcas conhecidas, produtos dentro do prazo. Nada de genérico ou de segunda linha.</p>
         </div>
 
-        <div class="feature-card" data-reveal data-delay="200">
-          <div class="feature-card__icon-box feature-card__icon-box--gold">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="13" fill="rgba(255,255,255,.18)" stroke="white" stroke-width="2"/>
-              <path d="M20 10v2.5M20 27.5V30" stroke="white" stroke-width="2" stroke-linecap="round"/>
-              <path d="M15 15.5c0-1.7 2.2-2.5 4-2 1.8.5 3.5 2 2.5 4-1 2-3.5 2-4.5 4s1 4.5 4 4.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <div class="why-item why-item--highlight" data-reveal data-delay="200">
+          <div class="why-item__num">02</div>
+          <div class="why-item__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="16" fill="rgba(196,154,26,.18)" stroke="url(#g2)" stroke-width="2.2"/>
+              <path d="M24 12v3M24 33v3" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M18 18.5c0-2 2.5-3 5-2.3 2.4.7 4.5 2.7 3 5-1.5 2.3-4.5 2.3-5.5 4.8s1.5 5.5 5 5.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+              <defs><linearGradient id="g2" x1="8" y1="8" x2="40" y2="40"><stop stop-color="#edc235"/><stop offset="1" stop-color="#c49a1a"/></linearGradient></defs>
             </svg>
           </div>
-          <div class="feature-card__stat">Melhor $</div>
-          <h3>Melhor Preço</h3>
-          <p>Compramos em grande volume e repassamos a economia para você. Preço justo sem abrir mão da qualidade.</p>
+          <h3>Preço abaixo do mercado</h3>
+          <p>Compramos direto em volume e repassamos a economia. Você paga menos e recebe mais.</p>
         </div>
 
-        <div class="feature-card" data-reveal data-delay="300">
-          <div class="feature-card__icon-box feature-card__icon-box--navy">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="14" width="22" height="15" rx="2.5" fill="rgba(255,255,255,.18)" stroke="white" stroke-width="2"/>
-              <path d="M25 19h8.5l4.5 7v5H25V19z" fill="rgba(255,255,255,.12)" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-              <circle cx="10" cy="31.5" r="3" fill="white"/>
-              <circle cx="30.5" cy="31.5" r="3" fill="white"/>
-              <path d="M7 20h8M7 23.5h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <div class="why-item" data-reveal data-delay="300">
+          <div class="why-item__num">03</div>
+          <div class="why-item__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <rect x="4" y="18" width="26" height="18" rx="3" fill="rgba(37,86,212,.15)" stroke="url(#g3)" stroke-width="2.2"/>
+              <path d="M30 23h10l5 8v5H30V23z" fill="rgba(37,86,212,.1)" stroke="url(#g3)" stroke-width="2.2" stroke-linejoin="round"/>
+              <circle cx="13" cy="38.5" r="3.5" fill="white"/>
+              <circle cx="36.5" cy="38.5" r="3.5" fill="white"/>
+              <path d="M9 26h9M9 30h6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              <defs><linearGradient id="g3" x1="4" y1="18" x2="45" y2="44"><stop stop-color="#edc235"/><stop offset="1" stop-color="#c49a1a"/></linearGradient></defs>
             </svg>
           </div>
-          <div class="feature-card__stat">Rápido</div>
-          <h3>Entrega Garantida</h3>
-          <p>Entregamos no seu endereço com agilidade e cuidado, ou retire pessoalmente na nossa loja em Recife.</p>
+          <h3>Entrega no dia seguinte</h3>
+          <p>Pediu hoje, chegou amanhã. Recife e região. Ou retire na loja se preferir.</p>
         </div>
 
-        <div class="feature-card" data-reveal data-delay="400">
-          <div class="feature-card__icon-box feature-card__icon-box--gold">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 17h24l-3 17H11L8 17z" fill="rgba(255,255,255,.18)" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M14 17L17 8M26 17l-3-9" stroke="white" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="20" cy="17" r="2.5" fill="white"/>
-              <path d="M20 22v9M15.5 26.5h9" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <div class="why-item why-item--highlight" data-reveal data-delay="400">
+          <div class="why-item__num">04</div>
+          <div class="why-item__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M24 8l3.5 7.5L36 17l-6 5.8 1.4 8.2L24 27l-7.4 4-1-8.2L9.5 17l8.5-1.5z" fill="rgba(196,154,26,.18)" stroke="url(#g4)" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M24 34v6M18 40h12" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+              <defs><linearGradient id="g4" x1="8" y1="8" x2="40" y2="48"><stop stop-color="#edc235"/><stop offset="1" stop-color="#c49a1a"/></linearGradient></defs>
             </svg>
           </div>
-          <div class="feature-card__stat">+26</div>
-          <h3>Ampla Variedade</h3>
-          <p>Mais de 26 produtos para montar sua cesta do jeito que precisar. De 1kg a 11kg + cestas especiais.</p>
+          <h3>+26 produtos, sua escolha</h3>
+          <p>Retira café? Adiciona mais arroz? Pode. Você monta do jeito que quiser, do 1kg ao 11kg.</p>
         </div>
 
       </div>
@@ -268,24 +283,26 @@
   </section>
 
   <!-- ═══ PRODUTOS ═══════════════════════════════════════════════ -->
-  <section id="produtos" class="section">
+  <section id="produtos" class="section section--produtos">
     <div class="container">
-      <div class="section__header" data-reveal>
-        <span class="section__eyebrow">Nosso Catálogo</span>
-        <h2>Nossas Cestas Básicas</h2>
-        <p>Escolha o tamanho ideal para você e sua família. Todos os itens podem ser personalizados.</p>
+      <div class="produtos-header" data-reveal>
+        <div class="produtos-header__left">
+          <span class="section__eyebrow">Nosso Catálogo</span>
+          <h2 class="produtos-header__titulo">Monte sua<br><span class="produtos-titulo-accent">cesta do jeito que quiser</span></h2>
+        </div>
+        <p class="produtos-header__desc">De 1kg a 11kg, com os produtos que sua família realmente usa. Troca, retira, adiciona — sem custo extra.</p>
       </div>
 
       <!-- Abas de categoria -->
       <div class="categorias-tabs" data-reveal data-delay="100">
         <button class="tab-btn tab-btn--active" data-cat="simples">
-          🧺 Cesta Simples
+          Cesta Simples
         </button>
         <button class="tab-btn" data-cat="completa">
-          ⭐ Cesta Completa
+          Cesta Completa
         </button>
         <button class="tab-btn" data-cat="especial">
-          🎁 Outras Opções
+          Outras Opções
         </button>
       </div>
 
@@ -312,7 +329,7 @@
           <p class="testimonial-text">"Já to na terceira compra e toda vez chega certinho. Encomendei a cesta de 7kg semana passada, chegou no outro dia com tudo fresquinho. Valeu demais!"</p>
           <div class="testimonial-author">
             <img
-              src="https://randomuser.me/api/portraits/women/44.jpg"
+              src="https://randomuser.me/api/portraits/women/46.jpg"
               alt="Simone Barros"
               class="testimonial-avatar-img"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
@@ -332,7 +349,7 @@
           <p class="testimonial-text">"Comprei pra levar pra minha mãe que mora em Olinda. Fiz o pedido pelo site, paguei no PIX e no dia seguinte já tinha chegado. Atendimento rápido no WhatsApp também."</p>
           <div class="testimonial-author">
             <img
-              src="https://randomuser.me/api/portraits/men/32.jpg"
+              src="https://randomuser.me/api/portraits/men/79.jpg"
               alt="Rafael Mendonça"
               class="testimonial-avatar-img"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
@@ -352,7 +369,7 @@
           <p class="testimonial-text">"Gostei muito porque pude tirar o café (não bebo) e colocar mais macarrão. Nunca vi isso em outro lugar. O preço tá abaixo do mercado e a qualidade é boa."</p>
           <div class="testimonial-author">
             <img
-              src="https://randomuser.me/api/portraits/women/68.jpg"
+              src="https://randomuser.me/api/portraits/women/71.jpg"
               alt="Patrícia Lemos"
               class="testimonial-avatar-img"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
@@ -372,7 +389,7 @@
           <p class="testimonial-text">"Faço pedido todo mês pra minha família. São 5 pessoas em casa e a cesta de 11kg resolve bem. Já indiquei pra 3 vizinhas minhas aqui no bairro."</p>
           <div class="testimonial-author">
             <img
-              src="https://randomuser.me/api/portraits/women/57.jpg"
+              src="https://randomuser.me/api/portraits/women/65.jpg"
               alt="Dona Conceição"
               class="testimonial-avatar-img"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
@@ -392,7 +409,7 @@
           <p class="testimonial-text">"Uso pra fazer doação na minha igreja. Compro 10 cestas de uma vez e sempre tem desconto. A RR facilita muito, nunca tive problema nenhum."</p>
           <div class="testimonial-author">
             <img
-              src="https://randomuser.me/api/portraits/men/55.jpg"
+              src="https://randomuser.me/api/portraits/men/83.jpg"
               alt="Edilson Santos"
               class="testimonial-avatar-img"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
@@ -412,7 +429,7 @@
           <p class="testimonial-text">"Minha primeira compra foi na dúvida, mas me arrependi de não ter comprado antes. Produto de boa qualidade, entrega pontual e o pessoal responde rápido. Recomendo."</p>
           <div class="testimonial-author">
             <img
-              src="https://randomuser.me/api/portraits/women/23.jpg"
+              src="https://randomuser.me/api/portraits/women/77.jpg"
               alt="Kátia Ferreira"
               class="testimonial-avatar-img"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
