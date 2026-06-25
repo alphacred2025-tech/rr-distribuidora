@@ -543,7 +543,7 @@ function submitCheckout(e) {
 
 // ─── PAGAMENTO ───────────────────────────────────────────────
 
-function initPagamento() {
+async function initPagamento() {
   const pedido = JSON.parse(localStorage.getItem('rr_pedido') || 'null');
   if (!pedido || !pedido.carrinho || pedido.carrinho.length === 0) {
     window.location.href = 'index.html';
@@ -567,6 +567,21 @@ function initPagamento() {
   const totalEl = document.getElementById('mp-total-valor');
   if (totalEl) totalEl.textContent = formatarPreco(pedido.total);
 
+  // Salva o pedido assim que chega na página de pagamento
+  // Garante que todo pedido iniciado apareça no admin, mesmo que o cliente abandone antes de pagar
+  if (typeof salvarPedido === 'function' && !pedido.savedToDb) {
+    try {
+      const savedId = await salvarPedido(pedido);
+      if (savedId) {
+        pedido.savedToDb = true;
+        pedido.dbId = savedId;
+        localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+      }
+    } catch(e) {
+      console.warn('[Pagamento] Save antecipado falhou:', e);
+    }
+  }
+
   // Botão Mercado Pago (Checkout Pro)
   const btnMP = document.getElementById('btn-pagar-mp');
   if (btnMP) {
@@ -585,16 +600,6 @@ function initPagamento() {
         if (!res.ok || !data.init_point) throw new Error(data.error || 'Erro ao criar sessão');
         pedido.pagamento = 'mercadopago';
         localStorage.setItem('rr_pedido', JSON.stringify(pedido));
-
-        // Salva pedido ANTES de redirecionar ao MP
-        // → pedidos com PIX gerado mas não pago ficam visíveis no admin
-        if (typeof salvarPedido === 'function' && !pedido.savedToDb) {
-          const savedId = await salvarPedido(pedido);
-          if (savedId) {
-            pedido.savedToDb = true;
-            localStorage.setItem('rr_pedido', JSON.stringify(pedido));
-          }
-        }
 
         window.location.href = data.init_point;
       } catch (err) {
@@ -649,6 +654,7 @@ async function initConfirmacao() {
   const mpPaymentId   = params.get('payment_id');
   const mpStatus      = params.get('status');
   const mpPaymentType = params.get('payment_type');
+  const mpExternalRef = params.get('external_reference');
 
   if (mpPaymentId) {
     pedido.mpPaymentId = mpPaymentId;
@@ -657,7 +663,6 @@ async function initConfirmacao() {
     else if (!pedido.pagamento || pedido.pagamento === 'mercadopago') pedido.pagamento = 'mercadopago';
     localStorage.setItem('rr_pedido', JSON.stringify(pedido));
 
-    // Pagamento pendente (ex: boleto gerado, PIX aguardando)
     if (mpStatus === 'pending') {
       const subtitulo = document.querySelector('.conf-subtitulo');
       if (subtitulo) subtitulo.textContent = 'Seu pagamento está sendo processado. Você receberá a confirmação em breve.';
@@ -690,33 +695,47 @@ async function initConfirmacao() {
 
   document.getElementById('conf-total').textContent = formatarPreco(pedido.total);
 
-  // Salva pedido se ainda não foi salvo (PIX manual, ou se o save pré-MP falhou)
-  // O status_pagamento é atualizado pelo webhook server-side (anon não tem UPDATE em pedidos)
-  if (!pedido.savedToDb && typeof salvarPedido === 'function') {
-    await salvarPedido(pedido);
+  // Salva pedido no Supabase (sempre tenta — se já foi salvo antes, database.js detecta duplicata)
+  // Garante que pedido chegue ao admin independente do fluxo de pagamento
+  if (typeof salvarPedido === 'function' && !pedido.savedToDb) {
+    try {
+      const savedId = await salvarPedido(pedido);
+      if (savedId) {
+        pedido.savedToDb = true;
+        pedido.dbId = savedId;
+        localStorage.setItem('rr_pedido', JSON.stringify(pedido));
+      }
+    } catch(e) {
+      console.error('[Confirmação] Falha ao salvar pedido:', e);
+    }
   }
 
-  // Botão WhatsApp
+  // Limpa carrinho imediatamente após salvar
+  clearCart();
+
+  // Botão WhatsApp (mantido para o cliente enviar manualmente se quiser)
   const msg = construirMensagemWhatsApp(pedido);
   const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
   const btnWA = document.getElementById('btn-whatsapp');
-  if (btnWA) btnWA.href = waLink;
+  if (btnWA) {
+    btnWA.href = waLink;
+    btnWA.addEventListener('click', () => { localStorage.removeItem('rr_pedido'); });
+  }
 
-  // Countdown para redirect automático
+  // Countdown visual (não redireciona automaticamente — evita perder o save)
   let countdown = 5;
   const countEl = document.getElementById('countdown');
-  const timer = setInterval(() => {
-    countdown--;
-    if (countEl) countEl.textContent = countdown;
-    if (countdown <= 0) {
-      clearInterval(timer);
-      clearCart();
-      window.location.href = waLink;
-    }
-  }, 1000);
-
-  // Limpar carrinho se usuário clicar manualmente
-  if (btnWA) btnWA.addEventListener('click', () => { clearInterval(timer); clearCart(); });
+  const countdownSection = document.querySelector('.conf-countdown');
+  if (countEl && countdownSection) {
+    const timer = setInterval(() => {
+      countdown--;
+      countEl.textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(timer);
+        countdownSection.textContent = 'Pedido registrado! Clique acima para enviar pelo WhatsApp.';
+      }
+    }, 1000);
+  }
 }
 
 // ─── Init por página ─────────────────────────────────────────
