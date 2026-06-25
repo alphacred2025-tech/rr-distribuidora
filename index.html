@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RR Distribuidora — Cestas Básicas de Qualidade em Recife/PE</title>
   <meta name="description" content="Monte sua cesta básica personalizada com a RR Distribuidora. Qualidade, preço justo e entrega rápida em Recife e região." />
-  <link rel="stylesheet" href="css/style.css?v=8" />
+  <link rel="stylesheet" href="css/style.css?v=9" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800;12..96,900&display=swap" rel="stylesheet">
 </head>
 <body data-page="index">
 
@@ -51,6 +53,15 @@
 
   <!-- ═══ HERO ══════════════════════════════════════════════════ -->
   <section class="hero">
+    <!-- Aurora / mesh -->
+    <div class="hero__mesh"  aria-hidden="true"></div>
+    <div class="hero__aurora" aria-hidden="true"></div>
+    <!-- Grid decorativo -->
+    <div class="hero__grid" aria-hidden="true"></div>
+    <!-- Orbs de brilho -->
+    <div class="hero__orb hero__orb--1" aria-hidden="true"></div>
+    <div class="hero__orb hero__orb--2" aria-hidden="true"></div>
+    <div class="hero__orb hero__orb--3" aria-hidden="true"></div>
     <!-- Partículas animadas -->
     <div class="hero__particles" aria-hidden="true">
       <span class="hero__particle"></span>
@@ -64,8 +75,6 @@
       <span class="hero__particle"></span>
       <span class="hero__particle"></span>
     </div>
-    <!-- Grid decorativo -->
-    <div class="hero__grid" aria-hidden="true"></div>
 
     <div class="container">
       <div class="hero__split">
@@ -325,7 +334,13 @@
           </div>
           <p class="testimonial-text">"Já to na terceira compra e toda vez chega certinho. Encomendei a cesta de 7kg semana passada, chegou no outro dia com tudo fresquinho. Valeu demais!"</p>
           <div class="testimonial-author">
-            <div class="testimonial-avatar">S</div>
+            <img
+              src="https://randomuser.me/api/portraits/women/44.jpg"
+              alt="Simone Barros"
+              class="testimonial-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            >
+            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">S</div>
             <div>
               <div class="testimonial-name">Simone Barros</div>
               <div class="testimonial-city">Boa Viagem, Recife</div>
@@ -339,7 +354,13 @@
           </div>
           <p class="testimonial-text">"Comprei pra levar pra minha mãe que mora em Olinda. Fiz o pedido pelo site, paguei no PIX e no dia seguinte já tinha chegado. Atendimento rápido no WhatsApp também."</p>
           <div class="testimonial-author">
-            <div class="testimonial-avatar">R</div>
+            <img
+              src="https://randomuser.me/api/portraits/men/32.jpg"
+              alt="Rafael Mendonça"
+              class="testimonial-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            >
+            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">R</div>
             <div>
               <div class="testimonial-name">Rafael Mendonça</div>
               <div class="testimonial-city">Casa Amarela, Recife</div>
@@ -353,7 +374,13 @@
           </div>
           <p class="testimonial-text">"Gostei muito porque pude tirar o café (não bebo) e colocar mais macarrão. Nunca vi isso em outro lugar. O preço tá abaixo do mercado e a qualidade é boa."</p>
           <div class="testimonial-author">
-            <div class="testimonial-avatar">P</div>
+            <img
+              src="https://randomuser.me/api/portraits/women/68.jpg"
+              alt="Patrícia Lemos"
+              class="testimonial-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            >
+            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">P</div>
             <div>
               <div class="testimonial-name">Patrícia Lemos</div>
               <div class="testimonial-city">Jardim São Paulo, Recife</div>
@@ -367,7 +394,13 @@
           </div>
           <p class="testimonial-text">"Faço pedido todo mês pra minha família. São 5 pessoas em casa e a cesta de 11kg resolve bem. Já indiquei pra 3 vizinhas minhas aqui no bairro."</p>
           <div class="testimonial-author">
-            <div class="testimonial-avatar">D</div>
+            <img
+              src="https://randomuser.me/api/portraits/women/57.jpg"
+              alt="Dona Conceição"
+              class="testimonial-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            >
+            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">D</div>
             <div>
               <div class="testimonial-name">Dona Conceição</div>
               <div class="testimonial-city">Dois Irmãos, Recife</div>
@@ -381,7 +414,13 @@
           </div>
           <p class="testimonial-text">"Uso pra fazer doação na minha igreja. Compro 10 cestas de uma vez e sempre tem desconto. A RR facilita muito, nunca tive problema nenhum."</p>
           <div class="testimonial-author">
-            <div class="testimonial-avatar">E</div>
+            <img
+              src="https://randomuser.me/api/portraits/men/55.jpg"
+              alt="Edilson Santos"
+              class="testimonial-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            >
+            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">E</div>
             <div>
               <div class="testimonial-name">Edilson Santos</div>
               <div class="testimonial-city">Iputinga, Recife</div>
@@ -395,7 +434,13 @@
           </div>
           <p class="testimonial-text">"Minha primeira compra foi na dúvida, mas me arrependi de não ter comprado antes. Produto de boa qualidade, entrega pontual e o pessoal responde rápido. Recomendo."</p>
           <div class="testimonial-author">
-            <div class="testimonial-avatar">K</div>
+            <img
+              src="https://randomuser.me/api/portraits/women/23.jpg"
+              alt="Kátia Ferreira"
+              class="testimonial-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            >
+            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">K</div>
             <div>
               <div class="testimonial-name">Kátia Ferreira</div>
               <div class="testimonial-city">Peixinhos, Olinda</div>
@@ -483,6 +528,6 @@
   <script src="js/dados.js?v=2"></script>
   <script src="js/carrinho.js?v=2"></script>
   <script src="js/app.js?v=3"></script>
-  <script src="js/animations.js?v=1"></script>
+  <script src="js/animations.js?v=2"></script>
 </body>
 </html>
