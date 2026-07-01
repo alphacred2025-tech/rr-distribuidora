@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RR Distribuidora — Cestas Básicas de Qualidade em Recife/PE</title>
   <meta name="description" content="Monte sua cesta básica personalizada com a RR Distribuidora. Qualidade, preço justo e entrega rápida em Recife e região." />
-  <link rel="stylesheet" href="css/style.css?v=10" />
+  <link rel="stylesheet" href="css/style.css?v=11" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@700;800;900&display=swap" rel="stylesheet">
 </head>
@@ -80,9 +80,25 @@
           </div>
         </div>
 
-        <!-- Lado direito: foto real da cesta -->
+        <!-- Lado direito: composição em profundidade -->
         <div class="hero__right" data-reveal="right">
-          <div class="hero__photo-wrap">
+          <div class="hero__photo-scene">
+            <!-- Aura dourada de fundo -->
+            <div class="hero__photo-aura"></div>
+            <!-- Anéis orgânicos em camadas -->
+            <div class="hero__photo-ring hero__photo-ring--1"></div>
+            <div class="hero__photo-ring hero__photo-ring--2"></div>
+            <div class="hero__photo-ring hero__photo-ring--3"></div>
+            <!-- Partículas de grãos estilizadas -->
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <div class="hero__grain"></div>
+            <!-- Foto principal da cesta -->
             <div class="hero__photo-frame">
               <img src="assets/img/cesta-real.png"
                    alt="Cesta Básica RR Distribuidora"
@@ -195,8 +211,9 @@
         <p class="produtos-header__desc">De 1kg a 11kg, com os produtos que sua família realmente usa. Troca, retira, adiciona — sem custo extra.</p>
       </div>
 
-      <!-- Abas de categoria -->
-      <div class="categorias-tabs" data-reveal data-delay="100">
+      <!-- Abas de categoria com indicador deslizante -->
+      <div class="categorias-tabs" id="categorias-tabs" data-reveal data-delay="100">
+        <div class="categorias-tabs__indicator" id="tabs-indicator"></div>
         <button class="tab-btn tab-btn--active" data-cat="simples">
           Cesta Simples
         </button>
@@ -222,129 +239,85 @@
         <h2>O que dizem sobre nós</h2>
         <p>Centenas de famílias já confiam na RR Distribuidora para suas compras mensais.</p>
       </div>
-      <div class="testimonials-grid">
 
-        <div class="testimonial-card" data-reveal data-delay="100">
-          <div class="testimonial-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-          </div>
-          <p class="testimonial-text">"Já to na terceira compra e toda vez chega certinho. Encomendei a cesta de 7kg semana passada, chegou no outro dia com tudo fresquinho. Valeu demais!"</p>
-          <div class="testimonial-author">
-            <img
-              src="https://randomuser.me/api/portraits/women/46.jpg"
-              alt="Simone Barros"
-              class="testimonial-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            >
-            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">S</div>
-            <div>
-              <div class="testimonial-name">Simone Barros</div>
-              <div class="testimonial-city">Boa Viagem, Recife</div>
+      <!-- Carrossel -->
+      <div class="testimonials-carousel" data-reveal data-delay="100">
+        <div class="testimonials-track" id="testimonials-track">
+
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <p class="testimonial-text">"Já to na terceira compra e toda vez chega certinho. Encomendei a cesta de 7kg semana passada, chegou no outro dia com tudo fresquinho. Valeu demais!"</p>
+            <div class="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/women/46.jpg" alt="Simone Barros" class="testimonial-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">S</div>
+              <div><div class="testimonial-name">Simone Barros</div><div class="testimonial-city">Boa Viagem, Recife</div></div>
             </div>
           </div>
-        </div>
 
-        <div class="testimonial-card" data-reveal data-delay="200">
-          <div class="testimonial-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-          </div>
-          <p class="testimonial-text">"Comprei pra levar pra minha mãe que mora em Olinda. Fiz o pedido pelo site, paguei no PIX e no dia seguinte já tinha chegado. Atendimento rápido no WhatsApp também."</p>
-          <div class="testimonial-author">
-            <img
-              src="https://randomuser.me/api/portraits/men/79.jpg"
-              alt="Rafael Mendonça"
-              class="testimonial-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            >
-            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">R</div>
-            <div>
-              <div class="testimonial-name">Rafael Mendonça</div>
-              <div class="testimonial-city">Casa Amarela, Recife</div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <p class="testimonial-text">"Comprei pra levar pra minha mãe que mora em Olinda. Fiz o pedido pelo site, paguei no PIX e no dia seguinte já tinha chegado. Atendimento rápido no WhatsApp também."</p>
+            <div class="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/men/79.jpg" alt="Rafael Mendonça" class="testimonial-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">R</div>
+              <div><div class="testimonial-name">Rafael Mendonça</div><div class="testimonial-city">Casa Amarela, Recife</div></div>
             </div>
           </div>
-        </div>
 
-        <div class="testimonial-card" data-reveal data-delay="300">
-          <div class="testimonial-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-          </div>
-          <p class="testimonial-text">"Gostei muito porque pude tirar o café (não bebo) e colocar mais macarrão. Nunca vi isso em outro lugar. O preço tá abaixo do mercado e a qualidade é boa."</p>
-          <div class="testimonial-author">
-            <img
-              src="https://randomuser.me/api/portraits/women/71.jpg"
-              alt="Patrícia Lemos"
-              class="testimonial-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            >
-            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">P</div>
-            <div>
-              <div class="testimonial-name">Patrícia Lemos</div>
-              <div class="testimonial-city">Jardim São Paulo, Recife</div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <p class="testimonial-text">"Gostei muito porque pude tirar o café (não bebo) e colocar mais macarrão. Nunca vi isso em outro lugar. O preço tá abaixo do mercado e a qualidade é boa."</p>
+            <div class="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/women/71.jpg" alt="Patrícia Lemos" class="testimonial-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">P</div>
+              <div><div class="testimonial-name">Patrícia Lemos</div><div class="testimonial-city">Jardim São Paulo, Recife</div></div>
             </div>
           </div>
-        </div>
 
-        <div class="testimonial-card" data-reveal data-delay="400">
-          <div class="testimonial-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-          </div>
-          <p class="testimonial-text">"Faço pedido todo mês pra minha família. São 5 pessoas em casa e a cesta de 11kg resolve bem. Já indiquei pra 3 vizinhas minhas aqui no bairro."</p>
-          <div class="testimonial-author">
-            <img
-              src="https://randomuser.me/api/portraits/women/65.jpg"
-              alt="Dona Conceição"
-              class="testimonial-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            >
-            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">D</div>
-            <div>
-              <div class="testimonial-name">Dona Conceição</div>
-              <div class="testimonial-city">Dois Irmãos, Recife</div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <p class="testimonial-text">"Faço pedido todo mês pra minha família. São 5 pessoas em casa e a cesta de 11kg resolve bem. Já indiquei pra 3 vizinhas minhas aqui no bairro."</p>
+            <div class="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Dona Conceição" class="testimonial-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">D</div>
+              <div><div class="testimonial-name">Dona Conceição</div><div class="testimonial-city">Dois Irmãos, Recife</div></div>
             </div>
           </div>
-        </div>
 
-        <div class="testimonial-card" data-reveal data-delay="500">
-          <div class="testimonial-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-          </div>
-          <p class="testimonial-text">"Uso pra fazer doação na minha igreja. Compro 10 cestas de uma vez e sempre tem desconto. A RR facilita muito, nunca tive problema nenhum."</p>
-          <div class="testimonial-author">
-            <img
-              src="https://randomuser.me/api/portraits/men/83.jpg"
-              alt="Edilson Santos"
-              class="testimonial-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            >
-            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">E</div>
-            <div>
-              <div class="testimonial-name">Edilson Santos</div>
-              <div class="testimonial-city">Iputinga, Recife</div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <p class="testimonial-text">"Uso pra fazer doação na minha igreja. Compro 10 cestas de uma vez e sempre tem desconto. A RR facilita muito, nunca tive problema nenhum."</p>
+            <div class="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/men/83.jpg" alt="Edilson Santos" class="testimonial-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">E</div>
+              <div><div class="testimonial-name">Edilson Santos</div><div class="testimonial-city">Iputinga, Recife</div></div>
             </div>
           </div>
-        </div>
 
-        <div class="testimonial-card" data-reveal data-delay="600">
-          <div class="testimonial-stars">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-          </div>
-          <p class="testimonial-text">"Minha primeira compra foi na dúvida, mas me arrependi de não ter comprado antes. Produto de boa qualidade, entrega pontual e o pessoal responde rápido. Recomendo."</p>
-          <div class="testimonial-author">
-            <img
-              src="https://randomuser.me/api/portraits/women/77.jpg"
-              alt="Kátia Ferreira"
-              class="testimonial-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            >
-            <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">K</div>
-            <div>
-              <div class="testimonial-name">Kátia Ferreira</div>
-              <div class="testimonial-city">Peixinhos, Olinda</div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <p class="testimonial-text">"Minha primeira compra foi na dúvida, mas me arrependi de não ter comprado antes. Produto de boa qualidade, entrega pontual e o pessoal responde rápido. Recomendo."</p>
+            <div class="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/women/77.jpg" alt="Kátia Ferreira" class="testimonial-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="testimonial-avatar testimonial-avatar--fallback" style="display:none">K</div>
+              <div><div class="testimonial-name">Kátia Ferreira</div><div class="testimonial-city">Peixinhos, Olinda</div></div>
             </div>
           </div>
-        </div>
 
+        </div><!-- /testimonials-track -->
+      </div><!-- /testimonials-carousel -->
+
+      <!-- Controles -->
+      <div class="testimonials-controls">
+        <button class="testimonials-btn" id="t-prev" aria-label="Anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="testimonials-dots" id="t-dots"></div>
+        <button class="testimonials-btn" id="t-next" aria-label="Próximo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
+
     </div>
   </section>
 
