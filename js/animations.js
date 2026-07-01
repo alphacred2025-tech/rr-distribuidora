@@ -1,10 +1,6 @@
-// ============================================================
-// animations.js — RR Distribuidora v2
-// Header scroll, scroll reveal, counters, ripple, cursor glow,
-// testimonial tilt, stagger cards, smooth scroll
-// ============================================================
+// animations.js — RR Distribuidora v3 — Clean Professional
 
-// ─── Header glassmorphism on scroll ─────────────────────────
+// ─── Header shadow on scroll ─────────────────────────────────
 (function initHeaderScroll() {
   const header = document.getElementById('header');
   if (!header) return;
@@ -32,12 +28,12 @@
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.10, rootMargin: '0px 0px -32px 0px' });
+  }, { threshold: 0.10, rootMargin: '0px 0px -24px 0px' });
 
   els.forEach(el => observer.observe(el));
 })();
 
-// ─── Contadores animados (easing) ───────────────────────────
+// ─── Contadores animados ─────────────────────────────────────
 (function initCounters() {
   function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
 
@@ -62,7 +58,7 @@
       if (entry.isIntersecting && !entry.target.dataset.done) {
         entry.target.dataset.done = '1';
         const target = parseInt(entry.target.dataset.target || '0');
-        animateCounter(entry.target, target, 1800);
+        animateCounter(entry.target, target, 1600);
         observer.unobserve(entry.target);
       }
     });
@@ -76,7 +72,7 @@
   if (!document.getElementById('ripple-style')) {
     const style = document.createElement('style');
     style.id = 'ripple-style';
-    style.textContent = '@keyframes rippleAnim{0%{transform:scale(0);opacity:.5}100%{transform:scale(1);opacity:0}}';
+    style.textContent = '@keyframes rippleAnim{0%{transform:scale(0);opacity:.4}100%{transform:scale(1);opacity:0}}';
     document.head.appendChild(style);
   }
 
@@ -85,64 +81,20 @@
     if (!btn) return;
     const ripple = document.createElement('span');
     const rect   = btn.getBoundingClientRect();
-    const size   = Math.max(rect.width, rect.height) * 2.2;
+    const size   = Math.max(rect.width, rect.height) * 2;
     ripple.style.cssText = `
-      position:absolute;
-      border-radius:50%;
-      background:rgba(255,255,255,.25);
-      width:${size}px; height:${size}px;
+      position:absolute;border-radius:50%;
+      background:rgba(255,255,255,.20);
+      width:${size}px;height:${size}px;
       top:${e.clientY - rect.top - size/2}px;
       left:${e.clientX - rect.left - size/2}px;
       transform:scale(0);
-      animation:rippleAnim .65s cubic-bezier(0,.55,.45,1) forwards;
-      pointer-events:none; z-index:10;
+      animation:rippleAnim .6s cubic-bezier(0,.55,.45,1) forwards;
+      pointer-events:none;z-index:10;
     `;
+    btn.style.overflow = 'hidden';
     btn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 700);
-  });
-})();
-
-// ─── Testimonial cards: tilt 3D ao hover ─────────────────────
-(function initCardTilt() {
-  const cards = document.querySelectorAll('.testimonial-card');
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width  - 0.5;
-      const y = (e.clientY - rect.top)  / rect.height - 0.5;
-      card.style.transform = `
-        translateY(-10px) scale(1.01)
-        rotateX(${(-y * 8).toFixed(1)}deg)
-        rotateY(${(x * 8).toFixed(1)}deg)
-      `;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      card.style.transition = 'transform .5s cubic-bezier(.34,1.56,.64,1)';
-      setTimeout(() => { card.style.transition = ''; }, 500);
-    });
-  });
-})();
-
-// ─── Feature cards: micro tilt ───────────────────────────────
-(function initFeatureTilt() {
-  const cards = document.querySelectorAll('.feature-card');
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width  - 0.5;
-      const y = (e.clientY - rect.top)  / rect.height - 0.5;
-      card.style.transform = `
-        translateY(-12px) scale(1.015)
-        rotateX(${(-y * 5).toFixed(1)}deg)
-        rotateY(${(x * 5).toFixed(1)}deg)
-      `;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      card.style.transition = 'transform .5s cubic-bezier(.34,1.56,.64,1), box-shadow .45s ease, border-color .26s ease';
-      setTimeout(() => { card.style.transition = ''; }, 500);
-    });
+    setTimeout(() => ripple.remove(), 650);
   });
 })();
 
@@ -151,13 +103,13 @@ function revealProductCards() {
   const cards = document.querySelectorAll('.produto-card');
   cards.forEach((card, i) => {
     card.style.opacity = '0';
-    card.style.transform = 'translateY(28px) scale(.97)';
+    card.style.transform = 'translateY(16px)';
     card.style.transition = 'none';
     setTimeout(() => {
-      card.style.transition = 'opacity .5s ease, transform .55s cubic-bezier(.34,1.56,.64,1)';
+      card.style.transition = 'opacity .4s ease, transform .4s ease';
       card.style.opacity = '1';
       card.style.transform = 'none';
-    }, i * 75 + 50);
+    }, i * 60 + 40);
   });
 }
 
@@ -179,18 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  setTimeout(revealProductCards, 500);
-
-  // Parallax suave no hero
-  const heroRight = document.querySelector('.hero__right');
-  if (heroRight) {
-    window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      if (y < 800) {
-        heroRight.style.transform = `translateY(${y * 0.06}px)`;
-      }
-    }, { passive: true });
-  }
+  setTimeout(revealProductCards, 400);
 });
 
 // ─── Smooth scroll âncoras internas ──────────────────────────
@@ -203,6 +144,6 @@ document.addEventListener('click', (e) => {
   e.preventDefault();
   const headerH = document.querySelector('.header')?.offsetHeight || 0;
   const annoH   = document.querySelector('.announcement-bar')?.offsetHeight || 0;
-  const top = target.getBoundingClientRect().top + window.scrollY - headerH - annoH - 20;
+  const top = target.getBoundingClientRect().top + window.scrollY - headerH - annoH - 16;
   window.scrollTo({ top, behavior: 'smooth' });
 });
